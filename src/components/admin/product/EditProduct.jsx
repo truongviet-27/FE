@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import "../../../component/admin/image/CardProfile.css";
+import "../../../components/admin/image/CardProfile.css";
 import { getBrands } from "../../../api/BrandApi";
 import { getSale } from "../../../api/SaleApi";
 import { getCategory } from "../../../api/CategoryApi";
@@ -439,7 +439,7 @@ const EditProduct = () => {
               </h4>
               <span className="text-dark">Số lượng</span>{" "}
               <select
-                class="form-control mb-2"
+                className="form-control mb-2"
                 onChange={(e) => changeCountHandler(e.target.value)}
                 value={count}
               >

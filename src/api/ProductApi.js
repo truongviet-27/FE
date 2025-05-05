@@ -1,7 +1,8 @@
 import Instance from "../axios/Instance";
 
 export const getAllProducts = async (page, size, active, token) => {
-    const url = `/api/v1/product/get-all?page=${page}&size=${size}&active=${active}`;
+    const url = `/api/v1/product/get-all?page=${page}&size=${size}&isActive=${active}`;
+    // eslint-disable-next-line no-useless-catch
     try {
         const response = await Instance.get(
             url,
@@ -18,6 +19,7 @@ export const getAllProducts = async (page, size, active, token) => {
 }
 export const getAllProductWishList = async (token, page, size) => {
     const url = `/api/v1/product/wish-list?page=${page}&size=${size}`;
+    // eslint-disable-next-line no-useless-catch
     try {
         const response = await Instance.get(
             url,
@@ -34,6 +36,7 @@ export const getAllProductWishList = async (token, page, size) => {
 }
 
 export const toggleLikeProduct = async (productId, likeStatus, token) => {
+    // eslint-disable-next-line no-useless-catch
     try {
         const response = await Instance.put(
             `/api/v1/product/like?productId=${productId}&liked=${likeStatus}`,
@@ -55,7 +58,7 @@ export const filterProducts = async (data) => {
 }
 
 export const getProductById = async (id) => {
-    const url = `/api/v1/product?id=${id}`;
+    const url = `/api/v1/product/${id}`;
     return await Instance.get(url);
 }
 
