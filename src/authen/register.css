@@ -1,0 +1,40 @@
+  /* .gradient-custom {
+    background: #6a11cb;
+    background: -webkit-linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));
+
+    background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1))
+  }
+
+  .card-registration .select-input.form-control[readonly]:not([disabled]) {
+    font-size: 1rem;
+    line-height: 2.15;
+    padding-left: .75em;
+    padding-right: .75em;
+  }
+
+  .card-registration .select-arrow {
+    top: 13px;
+  } */
+
+  /* Lớp bao quanh để chia thành 2 nhóm (mỗi nhóm 4 trường) */
+  .form-group {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    /* 4 cột, mỗi cột chiếm 1 phần */
+    gap: 16px;
+    /* Khoảng cách giữa các trường */
+    margin-bottom: 20px;
+    /* Khoảng cách giữa các nhóm */
+  }
+
+  .form-group .form-control {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+  }
+
+  label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
