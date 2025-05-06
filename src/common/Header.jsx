@@ -41,6 +41,7 @@ const Header = (props) => {
         e.preventDefault();
         const keyword = e.target.keyword.value.trim();
         if (keyword) {
+            // eslint-disable-next-line react/prop-types
             props.searchHandler(keyword);
             history.push("/search-page");
         }
@@ -58,6 +59,7 @@ const Header = (props) => {
         if (storedUser) {
             console.log("TEN" + storedUser.display_name);
             setUser(storedUser); // Cập nhật trạng thái `user` một lần.
+            // eslint-disable-next-line react/prop-types
             props.userHandler(storedUser);
             setCurrUser({
                 display_name: storedUser.fullName || "Tài khoản",
@@ -72,6 +74,7 @@ const Header = (props) => {
     }, []); // Chỉ chạy một lần khi component được mount.
 
     const signOutHandler = () => {
+        // eslint-disable-next-line react/prop-types
         props.refresh(false);
         toast.success("Tài khoản đã được đăng xuất.");
         localStorage.removeItem("token");
@@ -83,6 +86,7 @@ const Header = (props) => {
             display_name: "Tài khoản",
             image: user_image,
         });
+        // eslint-disable-next-line react/prop-types
         props.userHandler(null);
     };
 
@@ -96,6 +100,7 @@ const Header = (props) => {
                     <ul className="navbar-nav mini-ul">
                         <li
                             className={`nav-item mr-2 mini-item ${
+                                // eslint-disable-next-line react/prop-types
                                 props.header === 1 ? "active" : ""
                             }`}
                         >
@@ -105,6 +110,7 @@ const Header = (props) => {
                         </li>
                         <li
                             className={`nav-item mr-2 mini-item ${
+                                // eslint-disable-next-line react/prop-types
                                 props.header === 2 ? "active" : ""
                             }`}
                         >
@@ -114,6 +120,7 @@ const Header = (props) => {
                         </li>
                         <li
                             className={`cart nav-item mr-2 mini-item ${
+                                // eslint-disable-next-line react/prop-types
                                 props.header === 3 ? "active" : ""
                             }`}
                         >
@@ -124,6 +131,7 @@ const Header = (props) => {
                         {props.user && (
                             <li
                                 className={`order nav-item mr-2 mini-item ${
+                                    // eslint-disable-next-line react/prop-types
                                     props.header === 5 ? "active" : ""
                                 }`}
                             >
@@ -134,6 +142,7 @@ const Header = (props) => {
                         )}
                         <li
                             className={`nav-item mr-2 mini-item ${
+                                // eslint-disable-next-line react/prop-types
                                 props.header === 4 ? "active" : ""
                             }`}
                         >
@@ -143,6 +152,7 @@ const Header = (props) => {
                         </li>
                         <li
                             className={`nav-item mr-2 mini-item ${
+                                // eslint-disable-next-line react/prop-types
                                 props.header === 4 ? "active" : ""
                             }`}
                         >

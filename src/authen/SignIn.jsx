@@ -24,7 +24,6 @@ const SignIn = (props) => {
         };
         signIn(userFlag)
             .then((res) => {
-                console.log(res, "res");
                 const accessToken = res.data.data.accessToken;
                 if (!accessToken) {
                     throw new Error("Token không hợp lệ");
@@ -35,7 +34,6 @@ const SignIn = (props) => {
             })
             .then((res) => {
                 const user = res.data.data;
-                console.log(user, "user");
                 // eslint-disable-next-line react/prop-types
                 props.userHandler(user);
                 // Kiểm tra role và điều hướng

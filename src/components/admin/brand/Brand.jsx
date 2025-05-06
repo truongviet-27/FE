@@ -70,7 +70,7 @@ const Brand = () => {
                 <td>{item.isActive ? "Hoạt động" : "Không hoạt động"}</td>{" "}
                 <td>
                   {" "}
-                  <NavLink to={`/admin/brand-detail/${item.id}`} exact>
+                  <NavLink to={`/admin/brand-detail/${item._id}`} exact>
                     <i className="fa fa-pencil-square-o" aria-hidden="true"></i>
                   </NavLink>{" "}
                 </td>
