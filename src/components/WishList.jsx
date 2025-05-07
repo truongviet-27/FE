@@ -20,10 +20,11 @@ const WishList = () => {
 
     const onLoad = () => {
         const token = localStorage.getItem("token") || null;
-        getAllProductWishList(token, page, 10).then((response) => {
-            setProducts(response.content);
-            setTotal(response.totalPages);
-        })
+        getAllProductWishList(token, page, 10)
+            .then((response) => {
+                setProducts(response.content);
+                setTotal(response.totalPages);
+            })
             .catch((error) => {
                 toast.error(error.response.data.message);
             });
@@ -32,7 +33,7 @@ const WishList = () => {
             .then((resp) => setBrand(resp.data.content))
             .catch((error) => {
                 toast.error(error.message);
-            })
+            });
     };
 
     const onChangePage = (page) => {
@@ -66,7 +67,7 @@ const WishList = () => {
                 })
                 .catch((error) => {
                     toast.warning(error.response.message);
-                })
+                });
         }
     };
     return (
@@ -76,7 +77,9 @@ const WishList = () => {
                     <div className="col-sm-4 mt-2">
                         <select
                             className="form-control"
-                            onChange={(event) => getProductByBrandHandler(event.target.value)}
+                            onChange={(event) =>
+                                getProductByBrandHandler(event.target.value)
+                            }
                         >
                             <option value="0">Tất cả</option>
                             {brand &&
@@ -94,7 +97,7 @@ const WishList = () => {
                             <table>
                                 <thead>
                                     <tr>
-                                        <th scope="col">#</th>
+                                        <th scope="col">STT</th>
                                         <th scope="col">Tên sản phẩm</th>
                                         <th scope="col">Mã sản phẩm</th>
                                         <th scope="col">Thương hiệu</th>
@@ -106,7 +109,10 @@ const WishList = () => {
                                         products.map((item, index) => (
                                             <tr key={index}>
                                                 <th scope="row">
-                                                    <NavLink to={`/product-detail/${item.id}`} exact>
+                                                    <NavLink
+                                                        to={`/product-detail/${item.id}`}
+                                                        exact
+                                                    >
                                                         #{index + 1}
                                                     </NavLink>
                                                 </th>
@@ -117,7 +123,10 @@ const WishList = () => {
                                                     {" "}
                                                     <img
                                                         className="img-fluid"
-                                                        style={{ width: "100px", height: "100px" }}
+                                                        style={{
+                                                            width: "100px",
+                                                            height: "100px",
+                                                        }}
                                                         src={item.image}
                                                         alt=""
                                                     />
@@ -129,9 +138,13 @@ const WishList = () => {
                         </div>
                     </div>
                 </div>
-                <nav aria-label="Page navigation">
-                    <ul className="pagination offset-5 mt-3">
-                        <li className={page === 0 ? "page-item disabled" : "page-item"}>
+                <nav aria-label="Page navigation flex justify-center">
+                    <ul className="flex justify-center pagination mt-3 w-full flex justify-center gap-2">
+                        <li
+                            className={
+                                page === 0 ? "page-item disabled" : "page-item"
+                            }
+                        >
                             <button
                                 className="page-link"
                                 style={{ borderRadius: 50 }}
@@ -141,7 +154,13 @@ const WishList = () => {
                             </button>
                         </li>
                         {rows}
-                        <li className={page === total ? "page-item disabled" : "page-item"}>
+                        <li
+                            className={
+                                page === total
+                                    ? "page-item disabled"
+                                    : "page-item"
+                            }
+                        >
                             <button
                                 className="page-link"
                                 style={{ borderRadius: 50 }}

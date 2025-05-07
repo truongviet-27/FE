@@ -115,13 +115,15 @@ const NewSale = () => {
                                 </select>
                             </div>
                         </div>
-                        <button
-                            className="btn btn-primary btn-lg mt-5 mb-5 offset-4"
-                            type="submit"
-                            style={{ marginLeft: 500, borderRadius: 50 }}
-                        >
-                            Thêm mới
-                        </button>
+                       <div className="flex justify-center">
+                            <button
+                                className="btn btn-primary btn-lg mt-5 mb-5"
+                                type="submit"
+                                style={{ borderRadius: 50 }}
+                            >
+                                Thêm mới
+                            </button>
+                       </div>
                     </form>
                 </div>
             </div>

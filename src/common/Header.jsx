@@ -92,15 +92,14 @@ const Header = (props) => {
 
     return (
         <div className="mini-card">
-            <nav className="navbar navbar-expand-md col-12">
-                <div className="navbar-brand ml-1 col">
+            <nav className="navbar navbar-expand-md">
+                <div className="navbar-brand">
                     <img src={logo} width={50} height={50} alt="logo" />
                 </div>
-                <div className="collapse navbar-collapse col">
-                    <ul className="navbar-nav mini-ul">
+                <div className="flex items-center flex-1">
+                    <ul className="navbar-nav justify-center flex-2">
                         <li
-                            className={`nav-item mr-2 mini-item ${
-                                // eslint-disable-next-line react/prop-types
+                            className={`nav-item mr-2 mini-item text-[14px]${
                                 props.header === 1 ? "active" : ""
                             }`}
                         >
@@ -109,7 +108,7 @@ const Header = (props) => {
                             </NavLink>
                         </li>
                         <li
-                            className={`nav-item mr-2 mini-item ${
+                            className={`nav-item mr-2 mini-item text-[14px]${
                                 // eslint-disable-next-line react/prop-types
                                 props.header === 2 ? "active" : ""
                             }`}
@@ -119,7 +118,7 @@ const Header = (props) => {
                             </NavLink>
                         </li>
                         <li
-                            className={`cart nav-item mr-2 mini-item ${
+                            className={`cart nav-item mr-2 mini-item text-[14px]${
                                 // eslint-disable-next-line react/prop-types
                                 props.header === 3 ? "active" : ""
                             }`}
@@ -130,7 +129,7 @@ const Header = (props) => {
                         </li>
                         {props.user && (
                             <li
-                                className={`order nav-item mr-2 mini-item ${
+                                className={`order nav-item mr-2 mini-item text-[14px]${
                                     // eslint-disable-next-line react/prop-types
                                     props.header === 5 ? "active" : ""
                                 }`}
@@ -141,7 +140,7 @@ const Header = (props) => {
                             </li>
                         )}
                         <li
-                            className={`nav-item mr-2 mini-item ${
+                            className={`nav-item mr-2 mini-item text-[14px]${
                                 // eslint-disable-next-line react/prop-types
                                 props.header === 4 ? "active" : ""
                             }`}
@@ -151,7 +150,7 @@ const Header = (props) => {
                             </NavLink>
                         </li>
                         <li
-                            className={`nav-item mr-2 mini-item ${
+                            className={`nav-item mr-2 mini-item text-[14px]${
                                 // eslint-disable-next-line react/prop-types
                                 props.header === 4 ? "active" : ""
                             }`}
@@ -160,70 +159,58 @@ const Header = (props) => {
                                 Yêu thích
                             </NavLink>
                         </li>
-                        <div className="d-flex align-items-center">
-                            {/* Tìm kiếm */}
-                            <form
-                                className="form-inline d-flex my-2 my-lg-0 mr-3"
-                                onSubmit={submitHandler}
-                            >
-                                <input
-                                    className="form-control mr-sm-2"
-                                    type="search"
-                                    aria-label="Search"
-                                    name="keyword"
-                                />
-                                <button type="submit">
-                                    <i
-                                        className="fa fa-search ml-1"
-                                        aria-hidden="true"
-                                        style={{ fontSize: "12px" }}
-                                    ></i>
-                                </button>
-                            </form>
-
-                            {/* Dropdown Tên Tài Khoản */}
-                            <Dropdown
-                                customToggle={() => (
-                                    <div
-                                        className="topnav__right-user"
-                                        style={{ width: "200%" }}
-                                    >
-                                        <div className="topnav__right-user__image">
-                                            <img
-                                                style={{
-                                                    width: "41px",
-                                                    height: "41px",
-                                                }}
-                                                src={avt}
-                                                alt="user avatar"
-                                            />
-                                        </div>
-                                        <div className="topnav__right-user__name">
-                                            {curr_user.display_name}
-                                        </div>
-                                    </div>
-                                )}
-                                contentData={user ? user_menu : not_menu}
-                                renderItems={(item, index) => (
-                                    <NavLink
-                                        to={item.url}
-                                        key={index}
-                                        exact
-                                        onClick={
-                                            item.url === "/"
-                                                ? signOutHandler
-                                                : null
-                                        }
-                                    >
-                                        <div className="notification-item">
-                                            <i className={item.icon}></i>
-                                            <span>{item.content}</span>
-                                        </div>
-                                    </NavLink>
-                                )}
-                            />
-                        </div>
                     </ul>
+                    <div className="d-flex align-items-center flex-1 justify-between">
+                        {/* Tìm kiếm */}
+                        <form
+                            className="form-inline d-flex my-2 my-lg-0 mr-3"
+                            onSubmit={submitHandler}
+                        >
+                            <input
+                                className="form-control mr-sm-2"
+                                type="search"
+                                aria-label="Search"
+                                name="keyword"
+                            />
+                            <button type="submit">
+                                <i
+                                    className="fa fa-search ml-1"
+                                    aria-hidden="true"
+                                    style={{ fontSize: "12px" }}
+                                ></i>
+                            </button>
+                        </form>
+
+                        {/* Dropdown Tên Tài Khoản */}
+                        <Dropdown
+                            customToggle={() => (
+                                <div className="topnav__right-user flex flex-wrap justify-center">
+                                    <div className="topnav__right-user__image">
+                                        <img src={avt} alt="user avatar" />
+                                    </div>
+                                    <div className="topnav__right-user__name">
+                                        {curr_user.display_name}
+                                    </div>
+                                </div>
+                            )}
+                            contentData={user ? user_menu : not_menu}
+                            renderItems={(item, index) => (
+                                <NavLink
+                                    to={item.url}
+                                    key={index}
+                                    exact
+                                    onClick={
+                                        item.url === "/" ? signOutHandler : null
+                                    }
+                                >
+                                    <div className="notification-item">
+                                        <i className={item.icon}></i>
+                                        <span>{item.content}</span>
+                                    </div>
+                                </NavLink>
+                            )}
+                        />
+                    </div>
                 </div>
             </nav>
         </div>

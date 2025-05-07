@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import "./sidebar.css";
 import { Link, useLocation } from "react-router-dom";
-
 const sidebar_items_1 = [
   {
     "display_name": "Dashboard",
@@ -96,10 +95,10 @@ const Sidebar = (props) => {
   );
 
   return (
-    <div className="sidebar">
-      <div className="sidebar__logo">
-        {/* <img src={logo} alt="store logo" /> */}
-      </div>
+    <div className="sidebar !pt-[95px]">
+      {/* <div className="sidebar__logo">
+        <img src={logo} alt="store logo" />
+      </div> */}
       {sidebar_items.map((item, index) => (
         <Link to={item.route} key={index}>
           <SidebarItem

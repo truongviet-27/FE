@@ -286,7 +286,7 @@ const SearchOrder = () => {
     setFlagSuccess(checked);
   };
   return (
-    <div className="col-12" style={{ marginTop: "25px" }}>
+    <div className="col-12">
       <div className="card">
         {/* <div className="card__header">
           <button style={{ width: 60 }} onClick={() => history.push('/admin/orders')}>

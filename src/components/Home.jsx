@@ -71,39 +71,39 @@ const Home = (props) => {
 
     return (
         <div>
-            <Carousel autoplay autoplaySpeed={3000} style={{ width: "100%" }}>
+            <Carousel autoplay autoplaySpeed={100000} style={{ width: "100%" }}>
                 <div>
                     <img
                         src={second}
                         alt="Second slide"
-                        style={{ width: "100%", height: "50%" }}
+                        style={{ width: "100%", height: "700px" }}
                     />
                 </div>
                 <div>
                     <img
                         src={first}
                         alt="First slide"
-                        style={{ width: "100%", height: "50%" }}
+                        style={{ width: "100%", height: "700px" }}
                     />
                 </div>
                 <div>
                     <img
                         src={third}
                         alt="Third slide"
-                        style={{ width: "100%", height: "50%" }}
+                        style={{ width: "100%", height: "700px" }}
                     />
                 </div>
                 <div>
                     <img
                         src={fourth}
                         alt="Fourth slide"
-                        style={{ width: "100%", height: "50%" }}
+                        style={{ width: "100%", height: "700px" }}
                     />
                 </div>
             </Carousel>
 
             {/* Các phần hiển thị sản phẩm khác */}
-            <div className="col-11 container-fluid card">
+            <div className="col-11 container-fluid card !mt-10">
                 <div className="row padding d-flex">
                     {products.map((item) => (
                         <div className="col-md-4 mb-3" key={item._id}>
@@ -235,9 +235,12 @@ const Home = (props) => {
                                                 exact
                                                 className="btn btn-outline-primary btn-block"
                                             >
-                                                Thêm vào giỏ
+                                                <span className="mr-2">
+                                                    {" "}
+                                                    Thêm vào giỏ
+                                                </span>
                                                 <i
-                                                    className="fa fa-shopping-basket"
+                                                    className="fa fa-shopping-basket ml-10"
                                                     aria-hidden="true"
                                                 ></i>
                                             </NavLink>
@@ -276,7 +279,7 @@ const Home = (props) => {
 
             {/* Pagination */}
             <nav aria-label="Page navigation">
-                <ul className="pagination offset-5 mt-3">
+                <ul className="pagination mt-3 w-full flex justify-center gap-2">
                     <li
                         className={
                             page === 0 ? "page-item disabled" : "page-item"

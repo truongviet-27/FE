@@ -432,8 +432,8 @@ const Product = (props) => {
                                     </div>
                                 ))}
                             </div>
-                            <nav aria-label="Page navigation">
-                                <ul className="pagination offset-5 mt-3">
+                            <nav aria-label="Page navigation flex justify-center">
+                                <ul className="flex justify-center pagination mt-3 w-full flex justify-center gap-2">
                                     <li
                                         className={
                                             page === 0

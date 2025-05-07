@@ -106,13 +106,15 @@ const EditBrand = () => {
                                 </select>
                             </div>
                         </div>
-                        <button
-                            className="btn btn-primary btn-lg mt-5 mb-5"
-                            type="submit"
-                            style={{ marginLeft: 500, borderRadius: 50 }}
-                        >
-                            Cập nhật
-                        </button>
+                        <div className="flex justify-center">
+                            <button
+                                className="btn btn-primary btn-lg mt-5 mb-5"
+                                type="submit"
+                                style={{ borderRadius: 50 }}
+                            >
+                                Cập nhật
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>

@@ -29,7 +29,7 @@ import { useLocation } from "react-router-dom";
 import DashboardAdmin from "../components/admin/dashboard/DashboardAdmin";
 import ProductCreate from "../components/admin/product/ProductCreate";
 import Sidebar from "../components/admin/sidebar/SidebarAdmin";
-import TopNav from "../components/admin/topnav/TopNav"
+import TopNav from "../components/admin/topnav/TopNav";
 import OrderAdmin from "../components/admin/order/OrderAdmin";
 import Category from "../components/admin/category/Category";
 import NewCategory from "../components/admin/category/NewCategory";
@@ -61,7 +61,6 @@ import NewAccount from "../components/admin/account/NewAccount";
 import EditAccount from "../components/admin/account/EditAccount";
 // import ChatAI from "../component/ChatAI";
 
-
 const UserLayout = () => {
     const [user, setUser] = useState(null);
     const [temp, setTemp] = useState(true);
@@ -80,7 +79,7 @@ const UserLayout = () => {
 
     useEffect(() => {
         const savedUser = localStorage.getItem("user");
-        console.log(savedUser)
+        console.log(savedUser);
         if (savedUser) {
             setUser(JSON.parse(savedUser));
         }
@@ -141,208 +140,211 @@ const UserLayout = () => {
         setCartItem(res);
     };
 
-
     const setCartItemHandler = (data) => {
         setCartItem(data);
     };
 
-
     return (
-        <div className={`${isAdminRoute ? "layout" : ""} col-10 offset-1`}>
-            <div >
-                {!isAdminRoute && (
-                    <Header
-                        className="header-content"
-                        searchHandler={searchHandler}
-                        user={user}
-                        userHandler={userHandler}
-                        refresh={refresh}
-                    />
+        // <div className={`${isAdminRoute ? "flex" : ""} col-10 offset-1`}>
+        <div className={`${isAdminRoute ? "flex" : ""}`}>
+            {!isAdminRoute && (
+                <Header
+                    className="header-content"
+                    searchHandler={searchHandler}
+                    user={user}
+                    userHandler={userHandler}
+                    refresh={refresh}
+                />
+            )}
+            {isAdminRoute && <Sidebar user={user} />}
+            <div className={`${isAdminRoute ? "flex-1" : ""} `}>
+                {isAdminRoute && (
+                    <TopNav user={user} userHandler={userHandler} />
                 )}
+                {/* <div className={`${isAdminRoute ? "content-wrapper" : ""} `}> */}
+                <div className={`${isAdminRoute ? "!w-full" : ""} `}>
+                    <Switch>
+                        <Route path="/" exact>
+                            <Home user={user}></Home>
+                        </Route>
 
+                        <Route path="/store" exact>
+                            <Product user={user}></Product>
+                        </Route>
+
+                        <Route path="/sign-in" exact>
+                            <SignIn userHandler={userHandler}></SignIn>
+                        </Route>
+                        <Route path="/change-password" exact>
+                            <ChangePassword
+                                userHandler={userHandler}
+                            ></ChangePassword>
+                        </Route>
+
+                        <Route path="/wish-list" exact>
+                            <WishList></WishList>
+                        </Route>
+
+                        <Route path="/register" exact>
+                            <Register></Register>
+                        </Route>
+
+                        <Route path="/forgot-password" exact>
+                            <ForgotPassword></ForgotPassword>
+                        </Route>
+
+                        <Route path="/profile" exact>
+                            <Profile
+                                user={user}
+                                refresh={refresh}
+                                userHandler={userHandler}
+                            ></Profile>
+                        </Route>
+
+                        <Route path={`/product-detail/:id`} exact>
+                            <ProductDetail
+                                user={user}
+                                addHandler={addHandler}
+                            ></ProductDetail>
+                        </Route>
+
+                        <Route path="/search-page" exact>
+                            <Search keyword={keyword} user={user}></Search>
+                        </Route>
+
+                        <Route path="/cart" exact>
+                            <Cart
+                                outStockHandler={outStockHandler}
+                                buyHandler={buyHandler}
+                                cancelBuyHandler={cancelBuyHandler}
+                                clearBuyHandler={clearBuyHandler}
+                                buy={buy}
+                                user={user}
+                                cartItem={cartItem}
+                                cartHandler={cartHandler}
+                            ></Cart>
+                        </Route>
+
+                        <Route path="/checkout" exact>
+                            <Checkout
+                                temp={temp}
+                                buy={buy}
+                                outStockHandler={outStockHandler}
+                                user={user}
+                                cartItem={cartItem}
+                                clearHandler={clearHandler}
+                                setCartItemHandler={setCartItemHandler}
+                            ></Checkout>
+                        </Route>
+                        <Route path="/order/detail/:id" exact>
+                            <OrderDetail user={user}></OrderDetail>
+                        </Route>
+                        <Route path="/order" exact>
+                            <Order user={user}></Order>
+                        </Route>
+                        <Route path="/blog" exact>
+                            <Blog></Blog>
+                        </Route>
+                        <Route path="/admin/dashboard" exact>
+                            <DashboardAdmin className="dashboard-content"></DashboardAdmin>
+                        </Route>
+                        <Route path="/admin/account" exact>
+                            <Account></Account>
+                        </Route>
+
+                        <Route path="/admin/products" exact>
+                            <ProductAdmin></ProductAdmin>
+                        </Route>
+                        <Route path="/admin/add-product" exact>
+                            <ProductCreate className="add-product"></ProductCreate>
+                        </Route>
+                        <Route path="/admin/orders" exact>
+                            <OrderAdmin></OrderAdmin>
+                        </Route>
+                        <Route path="/admin/categories" exact>
+                            <Category></Category>
+                        </Route>
+                        <Route path="/admin/add-category" exact>
+                            <NewCategory></NewCategory>
+                        </Route>
+                        <Route path="/admin/sale" exact>
+                            <Sale></Sale>
+                        </Route>
+                        <Route path="/admin/add-sale" exact>
+                            <NewSale></NewSale>
+                        </Route>
+                        <Route path="/admin/vouchers" exact>
+                            <Voucher></Voucher>
+                        </Route>
+                        <Route path="/admin/add-voucher" exact>
+                            <NewVoucher></NewVoucher>
+                        </Route>
+                        <Route path="/admin/brand" exact>
+                            <Brand></Brand>
+                        </Route>
+                        <Route path="/admin/add-brand" exact>
+                            <NewBrand></NewBrand>
+                        </Route>
+                        <Route path={`/admin/order-detail/:id`} exact>
+                            <OrderForm></OrderForm>
+                        </Route>
+                        <Route path={`/admin/product-detail/:id`} exact>
+                            <EditProduct></EditProduct>
+                        </Route>
+                        <Route path={`/admin/detail-order/:id`} exact>
+                            <OrderDetailAdmin></OrderDetailAdmin>
+                        </Route>
+                        <Route path={`/admin/voucher-detail/:id`} exact>
+                            <EditVoucher></EditVoucher>
+                        </Route>
+                        <Route path={`/admin/brand-detail/:id`} exact>
+                            <EditBrand></EditBrand>
+                        </Route>
+                        <Route path={`/admin/category-detail/:id`} exact>
+                            <EditCategory></EditCategory>
+                        </Route>
+                        <Route path={`/admin/sale-detail/:id`} exact>
+                            <EditSale></EditSale>
+                        </Route>
+                        <Route path={`/admin/report-product`} exact>
+                            <ReportProduct></ReportProduct>
+                        </Route>
+                        <Route path={`/admin/order-product/:id`} exact>
+                            <OrderProduct></OrderProduct>
+                        </Route>
+                        <Route path={`/admin/report-month/:id`} exact>
+                            <ReportMonth
+                                yearHandler={yearHandler}
+                            ></ReportMonth>
+                        </Route>
+                        <Route path={`/admin/order-month/:id`} exact>
+                            <OrderMonth year={year}></OrderMonth>
+                        </Route>
+                        <Route path={`/admin/product-view/:id`} exact>
+                            <Detail></Detail>
+                        </Route>
+                        <Route path={`/admin/search/:id`} exact>
+                            <SearchOrder></SearchOrder>
+                        </Route>
+                        <Route path={`/admin/error-page`} exact>
+                            <Error></Error>
+                        </Route>
+                        <Route path={`/admin/add-account`} exact>
+                            <NewAccount></NewAccount>
+                        </Route>
+                        <Route path={`/admin/account-detail/:id`} exact>
+                            <EditAccount></EditAccount>
+                        </Route>
+                        {/* <Route path={`/chat/ai`} exact>
+                            <ChatAI></ChatAI>
+                        </Route> */}
+                    </Switch>
+                </div>
             </div>
-            {isAdminRoute && (<Sidebar className="sidebar" user={user} />)}
-            {isAdminRoute && (<div className="topnav">
-                <TopNav user={user} userHandler={userHandler} />
-            </div>)}
-            <div className={`${isAdminRoute ? "content-wrapper" : ""} `}>
-                <Switch>
-                    <Route path="/" exact>
-                        <Home user={user}></Home>
-                    </Route>
 
-                    <Route path="/store" exact>
-                        <Product
-                            user={user}
-                        ></Product>
-                    </Route>
-
-                    <Route path="/sign-in" exact>
-                        <SignIn userHandler={userHandler}></SignIn>
-                    </Route>
-                    <Route path="/change-password" exact>
-                        <ChangePassword userHandler={userHandler}></ChangePassword>
-                    </Route>
-
-                    <Route path="/wish-list" exact>
-                        <WishList></WishList>
-                    </Route>
-
-                    <Route path="/register" exact>
-                        <Register></Register>
-                    </Route>
-
-                    <Route path="/forgot-password" exact>
-                        <ForgotPassword></ForgotPassword>
-                    </Route>
-
-                    <Route path="/profile" exact>
-                        <Profile user={user} refresh={refresh} userHandler={userHandler}></Profile>
-                    </Route>
-
-                    <Route path={`/product-detail/:id`} exact>
-                        <ProductDetail
-                            user={user}
-                            addHandler={addHandler}
-                        ></ProductDetail>
-                    </Route>
-
-                    <Route path="/search-page" exact>
-                        <Search keyword={keyword} user={user}></Search>
-                    </Route>
-
-                    <Route path="/cart" exact>
-                        <Cart
-                            outStockHandler={outStockHandler}
-                            buyHandler={buyHandler}
-                            cancelBuyHandler={cancelBuyHandler}
-                            clearBuyHandler={clearBuyHandler}
-                            buy={buy}
-                            user={user}
-                            cartItem={cartItem}
-                            cartHandler={cartHandler}
-                        ></Cart>
-                    </Route>
-
-                    <Route path="/checkout" exact>
-                        <Checkout
-                            temp={temp}
-                            buy={buy}
-                            outStockHandler={outStockHandler}
-                            user={user}
-                            cartItem={cartItem}
-                            clearHandler={clearHandler}
-                            setCartItemHandler={setCartItemHandler}
-                        ></Checkout>
-                    </Route>
-                    <Route path="/order/detail/:id" exact>
-                        <OrderDetail
-                            user={user}
-                        ></OrderDetail>
-                    </Route>
-                    <Route path="/order" exact>
-                        <Order user={user}></Order>
-                    </Route>
-                    <Route path="/blog" exact>
-                        <Blog></Blog>
-                    </Route>
-                    <Route path="/admin/dashboard" exact>
-                        <DashboardAdmin className="dashboard-content" ></DashboardAdmin>
-                    </Route>
-                    <Route path="/admin/account" exact>
-                        <Account></Account>
-                    </Route>
-
-                    <Route path="/admin/products" exact>
-                        <ProductAdmin></ProductAdmin>
-                    </Route>
-                    <Route path="/admin/add-product" exact>
-                        <ProductCreate className="add-product"></ProductCreate>
-                    </Route>
-                    <Route path="/admin/orders" exact>
-                        <OrderAdmin></OrderAdmin>
-                    </Route>
-                    <Route path="/admin/categories" exact>
-                        <Category></Category>
-                    </Route>
-                    <Route path="/admin/add-category" exact>
-                        <NewCategory></NewCategory>
-                    </Route>
-                    <Route path="/admin/sale" exact>
-                        <Sale></Sale>
-                    </Route>
-                    <Route path="/admin/add-sale" exact>
-                        <NewSale></NewSale>
-                    </Route>
-                    <Route path="/admin/vouchers" exact>
-                        <Voucher></Voucher>
-                    </Route>
-                    <Route path="/admin/add-voucher" exact>
-                        <NewVoucher></NewVoucher>
-                    </Route>
-                    <Route path="/admin/brand" exact>
-                        <Brand></Brand>
-                    </Route>
-                    <Route path="/admin/add-brand" exact>
-                        <NewBrand></NewBrand>
-                    </Route>
-                    <Route path={`/admin/order-detail/:id`} exact>
-                        <OrderForm></OrderForm>
-                    </Route>
-                    <Route path={`/admin/product-detail/:id`} exact>
-                        <EditProduct></EditProduct>
-                    </Route>
-                    <Route path={`/admin/detail-order/:id`} exact>
-                        <OrderDetailAdmin></OrderDetailAdmin>
-                    </Route>
-                    <Route path={`/admin/voucher-detail/:id`} exact>
-                        <EditVoucher></EditVoucher>
-                    </Route>
-                    <Route path={`/admin/brand-detail/:id`} exact>
-                        <EditBrand></EditBrand>
-                    </Route>
-                    <Route path={`/admin/category-detail/:id`} exact>
-                        <EditCategory></EditCategory>
-                    </Route>
-                    <Route path={`/admin/sale-detail/:id`} exact>
-                        <EditSale></EditSale>
-                    </Route>
-                    <Route path={`/admin/report-product`} exact>
-                        <ReportProduct></ReportProduct>
-                    </Route>
-                    <Route path={`/admin/order-product/:id`} exact>
-                        <OrderProduct></OrderProduct>
-                    </Route>
-                    <Route path={`/admin/report-month/:id`} exact>
-                        <ReportMonth yearHandler={yearHandler}></ReportMonth>
-                    </Route>
-                    <Route path={`/admin/order-month/:id`} exact>
-                        <OrderMonth year={year}></OrderMonth>
-                    </Route>
-                    <Route path={`/admin/product-view/:id`} exact>
-                        <Detail></Detail>
-                    </Route>
-                    <Route path={`/admin/search/:id`} exact>
-                        <SearchOrder></SearchOrder>
-                    </Route>
-                    <Route path={`/admin/error-page`} exact>
-                        <Error></Error>
-                    </Route>
-                    <Route path={`/admin/add-account`} exact>
-                        <NewAccount></NewAccount>
-                    </Route>
-                    <Route path={`/admin/account-detail/:id`} exact>
-                        <EditAccount></EditAccount>
-                    </Route>
-                    {/* <Route path={`/chat/ai`} exact>
-                        <ChatAI></ChatAI>
-                    </Route> */}
-                </Switch>
-            </div>
-
-            {!isAdminRoute && (<Footer></Footer>)}
+            {!isAdminRoute && <Footer></Footer>}
             <ToastContainer></ToastContainer>
         </div>
     );
-}
+};
 export default UserLayout;
