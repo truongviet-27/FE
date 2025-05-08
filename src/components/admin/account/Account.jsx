@@ -22,10 +22,11 @@ const Account = () => {
     const [page, setPage] = useState(0);
     const [total, setTotal] = useState();
     const [role, setRole] = useState("TẤT CẢ");
+    const [size, setSize] = useState(10);
 
     var rows = new Array(total).fill(0).map((zero, index) => (
         <li
-            className={page === index + 1 ? "page-item active" : "page-item"}
+            className={page === index ? "page-item active" : "page-item"}
             key={index}
         >
             <button
@@ -43,16 +44,19 @@ const Account = () => {
     };
     useEffect(() => {
         onLoad();
-    }, [page]);
+    }, [page, size]);
 
     const onLoad = () => {
-        getAccounts(page, 9)
-            .then((resp) => setAccount(resp.data))
+        getAccounts(page, size)
+            .then((resp) => {
+                setAccount(resp.data.content);
+                setTotal(resp.data.totalPages);
+            })
             .catch((error) => console.log(error));
 
-        getTotalPage()
-            .then((resp) => setTotal(resp.data))
-            .catch((error) => console.log(error));
+        // getTotalPage()
+        //     .then((resp) => setTotal(resp.data.content))
+        //     .catch((error) => console.log(error));
     };
 
     const getAccountByRoleHandler = (value) => {
@@ -63,80 +67,86 @@ const Account = () => {
         } else {
             setPage(0);
             getAccountByRole(0, 9, value)
-                .then((resp) => setAccount(resp.data))
+                .then((resp) => setAccount(resp.data.content))
                 .catch((error) => console.log(error));
         }
     };
     return (
-        <div className="col-12">
-            <div className="card">
+        <div className="card flex flex-col justify-between !mx-[25px] overflow-y-hidden">
+            <div>
                 <div className="card__header mb-5">
                     <NavLink
-                        to="/admin/add-account"
+                        to="/admin/account/add-account"
                         className="btn btn-primary"
                         style={{ borderRadius: 50 }}
                     >
                         Thêm tài khoản
                     </NavLink>
                 </div>
-                <div className="mb-3 mt-3">
-                    <div className="form-check form-check-inline mr-5 ml-1">
-                        <input
-                            className="form-check-input"
-                            type="radio"
-                            name="inlineRadioOptions"
-                            value="TẤT CẢ"
-                            onChange={(event) =>
-                                getAccountByRoleHandler(event.target.value)
-                            }
-                            checked={role === "TẤT CẢ"}
-                        />
-                        <label className="form-check-label">Tất cả</label>
+                <div>
+                    <div className="mb-3 mt-3">
+                        <div className="form-check form-check-inline mr-5 ml-1">
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                name="inlineRadioOptions"
+                                value="TẤT CẢ"
+                                onChange={(event) =>
+                                    getAccountByRoleHandler(event.target.value)
+                                }
+                                checked={role === "TẤT CẢ"}
+                            />
+                            <label className="form-check-label">Tất cả</label>
+                        </div>
+                        <div className="form-check form-check-inline mr-5 ml-1">
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                name="inlineRadioOptions"
+                                value="ADMIN"
+                                onChange={(event) =>
+                                    getAccountByRoleHandler(event.target.value)
+                                }
+                                checked={role === "ADMIN"}
+                            />
+                            <label className="form-check-label">ADMIN</label>
+                        </div>
+                        <div className="form-check form-check-inline mr-5 ml-1">
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                name="inlineRadioOptions"
+                                value="CUSTOMER"
+                                onChange={(event) =>
+                                    getAccountByRoleHandler(event.target.value)
+                                }
+                                checked={role === "CUSTOMER"}
+                            />
+                            <label className="form-check-label">
+                                Khách hàng
+                            </label>
+                        </div>
                     </div>
-                    <div className="form-check form-check-inline mr-5 ml-1">
-                        <input
-                            className="form-check-input"
-                            type="radio"
-                            name="inlineRadioOptions"
-                            value="ADMIN"
-                            onChange={(event) =>
-                                getAccountByRoleHandler(event.target.value)
-                            }
-                            checked={role === "ADMIN"}
-                        />
-                        <label className="form-check-label">ADMIN</label>
-                    </div>
-                    <div className="form-check form-check-inline mr-5 ml-1">
-                        <input
-                            className="form-check-input"
-                            type="radio"
-                            name="inlineRadioOptions"
-                            value="CUSTOMER"
-                            onChange={(event) =>
-                                getAccountByRoleHandler(event.target.value)
-                            }
-                            checked={role === "CUSTOMER"}
-                        />
-                        <label className="form-check-label">Khách hàng</label>
-                    </div>
-                </div>
-                <table className="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th scope="col">Username</th>
-                            <th scope="col">Họ tên</th>
-                            <th scope="col">Giới tính</th>
-                            <th scope="col">SDT</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Vai trò</th>
-                            <th scope="col">Trạng thái</th>
-                            <th scope="col">Cập nhật</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {account &&
-                            account.map((item, index) => (
+                    <table className="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col">STT</th>
+                                <th scope="col">Username</th>
+                                <th scope="col">Họ tên</th>
+                                <th scope="col">Giới tính</th>
+                                <th scope="col">SDT</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Vai trò</th>
+                                <th scope="col">Trạng thái</th>
+                                <th scope="col">Cập nhật</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {account?.map((item, index) => (
                                 <tr key={index}>
+                                    <th scope="row">
+                                        {index + 1 + page * size}
+                                    </th>
                                     <th scope="row">{item.username}</th>
                                     <td style={{ width: "200px" }}>
                                         {item.fullName}
@@ -145,10 +155,9 @@ const Account = () => {
                                     <td>{item.phone}</td>
                                     <td>{item.email}</td>
                                     <td>
-                                        {" "}
                                         <Badge
-                                            type={roleName[item.roleName]}
-                                            content={item.roleName}
+                                            type={roleName[item.role]}
+                                            content={item.role}
                                         />
                                     </td>
                                     <td>
@@ -163,7 +172,7 @@ const Account = () => {
                                     </td>
                                     <td>
                                         <NavLink
-                                            to={`/admin/account-detail/${item.id}`}
+                                            to={`/admin/account/account-detail/${item._id}`}
                                             exact
                                         >
                                             <i
@@ -174,10 +183,18 @@ const Account = () => {
                                     </td>
                                 </tr>
                             ))}
-                    </tbody>
-                </table>
-                <nav aria-label="Page navigation flex justify-center">
-                    <ul className="flex justify-center pagination mt-3 w-full flex justify-center gap-2">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <nav
+                aria-label="Page navigation"
+                className="flex items-center justify-between mt-3"
+            >
+                <div className="w-[100px]" />
+
+                <div className="flex-1 flex justify-center items-center">
+                    <div className="flex pagination gap-2">
                         <li
                             className={
                                 page === 0 ? "page-item disabled" : "page-item"
@@ -194,7 +211,7 @@ const Account = () => {
                         {rows}
                         <li
                             className={
-                                page === total
+                                page === total - 1
                                     ? "page-item disabled"
                                     : "page-item"
                             }
@@ -202,14 +219,27 @@ const Account = () => {
                             <button
                                 className="page-link"
                                 style={{ borderRadius: 50 }}
-                                onClick={() => onChangePage(total)}
+                                onClick={() => onChangePage(page + 1)}
                             >
                                 {`>>`}
                             </button>
                         </li>
-                    </ul>
-                </nav>
-            </div>
+                    </div>
+                </div>
+
+                <div className="w-[100px] flex justify-end">
+                    <select
+                        className="py-2 pl-2 border border-gray-100 rounded-[6px]"
+                        onChange={(e) => setSize(e.target.value)}
+                    >
+                        <option value={5}>5</option>
+                        <option value={10}>10</option>
+                        <option value={20}>20</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                    </select>
+                </div>
+            </nav>
         </div>
     );
 };

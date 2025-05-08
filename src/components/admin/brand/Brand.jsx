@@ -1,21 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { getBrands } from "../../../api/BrandApi";
+import formatDate from "../../../utils/convertDate";
 
 const Brand = () => {
     const [brand, setBrand] = useState();
     const [page, setPage] = useState(0);
     const [total, setTotal] = useState();
+    const [size, setSize] = useState(10);
 
     var rows = new Array(total).fill(0).map((zero, index) => (
         <li
-            className={page === index + 1 ? "page-item active" : "page-item"}
+            className={page === index ? "page-item active" : "page-item"}
             key={index}
         >
             <button
                 className="page-link"
                 style={{ borderRadius: 50 }}
-                onClick={() => onChangePage(index + 1)}
+                onClick={() => onChangePage(index)}
             >
                 {index + 1}
             </button>
@@ -28,69 +30,77 @@ const Brand = () => {
 
     useEffect(() => {
         onLoad();
-    }, [page]);
+    }, [page, size]);
 
     const onLoad = () => {
-        getBrands(page, 9).then((resp) => {
+        getBrands(page, size).then((resp) => {
             setBrand(resp.data.content);
             setTotal(resp.data.totalPages);
         });
     };
 
     return (
-        <div className="col-12">
-            <div className="card">
+        <div className="card flex flex-col justify-between !mx-[25px] overflow-y-hidden">
+            <div>
                 <div className="card__header mb-5">
                     <NavLink
-                        to="/admin/add-brand"
+                        to="/admin/brand/add-brand"
                         className="btn btn-primary"
                         style={{ borderRadius: 50 }}
                     >
                         Thêm thương hiệu
                     </NavLink>
                 </div>
-                <table className="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th scope="col">STT</th>
-                            <th scope="col">Tên thương hiệu</th>
-                            <th scope="col">Mô tả</th>
-                            <th scope="col">Ngày tạo</th>
-                            <th scope="col">Trạng thái</th>
-                            <th scope="col">Cập nhật</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {brand &&
-                            brand.map((item, index) => (
+                <div className="overflow-y-auto max-h-[500px]">
+                    <table className="table table-bordered w-full">
+                        <thead className="sticky">
+                            <tr>
+                                <th scope="col">STT</th>
+                                <th scope="col">Tên thương hiệu</th>
+                                <th scope="col">Mô tả</th>
+                                <th scope="col">Ngày tạo</th>
+                                <th scope="col">Trạng thái</th>
+                                <th scope="col">Cập nhật</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {brand?.map((item, index) => (
                                 <tr key={index}>
-                                    <th scope="row">{index + 1}</th>
+                                    <th scope="row">
+                                        {index + 1 + page * size}
+                                    </th>
                                     <td>{item.name}</td>
                                     <td>{item.description}</td>
-                                    <td>{item.createDate}</td>
+                                    <td>{formatDate(item.createdAt)}</td>
                                     <td>
                                         {item.isActive
                                             ? "Hoạt động"
                                             : "Không hoạt động"}
-                                    </td>{" "}
+                                    </td>
                                     <td>
-                                        {" "}
                                         <NavLink
-                                            to={`/admin/brand-detail/${item._id}`}
-                                            exact
+                                            to={`/admin/brand/brand-detail/${item._id}`}
                                         >
                                             <i
                                                 className="fa fa-pencil-square-o"
                                                 aria-hidden="true"
                                             ></i>
-                                        </NavLink>{" "}
+                                        </NavLink>
                                     </td>
                                 </tr>
                             ))}
-                    </tbody>
-                </table>
-                <nav aria-label="Page navigation flex justify-center">
-                    <ul className="flex justify-center pagination mt-3 w-full flex justify-center gap-2">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <nav
+                aria-label="Page navigation"
+                className="flex items-center justify-between mt-3"
+            >
+                <div className="w-[100px]" />
+
+                <div className="flex-1 flex justify-center items-center">
+                    <div className="flex pagination gap-2">
                         <li
                             className={
                                 page === 0 ? "page-item disabled" : "page-item"
@@ -107,7 +117,7 @@ const Brand = () => {
                         {rows}
                         <li
                             className={
-                                page === total
+                                page === total - 1
                                     ? "page-item disabled"
                                     : "page-item"
                             }
@@ -115,14 +125,28 @@ const Brand = () => {
                             <button
                                 className="page-link"
                                 style={{ borderRadius: 50 }}
-                                onClick={() => onChangePage(total)}
+                                onClick={() => onChangePage(total - 1)}
                             >
                                 {`>>`}
                             </button>
                         </li>
-                    </ul>
-                </nav>
-            </div>
+                    </div>
+                </div>
+
+                <div className="w-[100px] flex justify-end">
+                    <select
+                        className="py-2 pl-2 border border-gray-100 rounded-[6px]"
+                        onChange={(e) => setSize(e.target.value)}
+                        value={size}
+                    >
+                        <option value={5}>5</option>
+                        <option value={10}>10</option>
+                        <option value={20}>20</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                    </select>
+                </div>
+            </nav>
         </div>
     );
 };

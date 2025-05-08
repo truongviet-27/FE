@@ -49,6 +49,8 @@ const Order = () => {
     const [shipDate, setShipDate] = useState(null);
     const [paymentMethod, setPaymentMethod] = useState("");
 
+    const [size, setSize] = useState(10);
+
     const shipmentHandler = (value) => {
         console.log(value);
         setShipment(value);
@@ -170,10 +172,10 @@ const Order = () => {
 
     useEffect(() => {
         onLoad();
-    }, [page]);
+    }, [page, size]);
 
     const onLoad = () => {
-        getAllOrderAndPagination(status, paymentMethod, page, 20)
+        getAllOrderAndPagination(status, paymentMethod, page, size)
             .then((res) => {
                 setOrders(res.data.content);
                 setTotal(res.data.totalPages);
@@ -394,222 +396,268 @@ const Order = () => {
         setFlagSuccess(checked);
     };
     return (
-        <div className="col-12">
-            <div className="card">
-                <div className="card__header">
-                    <h3>Đơn hàng</h3>
-                </div>
-                <div className="row">
-                    <div className="col-sm-4 mt-2">
-                        <select
-                            className="form-control"
-                            onChange={(event) =>
-                                getAllOrderByStatus(event.target.value)
-                            }
-                        >
-                            <option value="0">Tất cả</option>
-                            {orderStatuses &&
-                                orderStatuses.map((item, index) => (
-                                    <option key={index} value={item.id}>
-                                        {item.name}
-                                    </option>
-                                ))}
-                        </select>
+        <>
+            <div className="card flex flex-col justify-between !mx-[25px] overflow-y-hidden">
+                <div>
+                    <div className="card__header">
+                        <h3>Đơn hàng</h3>
                     </div>
-                    <div className="col-sm-4 mt-2">
-                        <select
-                            className="form-control"
-                            onChange={(e) => changeYearHandler(e.target.value)}
-                            value={year}
-                        >
-                            <option value="">Chọn năm</option>
-                            <option value="2023">2023</option>
-                            <option value="2024">2024</option>
-                            <option value="2025">2025</option>
-                        </select>
+                    <div className="row">
+                        <div className="col-sm-4 mt-2">
+                            <select
+                                className="form-control"
+                                onChange={(event) =>
+                                    getAllOrderByStatus(event.target.value)
+                                }
+                            >
+                                <option value="0">Tất cả</option>
+                                {orderStatuses &&
+                                    orderStatuses.map((item, index) => (
+                                        <option key={index} value={item.id}>
+                                            {item.name}
+                                        </option>
+                                    ))}
+                            </select>
+                        </div>
+                        <div className="col-sm-4 mt-2">
+                            <select
+                                className="form-control"
+                                onChange={(e) =>
+                                    changeYearHandler(e.target.value)
+                                }
+                                value={year}
+                            >
+                                <option value="">Chọn năm</option>
+                                <option value="2023">2023</option>
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                            </select>
+                        </div>
+                        <div className="col-sm-4 mt-2">
+                            <select
+                                className="form-control"
+                                onChange={(e) =>
+                                    getAllOrderByOrderStatusAndYearAndMonth(
+                                        e.target.value
+                                    )
+                                }
+                                value={month}
+                            >
+                                <option value="">Chọn tháng</option>
+                                {months &&
+                                    months.map((item, index) => (
+                                        <option key={index} value={item}>
+                                            Tháng {item}
+                                        </option>
+                                    ))}
+                            </select>
+                        </div>
                     </div>
-                    <div className="col-sm-4 mt-2">
-                        <select
-                            className="form-control"
-                            onChange={(e) =>
-                                getAllOrderByOrderStatusAndYearAndMonth(
-                                    e.target.value
-                                )
-                            }
-                            value={month}
-                        >
-                            <option value="">Chọn tháng</option>
-                            {months &&
-                                months.map((item, index) => (
-                                    <option key={index} value={item}>
-                                        Tháng {item}
-                                    </option>
-                                ))}
-                        </select>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-sm-4 mt-2">
-                        <input
-                            type="date"
-                            name=""
-                            id=""
-                            className="border"
-                            onChange={(e) => setFrom(e.target.value)}
-                            value={from}
-                        />
-                    </div>
+                    <div className="row">
+                        <div className="col-sm-4 mt-2">
+                            <input
+                                type="date"
+                                name=""
+                                id=""
+                                className="border w-full !rounded-[6px]"
+                                onChange={(e) => setFrom(e.target.value)}
+                                value={from}
+                            />
+                        </div>
 
-                    <div className="col-sm-4 mt-2">
-                        <input
-                            type="date"
-                            name=""
-                            id=""
-                            className="border"
-                            onChange={(e) => setTo(e.target.value)}
-                            value={to}
-                        />
-                    </div>
-                    <div className="col-sm-4 mt-2">
-                        <select
-                            className="form-control"
-                            onChange={(event) =>
-                                getAllOrdersByPaymentStatus(event.target.value)
-                            }
-                        >
-                            <option value="null">Phương thức thanh toán</option>
-                            <option value="Thanh toán khi giao hàng(COD)">
-                                Thanh toán khi giao hàng (COD)
-                            </option>
-                            <option value="CHUYỂN KHOẢN QUA VNPAY">
-                                Chuyển khoản qua VNPay
-                            </option>
-                        </select>
-                    </div>
+                        <div className="col-sm-4 mt-2">
+                            <input
+                                type="date"
+                                name=""
+                                id=""
+                                className="border w-full !rounded-[6px]"
+                                onChange={(e) => setTo(e.target.value)}
+                                value={to}
+                            />
+                        </div>
+                        <div className="col-sm-4 mt-2">
+                            <select
+                                className="form-control"
+                                onChange={(event) =>
+                                    getAllOrdersByPaymentStatus(
+                                        event.target.value
+                                    )
+                                }
+                            >
+                                <option value="null">
+                                    Phương thức thanh toán
+                                </option>
+                                <option value="Thanh toán khi giao hàng(COD)">
+                                    Thanh toán khi giao hàng (COD)
+                                </option>
+                                <option value="CHUYỂN KHOẢN QUA VNPAY">
+                                    Chuyển khoản qua VNPay
+                                </option>
+                            </select>
+                        </div>
 
-                    <div
-                        className="btn btn-primary mt-2"
-                        onClick={() => searchHandler()}
-                    >
-                        Tìm kiếm
+                        <div className="flex justify-center items-center mt-4 mb-4">
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => searchHandler()}
+                            >
+                                Tìm kiếm
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <div className="row"></div>
-                <div className="card__body">
-                    {orders && (
-                        <div>
-                            <div className="table-wrapper">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Mã đơn hàng</th>
-                                            <th scope="col">Ngày mua</th>
-                                            <th scope="col">Hình thức</th>
-                                            <th scope="col">Thanh toán</th>
-                                            <th scope="col">Tổng tiền</th>
-                                            {paymentMethod !==
-                                                "CHUYỂN KHOẢN QUA VNPAY" && (
+                    <div className="card__body">
+                        {orders && (
+                            <div>
+                                <div className="table-wrapper">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Mã đơn hàng</th>
+                                                <th scope="col">Ngày mua</th>
+                                                <th scope="col">Hình thức</th>
+                                                <th scope="col">Thanh toán</th>
+                                                <th scope="col">Tổng tiền</th>
+                                                {paymentMethod !==
+                                                    "CHUYỂN KHOẢN QUA VNPAY" && (
+                                                    <th scope="col">
+                                                        <Badge
+                                                            type={
+                                                                orderStatus[
+                                                                    "Chờ xác nhận"
+                                                                ]
+                                                            }
+                                                            content={
+                                                                "Chờ xác nhận"
+                                                            }
+                                                        />
+                                                    </th>
+                                                )}
                                                 <th scope="col">
                                                     <Badge
                                                         type={
                                                             orderStatus[
-                                                                "Chờ xác nhận"
+                                                                "Đang xử lí"
                                                             ]
                                                         }
-                                                        content={"Chờ xác nhận"}
+                                                        content={"Đang xử lí"}
                                                     />
                                                 </th>
-                                            )}
-                                            <th scope="col">
-                                                <Badge
-                                                    type={
-                                                        orderStatus[
-                                                            "Đang xử lí"
-                                                        ]
-                                                    }
-                                                    content={"Đang xử lí"}
-                                                />
-                                            </th>
-                                            <th scope="col">
-                                                <Badge
-                                                    type={
-                                                        orderStatus[
+                                                <th scope="col">
+                                                    <Badge
+                                                        type={
+                                                            orderStatus[
+                                                                "Đang vận chuyển"
+                                                            ]
+                                                        }
+                                                        content={
                                                             "Đang vận chuyển"
-                                                        ]
-                                                    }
-                                                    content={"Đang vận chuyển"}
-                                                />
-                                            </th>
-                                            <th scope="col">
-                                                <Badge
-                                                    type={
-                                                        orderStatus["Đã giao"]
-                                                    }
-                                                    content={"Đã giao"}
-                                                />
-                                            </th>
-                                            <th scope="col">
-                                                <Badge
-                                                    type={orderStatus["Đã hủy"]}
-                                                    content={"Hủy"}
-                                                />
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {orders &&
-                                            orders
-                                                // .filter((order) => {
-                                                //   // Lọc theo phương thức thanh toán "CHUYỂN KHOẢN QUA VNPAY"
-                                                //   if (paymentMethod === "CHUYỂN KHOẢN QUA VNPAY") {
-                                                //     return (
-                                                //       ["Đang xử lí", "Đang vận chuyển", "Đã giao", "Đã hủy"].includes(
-                                                //         order.orderStatusName
-                                                //       )
-                                                //     );
-                                                //   }
-                                                //   return true; // Hiển thị tất cả trạng thái nếu không chọn VNPAY
-                                                // })
-                                                .map((item, index) => (
-                                                    <tr key={index}>
-                                                        <th scope="row">
-                                                            <NavLink
-                                                                to={`/admin/detail-order/${item.id}`}
-                                                                exact
-                                                            >
-                                                                #{item.id}
-                                                            </NavLink>
-                                                        </th>
-                                                        <th>
-                                                            {item.createDate}
-                                                        </th>
-                                                        <th>
-                                                            {item.payment
-                                                                ? item.payment
-                                                                : "Chưa chọn phương thức thanh toán"}
-                                                        </th>
-                                                        <th>
-                                                            <Badge
-                                                                type={
-                                                                    pendingStatus[
-                                                                        item
-                                                                            .isPending
-                                                                    ]
-                                                                }
-                                                                content={
-                                                                    item.isPending
-                                                                        ? "Đã thanh toán"
-                                                                        : "Chưa thanh toán"
-                                                                }
-                                                            />
-                                                        </th>
-                                                        <th>
-                                                            {" "}
-                                                            {item.total.toLocaleString()}{" "}
-                                                            ₫
-                                                        </th>
-                                                        {paymentMethod !==
-                                                            "CHUYỂN KHOẢN QUA VNPAY" && (
+                                                        }
+                                                    />
+                                                </th>
+                                                <th scope="col">
+                                                    <Badge
+                                                        type={
+                                                            orderStatus[
+                                                                "Đã giao"
+                                                            ]
+                                                        }
+                                                        content={"Đã giao"}
+                                                    />
+                                                </th>
+                                                <th scope="col">
+                                                    <Badge
+                                                        type={
+                                                            orderStatus[
+                                                                "Đã hủy"
+                                                            ]
+                                                        }
+                                                        content={"Hủy"}
+                                                    />
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {orders &&
+                                                orders
+                                                    // .filter((order) => {
+                                                    //   // Lọc theo phương thức thanh toán "CHUYỂN KHOẢN QUA VNPAY"
+                                                    //   if (paymentMethod === "CHUYỂN KHOẢN QUA VNPAY") {
+                                                    //     return (
+                                                    //       ["Đang xử lí", "Đang vận chuyển", "Đã giao", "Đã hủy"].includes(
+                                                    //         order.orderStatusName
+                                                    //       )
+                                                    //     );
+                                                    //   }
+                                                    //   return true; // Hiển thị tất cả trạng thái nếu không chọn VNPAY
+                                                    // })
+                                                    .map((item, index) => (
+                                                        <tr key={index}>
+                                                            <th scope="row">
+                                                                <NavLink
+                                                                    to={`/admin/detail-order/${item.id}`}
+                                                                    exact
+                                                                >
+                                                                    #{item.id}
+                                                                </NavLink>
+                                                            </th>
+                                                            <th>
+                                                                {item.createdAt}
+                                                            </th>
+                                                            <th>
+                                                                {item.payment
+                                                                    ? item.payment
+                                                                    : "Chưa chọn phương thức thanh toán"}
+                                                            </th>
+                                                            <th>
+                                                                <Badge
+                                                                    type={
+                                                                        pendingStatus[
+                                                                            item
+                                                                                .isPending
+                                                                        ]
+                                                                    }
+                                                                    content={
+                                                                        item.isPending
+                                                                            ? "Đã thanh toán"
+                                                                            : "Chưa thanh toán"
+                                                                    }
+                                                                />
+                                                            </th>
+                                                            <th>
+                                                                {" "}
+                                                                {item.total.toLocaleString()}{" "}
+                                                                ₫
+                                                            </th>
+                                                            {paymentMethod !==
+                                                                "CHUYỂN KHOẢN QUA VNPAY" && (
+                                                                <th>
+                                                                    <div className="form-check mb-4">
+                                                                        <input
+                                                                            className="form-check-input"
+                                                                            type="radio"
+                                                                            name={
+                                                                                index
+                                                                            }
+                                                                            checked={
+                                                                                item.orderStatusId ===
+                                                                                1
+                                                                            }
+                                                                            value="1"
+                                                                        />
+                                                                    </div>
+                                                                </th>
+                                                            )}
+                                                            {/* <th>
+                                  <div className="form-check mb-4">
+                                    <input
+                                      className="form-check-input"
+                                      type="radio"
+                                      name={index}
+                                      checked={item.orderStatusId === 1}
+                                      value="1"
+                                    />
+                                  </div>
+                                </th> */}
                                                             <th>
                                                                 <div className="form-check mb-4">
                                                                     <input
@@ -620,160 +668,165 @@ const Order = () => {
                                                                         }
                                                                         checked={
                                                                             item.orderStatusId ===
-                                                                            1
+                                                                            2
                                                                         }
-                                                                        value="1"
+                                                                        value="2"
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            updateStatusHandlerFirst(
+                                                                                item.id,
+                                                                                e
+                                                                                    .target
+                                                                                    .value
+                                                                            )
+                                                                        }
                                                                     />
                                                                 </div>
                                                             </th>
-                                                        )}
-                                                        {/* <th>
-                              <div className="form-check mb-4">
-                                <input
-                                  className="form-check-input"
-                                  type="radio"
-                                  name={index}
-                                  checked={item.orderStatusId === 1}
-                                  value="1"
-                                />
-                              </div>
-                            </th> */}
-                                                        <th>
-                                                            <div className="form-check mb-4">
-                                                                <input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    name={index}
-                                                                    checked={
-                                                                        item.orderStatusId ===
-                                                                        2
-                                                                    }
-                                                                    value="2"
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        updateStatusHandlerFirst(
-                                                                            item.id,
+                                                            <th>
+                                                                <div className="form-check mb-4">
+                                                                    <input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        name={
+                                                                            index
+                                                                        }
+                                                                        checked={
+                                                                            item.orderStatusId ===
+                                                                            3
+                                                                        }
+                                                                        value="3"
+                                                                        onChange={(
                                                                             e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </div>
-                                                        </th>
-                                                        <th>
-                                                            <div className="form-check mb-4">
-                                                                <input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    name={index}
-                                                                    checked={
-                                                                        item.orderStatusId ===
-                                                                        3
-                                                                    }
-                                                                    value="3"
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        updateStatusHandlerSecond(
-                                                                            item.id,
+                                                                        ) =>
+                                                                            updateStatusHandlerSecond(
+                                                                                item.id,
+                                                                                e
+                                                                                    .target
+                                                                                    .value
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            </th>
+                                                            <th>
+                                                                <div className="form-check mb-4">
+                                                                    <input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        name={
+                                                                            index
+                                                                        }
+                                                                        checked={
+                                                                            item.orderStatusId ===
+                                                                            4
+                                                                        }
+                                                                        value="4"
+                                                                        onChange={(
                                                                             e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </div>
-                                                        </th>
-                                                        <th>
-                                                            <div className="form-check mb-4">
-                                                                <input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    name={index}
-                                                                    checked={
-                                                                        item.orderStatusId ===
-                                                                        4
-                                                                    }
-                                                                    value="4"
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        updateStatusHandlerThird(
-                                                                            item.id,
+                                                                        ) =>
+                                                                            updateStatusHandlerThird(
+                                                                                item.id,
+                                                                                e
+                                                                                    .target
+                                                                                    .value
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            </th>
+                                                            <th>
+                                                                <div className="form-check mb-4">
+                                                                    <input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        name={
+                                                                            index
+                                                                        }
+                                                                        checked={
+                                                                            item.orderStatusId ===
+                                                                            5
+                                                                        }
+                                                                        value="5"
+                                                                        onChange={(
                                                                             e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </div>
-                                                        </th>
-                                                        <th>
-                                                            <div className="form-check mb-4">
-                                                                <input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    name={index}
-                                                                    checked={
-                                                                        item.orderStatusId ===
-                                                                        5
-                                                                    }
-                                                                    value="5"
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        updateStatusHandlerFouth(
-                                                                            item.id,
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </div>
-                                                        </th>
-                                                    </tr>
-                                                ))}
-                                    </tbody>
-                                </table>
+                                                                        ) =>
+                                                                            updateStatusHandlerFouth(
+                                                                                item.id,
+                                                                                e
+                                                                                    .target
+                                                                                    .value
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            </th>
+                                                        </tr>
+                                                    ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
-                <nav aria-label="Page navigation flex justify-center">
-                    <ul className="flex justify-center pagination mt-3 w-full flex justify-center gap-2">
-                        <li
-                            className={
-                                page === 0 ? "page-item disabled" : "page-item"
-                            }
-                        >
-                            <button
-                                className="page-link"
-                                style={{ borderRadius: 50 }}
-                                onClick={() => onChangePage(0)}
+
+                <nav
+                    aria-label="Page navigation"
+                    className="flex items-center justify-between mt-3"
+                >
+                    <div className="w-[100px]" />
+
+                    <div className="flex-1 flex justify-center items-center">
+                        <div className="flex pagination gap-2">
+                            <li
+                                className={
+                                    page === 0
+                                        ? "page-item disabled"
+                                        : "page-item"
+                                }
                             >
-                                {`<<`}
-                            </button>
-                        </li>
-                        {rows}
-                        <li
-                            className={
-                                page === total
-                                    ? "page-item disabled"
-                                    : "page-item"
-                            }
-                        >
-                            <button
-                                className="page-link"
-                                style={{ borderRadius: 50 }}
-                                onClick={() => onChangePage(total - 1)}
+                                <button
+                                    className="page-link"
+                                    style={{ borderRadius: 50 }}
+                                    onClick={() => onChangePage(0)}
+                                >
+                                    {`<<`}
+                                </button>
+                            </li>
+                            {rows}
+                            <li
+                                className={
+                                    page === total - 1
+                                        ? "page-item disabled"
+                                        : "page-item"
+                                }
                             >
-                                {`>>`}
-                            </button>
-                        </li>
-                    </ul>
+                                <button
+                                    className="page-link"
+                                    style={{ borderRadius: 50 }}
+                                    onClick={() => onChangePage(page + 1)}
+                                >
+                                    {`>>`}
+                                </button>
+                            </li>
+                        </div>
+                    </div>
+
+                    <div className="w-[100px] flex justify-end">
+                        <select
+                            className="py-2 pl-2 border border-gray-100 rounded-[6px]"
+                            onChange={(e) => setSize(e.target.value)}
+                            value={size}
+                        >
+                            <option value={5}>5</option>
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={50}>50</option>
+                            <option value={100}>100</option>
+                        </select>
+                    </div>
                 </nav>
             </div>
             <Modal show={showFirst} onHide={handleCloseFirst}>
@@ -991,7 +1044,7 @@ const Order = () => {
                     </Button>
                 </Modal.Footer>
             </Modal>
-        </div>
+        </>
     );
 };
 

@@ -7,7 +7,7 @@ import AppLayout from "./layout/AppLayout";
 import { BrowserRouter as Router } from "react-router-dom";
 function App() {
     return (
-        <div className="" style={{ padding: "0 30px" }}>
+        <div className="">
             <Router>
                 <AppLayout></AppLayout>
             </Router>

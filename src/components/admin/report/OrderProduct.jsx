@@ -80,7 +80,7 @@ const OrderProduct = () => {
                                         <td>{item.fullName}</td>
                                         <td>{item.phone}</td>
                                         <td>{item.address}</td>
-                                        <td>{item.createDate}</td>
+                                        <td>{item.createdAt}</td>
                                         <td>{item.total}</td>
                                     </tr>
                                 ))}

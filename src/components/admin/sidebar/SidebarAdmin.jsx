@@ -10,58 +10,58 @@ const sidebar_items_1 = [
   {
     "display_name": "Tài khoản",
     "route": "/admin/account",
-    "add": "admin/add-account",
-    "modify": "admin/account-detail",
+    "add": "/admin/account/add-account",
+    "modify": "/admin/account/account-detail",
     "icon": "bx bx-user-pin"
   },
   {
     "display_name": "Sản phẩm",
-    "route": "/admin/products",
-    "add": "admin/add-product",
-    "modify": "admin/product-detail",
+    "route": "/admin/product",
+    "add": "/admin/product/add-product",
+    "modify": "/admin/product/product-detail",
     "icon": "bx bx-package"
   },
   {
     "display_name": "Đơn hàng",
-    "route": "/admin/orders",
-    "add": "admin/add-order",
-    "modify": "admin/order-detail",
-    "sub": "admin/detail-order",
+    "route": "/admin/order",
+    "add": "/admin/order/add-order",
+    "modify": "/admin/order/order-detail",
+    "sub": "/admin/order/detail-order",
     "icon": "bx bx-cart"
   },
   {
     "display_name": "Voucher",
-    "route": "/admin/vouchers",
-    "add": "admin/add-voucher",
-    "modify": "admin/voucher-detail",
+    "route": "/admin/voucher",
+    "add": "/admin/voucher/add-voucher",
+    "modify": "/admin/voucher/voucher-detail",
     "icon": "bx bx-bar-chart-alt"
   },
   {
     "display_name": "Loại sản phẩm",
-    "route": "/admin/categories",
-    "add": "admin/add-category",
-    "modify": "admin/category-detail",
+    "route": "/admin/category",
+    "add": "/admin/category/add-category",
+    "modify": "/admin/category/category-detail",
     "icon": "bx bx-list-ol"
   },
   {
     "display_name": "Khuyến mãi",
     "route": "/admin/sale",
-    "add": "admin/add-sale",
-    "modify": "admin/sale-detail",
+    "add": "/admin/sale/add-sale",
+    "modify": "/admin/sale/sale-detail",
     "icon": "bx bx-gift"
   },
   {
     "display_name": "Thương hiệu",
     "route": "/admin/brand",
-    "add": "admin/add-brand",
-    "modify": "admin/brand-detail",
+    "add": "/admin/brand/add-brand",
+    "modify": "/admin/brand/brand-detail",
     "icon": "bx bx-store-alt"
   },
   {
     "display_name": "Hộp thoại",
     "route": "/admin/chat",
-    "add": "admin/chat",
-    "modify": "admin/chat",
+    "add": "/admin/chat/chat",
+    "modify": "/admin/chat/chat",
     "icon": "bx bx-user-pin"
   }
 ]

@@ -123,108 +123,110 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="h-[calc(100vh-110px)] overflow-y-scroll overflow-x-hidden !pr-4">
-            <h2 className="page-header !ml-5">Thống kê</h2>
-            <div className="row" style={{ marginLeft: "10px" }}>
-                <div className="col-6">
-                    <div className="flex flex-col justify-between !pb-[30px] h-full">
-                        <StatusCard
-                            icon={statusCards[0].icon}
-                            count={countAcc}
-                            title={`Khách hàng`}
-                            onClick={() => {
-                                history.push("/admin/account");
-                            }}
-                        />
-                        <StatusCard
-                            icon={statusCards[1].icon}
-                            count={countPro}
-                            title={`Sản phẩm`}
-                            onClick={() => {
-                                history.push("/admin/products");
-                            }}
-                        />
-                        <StatusCard
-                            icon={statusCards[3].icon}
-                            count={countOr}
-                            title={`Đơn hàng`}
-                            onClick={() => {
-                                history.push("/admin/orders");
-                            }}
-                        />
-                        <StatusCard
-                            icon={statusCards[2].icon}
-                            count={total && `${total.toLocaleString()} Vnđ`}
-                            title={`Tổng doanh thu`}
-                        />
-                    </div>
-                </div>
-
-                {/* Doanh thu theo sản phẩm */}
-                <div className="col-6">
-                    <div className="card full-height">
-                        <Chart
-                            options={productChartOptions}
-                            series={productChartSeries}
-                            type="bar"
-                            height="400"
-                        />
-                    </div>
-                </div>
-
-                {/* Doanh thu theo năm */}
-                {/* <div className="col-6">
-          <div className="card full-height">
-            <Chart
-              options={yearChartOptions}
-              series={yearChartSeries}
-              type="line"
-              height="400"
-            />
-            <Link to="/admin/report-month/2024" className="btn btn-primary mt-3">
-              Xem chi tiết
-            </Link>
-          </div>
-        </div> */}
-                <div className="col-6">
-                    <div className="card full-height">
-                        <Chart
-                            options={yearChartOptions}
-                            series={yearChartSeries}
-                            type="line"
-                            height="400"
-                        />
-                        <div className="mt-3">
-                            <label htmlFor="year-select">Chọn năm:</label>
-                            <select
-                                id="year-select"
-                                value={selectedYear}
-                                onChange={handleYearChange}
-                                className="form-control"
-                            >
-                                <option value="2024">2024</option>
-                                <option value="2025">2025</option>
-                                {/* Thêm các năm khác nếu cần */}
-                            </select>
+        <div className="col-12">
+            <div className="card overflow-y-scroll">
+                <h2 className="page-header">Thống kê</h2>
+                <div className="row" style={{ marginLeft: "10px" }}>
+                    <div className="col-6">
+                        <div className="card justify-between full-height">
+                            <StatusCard
+                                icon={statusCards[0].icon}
+                                count={countAcc}
+                                title={`Khách hàng`}
+                                onClick={() => {
+                                    history.push("/admin/account");
+                                }}
+                            />
+                            <StatusCard
+                                icon={statusCards[1].icon}
+                                count={countPro}
+                                title={`Sản phẩm`}
+                                onClick={() => {
+                                    history.push("/admin/product");
+                                }}
+                            />
+                            <StatusCard
+                                icon={statusCards[3].icon}
+                                count={countOr}
+                                title={`Đơn hàng`}
+                                onClick={() => {
+                                    history.push("/admin/order");
+                                }}
+                            />
+                            <StatusCard
+                                icon={statusCards[2].icon}
+                                count={total && `${total.toLocaleString()} Vnđ`}
+                                title={`Tổng doanh thu`}
+                            />
                         </div>
-                        <Link
-                            to={`/admin/report-month/${selectedYear}`}
-                            className="btn btn-primary mt-3"
-                        >
-                            Xem chi tiết
-                        </Link>
                     </div>
-                </div>
 
-                {/* Biểu đồ Donut: Đơn hàng theo danh mục */}
-                <div className="col-6">
-                    <div className="card full-height">
-                        <Chart
-                            options={option}
-                            series={seri}
-                            type="donut"
-                            height="400"
-                        />
+                    {/* Doanh thu theo sản phẩm */}
+                    <div className="col-6">
+                        <div className="card full-height">
+                            <Chart
+                                options={productChartOptions}
+                                series={productChartSeries}
+                                type="bar"
+                                height="400"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Doanh thu theo năm */}
+                    {/* <div className="col-6">
+              <div className="card full-height">
+                <Chart
+                  options={yearChartOptions}
+                  series={yearChartSeries}
+                  type="line"
+                  height="400"
+                />
+                <Link to="/admin/report-month/2024" className="btn btn-primary mt-3">
+                  Xem chi tiết
+                </Link>
+              </div>
+            </div> */}
+                    <div className="col-6">
+                        <div className="card full-height">
+                            <Chart
+                                options={yearChartOptions}
+                                series={yearChartSeries}
+                                type="line"
+                                height="400"
+                            />
+                            <div className="mt-3">
+                                <label htmlFor="year-select">Chọn năm:</label>
+                                <select
+                                    id="year-select"
+                                    value={selectedYear}
+                                    onChange={handleYearChange}
+                                    className="form-control"
+                                >
+                                    <option value="2024">2024</option>
+                                    <option value="2025">2025</option>
+                                    {/* Thêm các năm khác nếu cần */}
+                                </select>
+                            </div>
+                            <Link
+                                to={`/admin/report-month/${selectedYear}`}
+                                className="btn btn-primary mt-3"
+                            >
+                                Xem chi tiết
+                            </Link>
+                        </div>
+                    </div>
+
+                    {/* Biểu đồ Donut: Đơn hàng theo danh mục */}
+                    <div className="col-6">
+                        <div className="card full-height">
+                            <Chart
+                                options={option}
+                                series={seri}
+                                type="donut"
+                                height="400"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

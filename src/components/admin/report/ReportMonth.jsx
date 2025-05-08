@@ -157,7 +157,7 @@ const ReportMonth = (props) => {
                                             <td>{item.fullname}</td>
                                             <td>{item.phone}</td>
                                             <td>{item.address}</td>
-                                            <td>{item.createDate}</td>
+                                            <td>{item.createdAt}</td>
                                             <td>{item.total}</td>
                                         </tr>
                                     ))}

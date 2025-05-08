@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { getVouchers } from "../../../api/VoucherApi";
+import formatDate from "../../../utils/convertDate";
 
 const Voucher = () => {
     const [voucher, setVoucher] = useState();
     const [page, setPage] = useState(0);
     const [total, setTotal] = useState();
+    const [size, setSize] = useState(10);
 
     var rows = new Array(total).fill(0).map((zero, index) => (
         <li
-            className={page === index + 1 ? "page-item active" : "page-item"}
+            className={page === index ? "page-item active" : "page-item"}
             key={index}
         >
             <button
@@ -28,21 +30,21 @@ const Voucher = () => {
 
     useEffect(() => {
         onLoad();
-    }, [page]);
+    }, [page, size]);
 
     const onLoad = () => {
-        getVouchers(page, 9).then((resp) => {
+        getVouchers(page, size).then((resp) => {
             setVoucher(resp.data.content);
             setTotal(resp.data.totalPages);
         });
     };
 
     return (
-        <div className="col-12">
-            <div className="card">
+        <div className="card flex flex-col justify-between !mx-[25px] overflow-y-hidden">
+            <div className="">
                 <div className="card__header mb-5">
                     <NavLink
-                        to="/admin/add-voucher"
+                        to="/admin/voucher/add-voucher"
                         className="btn btn-primary"
                         style={{ borderRadius: 50 }}
                     >
@@ -62,37 +64,44 @@ const Voucher = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {voucher &&
-                            voucher.map((item, index) => (
-                                <tr key={index}>
-                                    <th scope="row">{index + 1}</th>
-                                    <td>{item.code}</td>
-                                    <td>{item.discount}</td>
-                                    <td>{item.count}</td>
-                                    <td>{item.expireDate}</td>
-                                    <td>
-                                        {item.isActive
-                                            ? "Hoạt động"
-                                            : "Không hoạt động"}
-                                    </td>
-                                    <td>
-                                        {" "}
-                                        <NavLink
-                                            to={`/admin/voucher-detail/${item.id}`}
-                                            exact
-                                        >
-                                            <i
-                                                className="fa fa-pencil-square-o"
-                                                aria-hidden="true"
-                                            ></i>
-                                        </NavLink>{" "}
-                                    </td>
-                                </tr>
-                            ))}
+                        {voucher?.map((item, index) => (
+                            <tr key={index}>
+                                <th scope="row">{index + 1 + page * size}</th>
+                                <td>{item.code}</td>
+                                <td>{item.discount}</td>
+                                <td>{item.count}</td>
+                                <td>{formatDate(item.expireDate, true)}</td>
+                                <td>
+                                    {item.isActive
+                                        ? "Hoạt động"
+                                        : "Không hoạt động"}
+                                </td>
+                                <td>
+                                    {" "}
+                                    <NavLink
+                                        to={`/admin/voucher/voucher-detail/${item._id}`}
+                                        exact
+                                    >
+                                        <i
+                                            className="fa fa-pencil-square-o"
+                                            aria-hidden="true"
+                                        ></i>
+                                    </NavLink>{" "}
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
-                <nav aria-label="Page navigation flex justify-center">
-                    <ul className="flex justify-center pagination mt-3 w-full flex justify-center gap-2">
+            </div>
+
+            <nav
+                aria-label="Page navigation"
+                className="flex items-center justify-between mt-3"
+            >
+                <div className="w-[100px]" />
+
+                <div className="flex-1 flex justify-center items-center">
+                    <div className="flex pagination gap-2">
                         <li
                             className={
                                 page === 0 ? "page-item disabled" : "page-item"
@@ -109,7 +118,7 @@ const Voucher = () => {
                         {rows}
                         <li
                             className={
-                                page === total
+                                page === total - 1
                                     ? "page-item disabled"
                                     : "page-item"
                             }
@@ -117,14 +126,28 @@ const Voucher = () => {
                             <button
                                 className="page-link"
                                 style={{ borderRadius: 50 }}
-                                onClick={() => onChangePage(total)}
+                                onClick={() => onChangePage(page + 1)}
                             >
                                 {`>>`}
                             </button>
                         </li>
-                    </ul>
-                </nav>
-            </div>
+                    </div>
+                </div>
+
+                <div className="w-[100px] flex justify-end">
+                    <select
+                        className="py-2 pl-2 border border-gray-100 rounded-[6px]"
+                        onChange={(e) => setSize(e.target.value)}
+                        value={size}
+                    >
+                        <option value={5}>5</option>
+                        <option value={10}>10</option>
+                        <option value={20}>20</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                    </select>
+                </div>
+            </nav>
         </div>
     );
 };

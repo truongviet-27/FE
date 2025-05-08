@@ -501,7 +501,7 @@
 //               )}
 //             </div> */}
 //             <button
-//               className="order-btn btn btn-primary btn-lg mt-5 mb-5"
+//               className="order-btn btn btn-primary btn-lg mt-4 mb-4"
 //               type="submit"
 //               style={{ marginLeft: 680 }}
 //             >
@@ -1134,7 +1134,7 @@ const Checkout = (props) => {
               )}
             </div> */}
                         <button
-                            className="order-btn btn btn-primary btn-lg mt-5 mb-5"
+                            className="order-btn btn btn-primary btn-lg mt-4 mb-4"
                             type="submit"
                             style={{ marginLeft: 680 }}
                         >

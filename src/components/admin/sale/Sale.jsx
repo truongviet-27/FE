@@ -6,6 +6,7 @@ const Sale = () => {
     const [sale, setSale] = useState();
     const [page, setPage] = useState(0);
     const [total, setTotal] = useState();
+    const [size, setSize] = useState(10);
 
     var rows = new Array(total).fill(0).map((zero, index) => (
         <li
@@ -28,20 +29,20 @@ const Sale = () => {
 
     useEffect(() => {
         onLoad();
-    }, [page]);
+    }, [page, size]);
 
     const onLoad = () => {
-        getSale(page, 2).then((resp) => {
+        getSale(page, size).then((resp) => {
             setSale(resp.data.content);
             setTotal(resp.data.totalPages);
         });
     };
     return (
-        <div className="col-12">
-            <div className="card">
+        <div className="card flex flex-col justify-between !mx-[25px] overflow-y-hidden">
+            <div>
                 <div className="card__header mb-5">
                     <NavLink
-                        to="/admin/add-sale"
+                        to="/admin/sale/add-sale"
                         className="btn btn-primary"
                         style={{ borderRadius: 50 }}
                     >
@@ -60,11 +61,9 @@ const Sale = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {(sale ?? []).map((item, index) => (
+                        {sale?.map((item, index) => (
                             <tr key={item._id}>
-                                <th scope="row">
-                                    {index + 1 + (page > 0 ? page + 1 : page)}
-                                </th>
+                                <th scope="row">{index + 1 + page * size}</th>
                                 <td>{item.name}</td>
                                 <td>{item.description}</td>
                                 <td>{item.discount}</td>
@@ -75,7 +74,7 @@ const Sale = () => {
                                 </td>
                                 <td>
                                     <NavLink
-                                        to={`/admin/sale-detail/${item._id}`}
+                                        to={`/admin/sale/sale-detail/${item._id}`}
                                         exact
                                     >
                                         <i
@@ -88,8 +87,15 @@ const Sale = () => {
                         ))}
                     </tbody>
                 </table>
-                <nav aria-label="Page navigation flex justify-center">
-                    <ul className="flex justify-center pagination mt-3 w-full flex justify-center gap-2">
+            </div>
+            <nav
+                aria-label="Page navigation"
+                className="flex items-center justify-between mt-3"
+            >
+                <div className="w-[100px]" />
+
+                <div className="flex-1 flex justify-center items-center">
+                    <div className="flex pagination gap-2">
                         <li
                             className={
                                 page === 0 ? "page-item disabled" : "page-item"
@@ -114,14 +120,28 @@ const Sale = () => {
                             <button
                                 className="page-link"
                                 style={{ borderRadius: 50 }}
-                                onClick={() => onChangePage(page + 1)}
+                                onClick={() => onChangePage(total - 1)}
                             >
                                 {`>>`}
                             </button>
                         </li>
-                    </ul>
-                </nav>
-            </div>
+                    </div>
+                </div>
+
+                <div className="w-[100px] flex justify-end">
+                    <select
+                        className="py-2 pl-2 border border-gray-100 rounded-[6px]"
+                        onChange={(e) => setSize(e.target.value)}
+                        value={size}
+                    >
+                        <option value={5}>5</option>
+                        <option value={10}>10</option>
+                        <option value={20}>20</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                    </select>
+                </div>
+            </nav>
         </div>
     );
 };

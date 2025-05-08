@@ -142,7 +142,7 @@ const TopNav = (props) => {
     };
 
     return (
-        <div className="topnav">
+        <div className="topnav border-b border-gray-300">
             <div className="topnav__search">
                 <input
                     type="text"

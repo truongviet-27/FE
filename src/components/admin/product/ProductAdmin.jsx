@@ -13,6 +13,8 @@ const Product = () => {
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const [brand, setBrand] = useState([]);
+    const [size, setSize] = useState(10);
+
     function formatCurrency(price) {
         return price.toLocaleString("vi-VN", {
             style: "currency",
@@ -22,10 +24,10 @@ const Product = () => {
 
     useEffect(() => {
         onLoad();
-    }, [page]);
+    }, [page, size]);
 
     const onLoad = () => {
-        getAllProductsByBrand(0, page, 10)
+        getAllProductsByBrand(null, page, size)
             .then((response) => {
                 setProducts(response.data.content);
                 setTotal(response.data.totalPages);
@@ -82,73 +84,74 @@ const Product = () => {
         }
     };
     return (
-        <div className="col-12">
-            <div className="card">
-                <div className="card__header mb-5">
-                    <NavLink
-                        to="/admin/add-product"
-                        className="btn btn-primary"
-                        style={{ borderRadius: 50 }}
-                    >
-                        Thêm sản phẩm
-                    </NavLink>
-                </div>
-                <div className="row mb-3 mt-3">
-                    <div className="col-sm-4 mt-2">
-                        <select
-                            className="form-control"
-                            onChange={(event) =>
-                                getProductByBrandHandler(event.target.value)
-                            }
+        <>
+            <div className="card flex flex-col justify-between !mx-[25px] overflow-y-hidden">
+                <div>
+                    <div className="card__header">
+                        <NavLink
+                            to="/admin/product/add-product"
+                            className="btn btn-primary"
+                            style={{ borderRadius: 50 }}
                         >
-                            <option value="0">Tất cả</option>
-                            {brand &&
-                                brand.map((item, index) => (
-                                    <option key={index} value={item.id}>
-                                        {item.name}
-                                    </option>
-                                ))}
-                        </select>
+                            Thêm sản phẩm
+                        </NavLink>
                     </div>
-                </div>
-                <div className="card__body">
-                    <div>
-                        <div className="table-wrapper">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th scope="col">STT</th>
-                                        <th scope="col">Tên sản phẩm</th>
-                                        <th scope="col">Mã sản phẩm</th>
-                                        <th scope="col">Thương hiệu</th>
-                                        <th scope="col">Hình ảnh</th>
+                    <div className="row mb-3 mt-3">
+                        <div className="col-sm-4 mt-2">
+                            <select
+                                className="form-control"
+                                onChange={(event) =>
+                                    getProductByBrandHandler(event.target.value)
+                                }
+                            >
+                                <option value={""}>Tất cả</option>
+                                {brand &&
+                                    brand.map((item, index) => (
+                                        <option key={index} value={item._id}>
+                                            {item.name}
+                                        </option>
+                                    ))}
+                            </select>
+                        </div>
+                    </div>
+                    <div className="card__body">
+                        <div>
+                            <div className="table-wrapper">
+                                <table className="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">STT</th>
+                                            <th scope="col">Tên sản phẩm</th>
+                                            <th scope="col">Mã sản phẩm</th>
+                                            <th scope="col">Thương hiệu</th>
+                                            <th scope="col">Hình ảnh</th>
 
-                                        <th scope="col">Trạng thái</th>
-                                        <th scope="col">Cập nhật</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {products &&
-                                        products.map((item, index) => (
+                                            <th scope="col">Trạng thái</th>
+                                            <th scope="col">Cập nhật</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="">
+                                        {products?.map((item, index) => (
                                             <tr key={index}>
                                                 <th scope="row">
                                                     <NavLink
-                                                        to={`/admin/product-view/${item.id}`}
+                                                        to={`/admin/product/product-view/${item._id}`}
                                                         exact
                                                     >
-                                                        #{index + 1}
+                                                        {index +
+                                                            1 +
+                                                            page * size}
                                                     </NavLink>
                                                 </th>
                                                 <th>{item.name}</th>
                                                 <th>{item.code}</th>
-                                                <th>{item.brand}</th>
-                                                <th>
-                                                    {" "}
+                                                <th>{item?.brand?.name}</th>
+                                                <th className="flex items-center justify-center h-[60px] border-0">
                                                     <img
                                                         className="img-fluid"
                                                         style={{
-                                                            width: "100px",
-                                                            height: "100px",
+                                                            width: "50px",
+                                                            height: "50px",
                                                         }}
                                                         src={item.image}
                                                         alt=""
@@ -162,7 +165,7 @@ const Product = () => {
                                                 </th>
                                                 <th>
                                                     <NavLink
-                                                        to={`/admin/product-detail/${item.id}`}
+                                                        to={`/admin/product/product-detail/${item._id}`}
                                                         exact
                                                     >
                                                         <i
@@ -173,43 +176,67 @@ const Product = () => {
                                                 </th>
                                             </tr>
                                         ))}
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <nav aria-label="Page navigation flex justify-center">
-                    <ul className="flex justify-center pagination mt-3 w-full flex justify-center gap-2">
-                        <li
-                            className={
-                                page === 0 ? "page-item disabled" : "page-item"
-                            }
-                        >
-                            <button
-                                className="page-link"
-                                style={{ borderRadius: 50 }}
-                                onClick={() => onChangePage(0)}
+                <nav
+                    aria-label="Page navigation"
+                    className="flex items-center justify-between mt-3"
+                >
+                    <div className="w-[100px]" />
+
+                    <div className="flex-1 flex justify-center items-center">
+                        <div className="flex pagination gap-2">
+                            <li
+                                className={
+                                    page === 0
+                                        ? "page-item disabled"
+                                        : "page-item"
+                                }
                             >
-                                {`<<`}
-                            </button>
-                        </li>
-                        {rows}
-                        <li
-                            className={
-                                page === total
-                                    ? "page-item disabled"
-                                    : "page-item"
-                            }
-                        >
-                            <button
-                                className="page-link"
-                                style={{ borderRadius: 50 }}
-                                onClick={() => onChangePage(total - 1)}
+                                <button
+                                    className="page-link"
+                                    style={{ borderRadius: 50 }}
+                                    onClick={() => onChangePage(0)}
+                                >
+                                    {`<<`}
+                                </button>
+                            </li>
+                            {rows}
+                            <li
+                                className={
+                                    page === total - 1
+                                        ? "page-item disabled"
+                                        : "page-item"
+                                }
                             >
-                                {`>>`}
-                            </button>
-                        </li>
-                    </ul>
+                                <button
+                                    className="page-link"
+                                    style={{ borderRadius: 50 }}
+                                    onClick={() => onChangePage(page + 1)}
+                                >
+                                    {`>>`}
+                                </button>
+                            </li>
+                        </div>
+                    </div>
+
+                    <div className="w-[100px] flex justify-end">
+                        <select
+                            className="py-2 pl-2 border border-gray-100 rounded-[6px]"
+                            onChange={(e) => setSize(e.target.value)}
+                            value={size}
+                        >
+                            <option value={5}>5</option>
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={50}>50</option>
+                            <option value={100}>100</option>
+                        </select>
+                    </div>
                 </nav>
             </div>
             <Modal show={show} onHide={handleClose}>
@@ -229,7 +256,7 @@ const Product = () => {
                     </Form>
                 </Modal.Body>
             </Modal>
-        </div>
+        </>
     );
 };
 

@@ -20,5 +20,5 @@ export const createCategory = async (data) => {
 
 export const updateCategory = async (data) => {
     const url = `/api/v1/category/update`;
-    return await Instance.post(url, data);
+    return await Instance.put(url, data);
 }

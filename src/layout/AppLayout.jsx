@@ -252,58 +252,58 @@ const UserLayout = () => {
                             <Account></Account>
                         </Route>
 
-                        <Route path="/admin/products" exact>
+                        <Route path="/admin/product" exact>
                             <ProductAdmin></ProductAdmin>
                         </Route>
-                        <Route path="/admin/add-product" exact>
+                        <Route path="/admin/product/add-product" exact>
                             <ProductCreate className="add-product"></ProductCreate>
                         </Route>
-                        <Route path="/admin/orders" exact>
+                        <Route path="/admin/order" exact>
                             <OrderAdmin></OrderAdmin>
                         </Route>
-                        <Route path="/admin/categories" exact>
+                        <Route path="/admin/category" exact>
                             <Category></Category>
                         </Route>
-                        <Route path="/admin/add-category" exact>
+                        <Route path="/admin/category/add-category" exact>
                             <NewCategory></NewCategory>
                         </Route>
                         <Route path="/admin/sale" exact>
                             <Sale></Sale>
                         </Route>
-                        <Route path="/admin/add-sale" exact>
+                        <Route path="/admin/sale/add-sale" exact>
                             <NewSale></NewSale>
                         </Route>
-                        <Route path="/admin/vouchers" exact>
+                        <Route path="/admin/voucher" exact>
                             <Voucher></Voucher>
                         </Route>
-                        <Route path="/admin/add-voucher" exact>
+                        <Route path="/admin/voucher/add-voucher" exact>
                             <NewVoucher></NewVoucher>
                         </Route>
                         <Route path="/admin/brand" exact>
                             <Brand></Brand>
                         </Route>
-                        <Route path="/admin/add-brand" exact>
+                        <Route path="/admin/brand/add-brand" exact>
                             <NewBrand></NewBrand>
                         </Route>
                         <Route path={`/admin/order-detail/:id`} exact>
                             <OrderForm></OrderForm>
                         </Route>
-                        <Route path={`/admin/product-detail/:id`} exact>
+                        <Route path={`/admin/product/product-detail/:id`} exact>
                             <EditProduct></EditProduct>
                         </Route>
                         <Route path={`/admin/detail-order/:id`} exact>
                             <OrderDetailAdmin></OrderDetailAdmin>
                         </Route>
-                        <Route path={`/admin/voucher-detail/:id`} exact>
+                        <Route path={`/admin/voucher/voucher-detail/:id`} exact>
                             <EditVoucher></EditVoucher>
                         </Route>
-                        <Route path={`/admin/brand-detail/:id`} exact>
+                        <Route path={`/admin/brand/brand-detail/:id`} exact>
                             <EditBrand></EditBrand>
                         </Route>
-                        <Route path={`/admin/category-detail/:id`} exact>
+                        <Route path={`/admin/category/category-detail/:id`} exact>
                             <EditCategory></EditCategory>
                         </Route>
-                        <Route path={`/admin/sale-detail/:id`} exact>
+                        <Route path={`/admin/sale/sale-detail/:id`} exact>
                             <EditSale></EditSale>
                         </Route>
                         <Route path={`/admin/report-product`} exact>
@@ -320,7 +320,7 @@ const UserLayout = () => {
                         <Route path={`/admin/order-month/:id`} exact>
                             <OrderMonth year={year}></OrderMonth>
                         </Route>
-                        <Route path={`/admin/product-view/:id`} exact>
+                        <Route path={`/admin/product/product-view/:id`} exact>
                             <Detail></Detail>
                         </Route>
                         <Route path={`/admin/search/:id`} exact>
@@ -329,15 +329,17 @@ const UserLayout = () => {
                         <Route path={`/admin/error-page`} exact>
                             <Error></Error>
                         </Route>
-                        <Route path={`/admin/add-account`} exact>
+                        <Route path={`/admin/account/add-account`} exact>
                             <NewAccount></NewAccount>
                         </Route>
-                        <Route path={`/admin/account-detail/:id`} exact>
+                        <Route path={`/admin/account/account-detail/:id`} exact>
                             <EditAccount></EditAccount>
                         </Route>
                         {/* <Route path={`/chat/ai`} exact>
                             <ChatAI></ChatAI>
                         </Route> */}
+
+                        
                     </Switch>
                 </div>
             </div>

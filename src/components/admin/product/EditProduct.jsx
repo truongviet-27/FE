@@ -1207,7 +1207,7 @@ const EditProduct = () => {
                     </div>
                     <div className="flex justify-center">
                         <button
-                            className="btn btn-primary btn-lg mt-5 mb-5"
+                            className="btn btn-primary btn-lg mt-4 mb-4"
                             type="submit"
                             style={{ marginLeft: 70, borderRadius: 50 }}
                         >
