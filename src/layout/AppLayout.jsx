@@ -59,6 +59,7 @@ import WishList from "../components/WishList";
 import Account from "../components/admin/account/Account";
 import NewAccount from "../components/admin/account/NewAccount";
 import EditAccount from "../components/admin/account/EditAccount";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 // import ChatAI from "../component/ChatAI";
 
 const UserLayout = () => {
@@ -73,9 +74,18 @@ const UserLayout = () => {
     const isAdminRoute = location.pathname.startsWith("/admin");
 
     const [year, setYear] = useState();
+
+    const history = useHistory();
+
     const yearHandler = (value) => {
         setYear(value);
     };
+
+    if (isAdminRoute) {
+        if (user.role !== "ADMIN") {
+            history.push("/admin/login");
+        }
+    }
 
     useEffect(() => {
         const savedUser = localStorage.getItem("user");
@@ -300,7 +310,10 @@ const UserLayout = () => {
                         <Route path={`/admin/brand/brand-detail/:id`} exact>
                             <EditBrand></EditBrand>
                         </Route>
-                        <Route path={`/admin/category/category-detail/:id`} exact>
+                        <Route
+                            path={`/admin/category/category-detail/:id`}
+                            exact
+                        >
                             <EditCategory></EditCategory>
                         </Route>
                         <Route path={`/admin/sale/sale-detail/:id`} exact>
@@ -338,8 +351,6 @@ const UserLayout = () => {
                         {/* <Route path={`/chat/ai`} exact>
                             <ChatAI></ChatAI>
                         </Route> */}
-
-                        
                     </Switch>
                 </div>
             </div>
