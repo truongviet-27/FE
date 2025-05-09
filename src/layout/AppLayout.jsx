@@ -84,6 +84,8 @@ const UserLayout = () => {
     if (isAdminRoute) {
         if (user.role !== "ADMIN") {
             history.push("/admin/login");
+        } else {
+            history.push("/admin/dashboard");
         }
     }
 
