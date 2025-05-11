@@ -61,20 +61,20 @@ const Product = (props) => {
     const [total, setTotal] = useState({});
     const [categories, setCategories] = useState([]);
     const [categoryIds, setCategory] = useState([]);
-    const [brandIds, setBrand] = useState([]);
+    const [brandIds, setBrandIds] = useState([]);
     const [price, setPrice] = useState([]);
     const [min, setMin] = useState(0);
-    const [max, setMax] = useState(10000000);
+    const [max, setMax] = useState(0);
 
     useEffect(() => {
         getBrands(0, 100).then((response) => {
-            setBrands(response.content);
+            setBrands(response.data.content);
         });
     }, []);
 
     useEffect(() => {
         getCategory(0, 100).then((response) => {
-            setCategories(response.content);
+            setCategories(response.data.content);
         });
     }, []);
 
@@ -98,9 +98,15 @@ const Product = (props) => {
 
         toggleLikeProduct(productId, !currentLikeStatus, token)
             .then((response) => {
-                getAllProducts(page, 12, true, token).then((response) => {
-                    setProducts(response?.content);
-                    setTotal(response?.totalPages);
+                toast.success(response.data.message);
+                getAllProducts(
+                    page,
+                    10,
+                    true,
+                    JSON.parse(localStorage.getItem("user"))._id
+                ).then((response) => {
+                    setProducts(response?.data?.content);
+                    setTotal(response?.data.totalPages);
                 });
             })
             .catch((error) => {
@@ -109,30 +115,32 @@ const Product = (props) => {
     };
 
     useEffect(() => {
-        const token = localStorage.getItem("token") || null;
         if (
             categoryIds.length === 0 &&
             brandIds.length === 0 &&
             price.length === 0
         ) {
-            console.log("TOKEN HOME:", token);
-            getAllProducts(page, 12, true, token).then((response) => {
-                setProducts(response.content); // Lưu các sản phẩm vào state
-                setTotal(response.totalPages);
+            getAllProducts(
+                page,
+                10,
+                true,
+                JSON.parse(localStorage.getItem("user"))?._id
+            ).then((response) => {
+                setProducts(response?.data.content);
+                setTotal(response.data.totalPages);
             });
         } else {
             const data = {
                 page: page,
                 count: count,
-                categoryIds:
-                    categoryIds.length > 0 ? categoryIds : defaultCategory,
-                brandIds: brandIds.length > 0 ? brandIds : defaultBrand,
+                categoryIds: categoryIds.length > 0 ? categoryIds : [],
+                brandIds: brandIds.length > 0 ? brandIds : [],
                 min: min,
                 max: max,
             };
             filterProducts(data)
                 .then((resp) => {
-                    setProducts(resp.data.content);
+                    setProducts(resp?.data.content);
                     setTotal(resp.data.totalPages);
                 })
                 .catch((error) => {
@@ -148,7 +156,6 @@ const Product = (props) => {
     };
 
     const chooseCategoryHandler = (value) => {
-        console.log("VALUEE" + value);
         const index = categoryIds.indexOf(value);
         if (index > -1) {
             setCategory(categoryIds.filter((i) => i !== value));
@@ -158,17 +165,20 @@ const Product = (props) => {
         onChangePage(0);
     };
 
+    console.log(brandIds, "brandIds");
+
     const chooseBrandHandler = (value) => {
         const index = brandIds.indexOf(value);
         if (index > -1) {
-            setBrand(brandIds.filter((i) => i !== value));
+            setBrandIds(brandIds.filter((i) => i !== value));
         } else {
-            setBrand([...brandIds, value]);
+            setBrandIds([...brandIds, value]);
         }
         onChangePage(0);
     };
     const choosePriceHandler = (value) => {
         const index = price.indexOf(value);
+        console.log(index, "index");
         if (index > -1) {
             setPrice([]);
             setMin(0);
@@ -184,147 +194,390 @@ const Product = (props) => {
         <div>
             <div className="mt-5">
                 <div className="row">
-                    <div className="col-3">
-                        <Collapse defaultActiveKey={["1"]} accordion>
+                    <div className="col-2 lg:col-3 md:col-4">
+                        <Collapse accordion>
                             <Panel header="Thương hiệu" key="1">
-                                <ul className="list-group">
-                                    {brands.map((item, index) => (
-                                        <div
-                                            className="sidebar__item"
-                                            key={index}
+                                <ul className="list-group flex flex-col gap-2">
+                                    {brands?.map((item, index) => (
+                                        <button
+                                            className={`!text-[14px] !px-4 text-black ${
+                                                brandIds.includes(item?._id)
+                                                    ? `!bg-neutral-300`
+                                                    : ``
+                                            }`}
+                                            key={item._id}
                                             onClick={() =>
-                                                chooseBrandHandler(item.id)
+                                                chooseBrandHandler(item._id)
                                             }
                                         >
-                                            <div
-                                                className={
-                                                    brandIds.includes(item?._id)
-                                                        ? `sidebar__item-inner active`
-                                                        : `sidebar__item-inner`
-                                                }
-                                            >
+                                            <div className={`text-left`}>
                                                 <i className="bx bx-category-alt"></i>
-                                                <span>{item?.name}</span>
+                                                <span className="!ml-1">
+                                                    {item?.name}
+                                                </span>
                                             </div>
-                                        </div>
+                                        </button>
                                     ))}
                                 </ul>
                             </Panel>
                             <Panel header="Loại sản phẩm" key="2">
-                                <ul className="list-group">
-                                    {categories.map((item, index) => (
-                                        <div
-                                            className="sidebar__item"
-                                            key={index}
+                                <ul className="list-group flex flex-col gap-2">
+                                    {categories?.map((item, index) => (
+                                        <button
+                                            className={`!text-[14px] !px-4 text-black ${
+                                                categories.includes(item?._id)
+                                                    ? `!bg-neutral-300`
+                                                    : ``
+                                            }`}
+                                            key={item._id}
                                             onClick={() =>
                                                 chooseCategoryHandler(item?._id)
                                             }
                                         >
-                                            <div
-                                                className={
-                                                    categoryIds.includes(
-                                                        item?._id
-                                                    )
-                                                        ? `sidebar__item-inner active`
-                                                        : `sidebar__item-inner`
-                                                }
-                                            >
+                                            <div className={`text-left`}>
                                                 <i className="bx bx-category-alt"></i>
-                                                <span>{item?.name}</span>
+                                                <span className="!ml-1">
+                                                    {item?.name}
+                                                </span>
                                             </div>
-                                        </div>
+                                        </button>
                                     ))}
                                 </ul>
                             </Panel>
                             <Panel header="Giá" key="3">
-                                <ul className="list-group">
-                                    {prices.map((item, index) => (
-                                        <div
-                                            className="sidebar__item"
+                                <ul className="list-group flex flex-col gap-2">
+                                    {prices?.map((item, index) => (
+                                        <button
+                                            className={`!text-[14px] !px-4 !text-left !text-black ${
+                                                (prices.includes(item?._id)
+                                                    ? `!bg-neutral-300`
+                                                    : ``,
+                                                console.log(
+                                                    prices.includes(item?._id),
+                                                    "xxxxxxx"
+                                                ))
+                                            } w-full`}
+                                            onClick={() =>
+                                                choosePriceHandler(item.value)
+                                            }
                                             key={index}
                                         >
-                                            <div
-                                                className={
-                                                    price.includes(item.value)
-                                                        ? `sidebar__item-inner active`
-                                                        : `sidebar__item-inner`
-                                                }
-                                                onClick={() =>
-                                                    choosePriceHandler(
-                                                        item.value
-                                                    )
-                                                }
-                                            >
+                                            <div className="text-left">
                                                 <i className={item.icon}></i>
-                                                <span>{item.display_name}</span>
+                                                <span className="!ml-1">
+                                                    {item.display_name}
+                                                </span>
                                             </div>
-                                        </div>
+                                        </button>
                                     ))}
                                 </ul>
                             </Panel>
                         </Collapse>
                     </div>
 
-                    <div className="col">
+                    <div className="col-10 lg:col-9 md:col-8">
                         <div className="container-fluid padding">
                             <div className="row welcome mini-card">
-                                <h4 className="title text-danger">
+                                <h4 className="title text-danger !mb-0">
                                     Sản phẩm nổi bật
                                 </h4>
                             </div>
-                            <div className="row padding">
-                                {products.map((item, index) => (
+                            {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 !mt-10">
+                                {products?.map((item, index) => (
                                     <div
-                                        className="col-md-4 mb-3"
-                                        key={item?._id}
+                                        key={item._id}
+                                        className="border border-gray-200 p-4 rounded-2xl"
                                     >
-                                        <div className="card h-100">
-                                            <div className="d-flex justify-content-between position-absolute w-100">
-                                                <div className="label-new">
-                                                    <span
-                                                        className="text-white small d-flex align-items-center px-2 py-1"
-                                                        style={{
-                                                            backgroundColor:
-                                                                "yellowgreen",
-                                                        }}
-                                                    >
-                                                        <i
-                                                            className="fa fa-star"
-                                                            aria-hidden="true"
-                                                        ></i>
-                                                        <span className="ml-1">
-                                                            Mới
-                                                        </span>
+                                        <div className="d-flex justify-content-between position-absolute">
+                                            <div className="label-new">
+                                                <span
+                                                    className="text-white small d-flex align-items-center px-2 py-1"
+                                                    style={{
+                                                        backgroundColor:
+                                                            "yellowgreen",
+                                                    }}
+                                                >
+                                                    <i
+                                                        className="fa fa-star"
+                                                        aria-hidden="true"
+                                                    ></i>
+                                                    <span className="ml-1">
+                                                        Mới
                                                     </span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <NavLink
+                                            to={`/product-detail/${item?._id}`}
+                                        >
+                                            <img
+                                                src={item?.image}
+                                                style={{
+                                                    width: 150,
+                                                    height: 150,
+                                                }}
+                                                alt={item?.name}
+                                            />
+                                        </NavLink>
+                                        <div className="card-body px-2 pb-2 pt-1">
+                                            <div className="d-flex justify-content-between">
+                                                <div>
+                                                    <p className="h4 text-primary">
+                                                        {(
+                                                            (item?.price *
+                                                                (100 -
+                                                                    item?.discount)) /
+                                                            100
+                                                        )?.toLocaleString()}{" "}
+                                                        Đ
+                                                    </p>
                                                 </div>
                                             </div>
+                                            <p className="text-warning d-flex align-items-center mb-2">
+                                                <i
+                                                    className="fa fa-star"
+                                                    aria-hidden="true"
+                                                ></i>
+                                                <i
+                                                    className="fa fa-star"
+                                                    aria-hidden="true"
+                                                ></i>
+                                                <i
+                                                    className="fa fa-star"
+                                                    aria-hidden="true"
+                                                ></i>
+                                                <i
+                                                    className="fa fa-star"
+                                                    aria-hidden="true"
+                                                ></i>
+                                                <i
+                                                    className="fa fa-star"
+                                                    aria-hidden="true"
+                                                ></i>
+                                            </p>
+                                            <p className="mb-0">
+                                                <strong>
+                                                    <NavLink
+                                                        to={`/product-detail/${item?._id}`}
+                                                        className="text-secondary"
+                                                    >
+                                                        {item?.name}
+                                                    </NavLink>
+                                                </strong>
+                                            </p>
+                                            <p className="mb-1">
+                                                <small>
+                                                    <NavLink
+                                                        to="#"
+                                                        className="text-secondary"
+                                                    >
+                                                        {item?.brand?.name}
+                                                    </NavLink>
+                                                </small>
+                                            </p>
+                                            <div className="d-flex mb-3 justify-content-between">
+                                                <div>
+                                                    <p className="mb-0 small">
+                                                        <b>Yêu thích: </b>{" "}
+                                                        {item?.view} lượt
+                                                    </p>
+                                                    <p className="mb-0 small">
+                                                        <b>Giá gốc: </b>{" "}
+                                                        {item?.price?.toLocaleString()}{" "}
+                                                        Đ
+                                                    </p>
+                                                    <p className="mb-0 small text-danger">
+                                                        <span className="font-weight-bold">
+                                                            Tiết kiệm:
+                                                            {(item?.discount *
+                                                                item?.price) /
+                                                                100}
+                                                        </span>{" "}
+                                                        ({item?.discount}%)
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="d-flex justify-content-between">
+                                                <div className="col px-0">
+                                                    <NavLink
+                                                        to={`/product-detail/${item?._id}`}
+                                                        exact
+                                                        className="btn btn-outline-primary btn-block"
+                                                    >
+                                                        <span className="!mr-2">
+                                                            Thêm vào giỏ
+                                                        </span>
+                                                        <i
+                                                            className="fa fa-shopping-basket"
+                                                            aria-hidden="true"
+                                                        />
+                                                    </NavLink>
+                                                </div>
+                                                <div className="ml-2">
+                                                    <NavLink
+                                                        to="#"
+                                                        className="btn btn-outline-success"
+                                                        data-toggle="tooltip"
+                                                        data-placement="left"
+                                                        title="Add to Wishlist"
+                                                        onClick={() =>
+                                                            handleLike(
+                                                                item?._id,
+                                                                item?.liked
+                                                            )
+                                                        }
+                                                    >
+                                                        <i
+                                                            className={`fa fa-heart ${
+                                                                item?.liked
+                                                                    ? "text-danger"
+                                                                    : ""
+                                                            }`}
+                                                            aria-hidden="true"
+                                                        ></i>
+                                                    </NavLink>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div> */}
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 !mt-10">
+                                {products?.map((item) => (
+                                    <div className="mb-3" key={item._id}>
+                                        <div className="border rounded-2xl p-4 !overflow-y-hidden !h-full relative">
+                                            <div className="absolute">
+                                                <span className="text-white bg-success small flex items-center px-2 py-1">
+                                                    <i
+                                                        className="fa fa-star"
+                                                        aria-hidden="true"
+                                                    ></i>
+                                                    <span className="ml-1">
+                                                        New
+                                                    </span>
+                                                </span>
+                                            </div>
+                                            <div className="position-absolute right-6 text-[#EE4D2D] bg-[#FEEEEA] flex items-center px-2 py-1 text-[14px] font-medium">
+                                                <span className="ml-1">
+                                                    Đã bán 12
+                                                </span>
+                                            </div>
+
                                             <NavLink
-                                                to={`/product-detail/${item?._id}`}
+                                                to={`/product-detail/${item._id}`}
+                                                style={{
+                                                    display: "flex",
+                                                    justifyContent: "center",
+                                                    alignItems: "center",
+                                                    width: "100%",
+                                                    height: "250px",
+                                                    overflow: "hidden",
+                                                }}
                                             >
                                                 <img
                                                     src={item?.image}
+                                                    alt="Product"
                                                     style={{
-                                                        width: 150,
-                                                        height: 150,
+                                                        width: "100%",
+                                                        height: "100%",
+                                                        objectFit: "cover",
                                                     }}
-                                                    alt={item?.name}
+                                                    className="mini-card"
                                                 />
                                             </NavLink>
-                                            <div className="card-body px-2 pb-2 pt-1">
-                                                <div className="d-flex justify-content-between">
-                                                    <div>
-                                                        <p className="h4 text-primary">
-                                                            {(
-                                                                (item?.price *
-                                                                    (100 -
-                                                                        item?.discount)) /
-                                                                100
-                                                            ).toLocaleString()}{" "}
-                                                            Đ
-                                                        </p>
+
+                                            <div className="card-body p-0">
+                                                <div className="flex flex-col justify-between">
+                                                    <div className="flex items-center gap-1 pr-4 pt-2 rounded-2xl text-[#EE4D2D] line-through">
+                                                        <div className="flex gap-1 font-medium text-[12px]">
+                                                            <span>
+                                                                {Math.min(
+                                                                    ...item.attributes.map(
+                                                                        (a) =>
+                                                                            a.price ??
+                                                                            0
+                                                                    )
+                                                                ).toLocaleString()}{" "}
+                                                            </span>
+                                                            <span className="text-[12px]">
+                                                                đ
+                                                            </span>
+                                                        </div>
+                                                        <span>-</span>
+                                                        <div className="flex gap-1 font-medium text-[12px]">
+                                                            <span>
+                                                                {Math.max(
+                                                                    ...item.attributes.map(
+                                                                        (a) =>
+                                                                            a.price ??
+                                                                            0
+                                                                    )
+                                                                ).toLocaleString()}{" "}
+                                                            </span>
+                                                            <span className="text-[12px]">
+                                                                đ
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex gap-3 mb-1 items-center pr-4 py-2 rounded-2xl text-[#EE4D2D]">
+                                                        <div className="flex gap-2">
+                                                            <span className="font-medium text-[16px]">
+                                                                {(
+                                                                    (Math.min(
+                                                                        ...item.attributes.map(
+                                                                            (
+                                                                                a
+                                                                            ) =>
+                                                                                a.price ??
+                                                                                0
+                                                                        )
+                                                                    ) *
+                                                                        (100 -
+                                                                            item
+                                                                                ?.sale
+                                                                                ?.discount)) /
+                                                                    100
+                                                                ).toLocaleString()}{" "}
+                                                                <span className="text-[12px]">
+                                                                    đ
+                                                                </span>
+                                                            </span>
+                                                            <span>-</span>
+                                                            <span className="font-medium text-[16px]">
+                                                                {(
+                                                                    (Math.max(
+                                                                        ...item.attributes.map(
+                                                                            (
+                                                                                a
+                                                                            ) =>
+                                                                                a.price ??
+                                                                                0
+                                                                        )
+                                                                    ) *
+                                                                        (100 -
+                                                                            item
+                                                                                ?.sale
+                                                                                ?.discount)) /
+                                                                    100
+                                                                ).toLocaleString()}{" "}
+                                                                <span className="text-[12px]">
+                                                                    đ
+                                                                </span>
+                                                            </span>
+                                                        </div>
+                                                        <div className="font-medium text-[14px]">
+                                                            (
+                                                            {
+                                                                item?.sale
+                                                                    ?.discount
+                                                            }
+                                                            %)
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <p className="text-warning d-flex align-items-center mb-2">
+                                                <p className="text-warning d-flex align-items-center mb-3">
                                                     <i
                                                         className="fa fa-star"
                                                         aria-hidden="true"
@@ -346,58 +599,53 @@ const Product = (props) => {
                                                         aria-hidden="true"
                                                     ></i>
                                                 </p>
-                                                <p className="mb-0">
-                                                    <strong>
-                                                        <NavLink
-                                                            to={`/product-detail/${item?._id}`}
-                                                            className="text-secondary"
-                                                        >
-                                                            {item?.name}
-                                                        </NavLink>
-                                                    </strong>
-                                                </p>
-                                                <p className="mb-1">
-                                                    <small>
-                                                        <NavLink
-                                                            to="#"
-                                                            className="text-secondary"
-                                                        >
-                                                            {item?.brand}
-                                                        </NavLink>
-                                                    </small>
-                                                </p>
-                                                <div className="d-flex mb-3 justify-content-between">
-                                                    <div>
-                                                        <p className="mb-0 small">
-                                                            <b>Yêu thích: </b>{" "}
-                                                            {item?.view} lượt
-                                                        </p>
-                                                        <p className="mb-0 small">
-                                                            <b>Giá gốc: </b>{" "}
-                                                            {item?.price.toLocaleString()}{" "}
-                                                            Đ
-                                                        </p>
-                                                        <p className="mb-0 small text-danger">
-                                                            <span className="font-weight-bold">
-                                                                Tiết kiệm:
-                                                                {(item?.discount *
-                                                                    item?.price) /
-                                                                    100}
-                                                            </span>{" "}
-                                                            ({item?.discount}%)
-                                                        </p>
+                                                <div className="mb-0">
+                                                    <span>{item?.name}</span>
+                                                </div>
+                                                <div className="!my-3">
+                                                    <span className="font-medium">
+                                                        Thương hiệu:
+                                                    </span>
+                                                    <span>
+                                                        {item?.brand?.name}
+                                                    </span>
+                                                </div>
+                                                <div className="flex mb-3 justify-content-between">
+                                                    <div className="flex gap-4">
+                                                        <div className="flex gap-1">
+                                                            <span className="font-medium">
+                                                                Lượt xem:
+                                                            </span>
+                                                            <span className="">
+                                                                {item?.view}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex gap-1">
+                                                            <span className="font-medium">
+                                                                Yêu thích:
+                                                            </span>
+                                                            <span className="">
+                                                                {
+                                                                    item
+                                                                        ?.likeQuantity
+                                                                        ?.length
+                                                                }{" "}
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div className="d-flex justify-content-between">
-                                                    <div className="col px-0">
+                                                    <div className="">
                                                         <NavLink
-                                                            to={`/product-detail/${item?._id}`}
+                                                            to={`/product-detail/${item._id}`}
                                                             exact
                                                             className="btn btn-outline-primary btn-block"
                                                         >
-                                                            Thêm vào giỏ
+                                                            <span className="!mr-2">
+                                                                Thêm vào giỏ
+                                                            </span>
                                                             <i
-                                                                className="fa fa-shopping-basket"
+                                                                className="fa fa-shopping-basket ml-10"
                                                                 aria-hidden="true"
                                                             ></i>
                                                         </NavLink>
@@ -411,7 +659,7 @@ const Product = (props) => {
                                                             title="Add to Wishlist"
                                                             onClick={() =>
                                                                 handleLike(
-                                                                    item?._id,
+                                                                    item._id,
                                                                     item?.liked
                                                                 )
                                                             }
@@ -432,8 +680,11 @@ const Product = (props) => {
                                     </div>
                                 ))}
                             </div>
-                            <nav aria-label="Page navigation flex justify-center">
-                                <ul className="flex justify-center pagination mt-3 w-full flex justify-center gap-2">
+                            <nav
+                                aria-label="Page navigation flex justify-center"
+                                className="!mt-10 !mb-20"
+                            >
+                                <ul className="flex justify-center pagination mt-3 w-full gap-4">
                                     <li
                                         className={
                                             page === 0
@@ -452,7 +703,7 @@ const Product = (props) => {
                                     {rows}
                                     <li
                                         className={
-                                            page === total
+                                            page === total - 1
                                                 ? "page-item disabled"
                                                 : "page-item"
                                         }

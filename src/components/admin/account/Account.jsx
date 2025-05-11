@@ -7,6 +7,7 @@ import {
 } from "../../../api/AccountApi";
 
 import Badge from "../badge/Badge";
+import { toast } from "react-toastify";
 
 const roleName = {
     CUSTOMER: "success",
@@ -52,7 +53,7 @@ const Account = () => {
                 setAccount(resp.data.content);
                 setTotal(resp.data.totalPages);
             })
-            .catch((error) => console.log(error));
+            .catch((error) => toast.warning(error.response.data.message));
 
         // getTotalPage()
         //     .then((resp) => setTotal(resp.data.content))
@@ -68,7 +69,7 @@ const Account = () => {
             setPage(0);
             getAccountByRole(0, 9, value)
                 .then((resp) => setAccount(resp.data.content))
-                .catch((error) => console.log(error));
+                .catch((error) => toast.warning(error.response.data.message));
         }
     };
     return (

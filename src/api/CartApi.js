@@ -5,6 +5,11 @@ export const modifyCartItem = async (data) => {
     return await Instance.post(url, data);
 }
 
+export const modifyCartItemFromDetail = async (data) => {
+    const url = `/api/v1/cart/modify-from-detail`;
+    return await Instance.post(url, data);
+}
+
 
 export const isEnoughCartItem = async (id, quantity) => {
     const url = `/api/v1/cart/check-stock?id=${id}&quantity=${quantity}`;

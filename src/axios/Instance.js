@@ -1,12 +1,13 @@
 import axios from "axios";
+import qs from "qs";
 
 const Instance = axios.create({
-    // baseURL: "http://localhost:8086",
     baseURL: "http://localhost:8080",
-    headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-    },
+    paramsSerializer: (params) =>
+        qs.stringify(params, {
+            skipNulls: true,
+            arrayFormat: "comma",
+        }),
 });
 
 Instance.interceptors.request.use(

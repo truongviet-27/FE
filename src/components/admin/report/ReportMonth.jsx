@@ -164,7 +164,7 @@ const ReportMonth = (props) => {
                             </tbody>
                         </table>
                         <nav aria-label="navigation">
-                            <ul className="flex justify-center pagination mt-3 w-full flex justify-center gap-2">
+                            <ul className="flex justify-center pagination mt-3 w-full gap-4">
                                 {/* Pagination controls */}
                             </ul>
                         </nav>

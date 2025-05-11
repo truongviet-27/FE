@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import { Button, Form } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
@@ -13,20 +14,21 @@ const WishList = () => {
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const [brand, setBrand] = useState([]);
+    const [size, setSize] = useState(10);
 
     useEffect(() => {
         onLoad();
-    }, [page, localStorage.getItem("token")]);
+    }, [page, localStorage.getItem("token"), size]);
 
     const onLoad = () => {
         const token = localStorage.getItem("token") || null;
         getAllProductWishList(token, page, 10)
             .then((response) => {
-                setProducts(response.content);
-                setTotal(response.totalPages);
+                setProducts(response.data.content);
+                setTotal(response.data.totalPages);
             })
             .catch((error) => {
-                toast.error(error.response.data.message);
+                toast.warning(error.response.data.message);
             });
 
         getBrands(0, 20)
@@ -42,7 +44,7 @@ const WishList = () => {
 
     var rows = new Array(total).fill(0).map((zero, index) => (
         <li
-            className={page === index + 1 ? "page-item active" : "page-item"}
+            className={page === index ? "page-item active" : "page-item"}
             key={index}
         >
             <button
@@ -66,13 +68,13 @@ const WishList = () => {
                     setTotal(resp.data.totalPages);
                 })
                 .catch((error) => {
-                    toast.warning(error.response.message);
+                    toast.warning(error.response.data.message);
                 });
         }
     };
     return (
-        <div className="col-12">
-            <div className="card">
+        <div className="col-12 !mb-20">
+            <div className="">
                 <div className="row mb-3 mt-3">
                     <div className="col-sm-4 mt-2">
                         <select
@@ -82,94 +84,114 @@ const WishList = () => {
                             }
                         >
                             <option value="0">Tất cả</option>
-                            {brand &&
-                                brand.map((item, index) => (
-                                    <option key={index} value={item.id}>
-                                        {item.name}
-                                    </option>
-                                ))}
+                            {brand?.map((item, index) => (
+                                <option key={index} value={item.id}>
+                                    {item.name}
+                                </option>
+                            ))}
                         </select>
                     </div>
                 </div>
                 <div className="card__body">
-                    <div>
-                        <div className="table-wrapper">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th scope="col">STT</th>
-                                        <th scope="col">Tên sản phẩm</th>
-                                        <th scope="col">Mã sản phẩm</th>
-                                        <th scope="col">Thương hiệu</th>
-                                        <th scope="col">Hình ảnh</th>
+                    <div className="table-wrapper">
+                        <table className="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th scope="col">STT</th>
+                                    <th scope="col">Tên sản phẩm</th>
+                                    <th scope="col">Mã sản phẩm</th>
+                                    <th scope="col">Thương hiệu</th>
+                                    <th scope="col">Hình ảnh</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {products?.map((item, index) => (
+                                    <tr key={item._id}>
+                                        <th scope="row">
+                                            <NavLink
+                                                to={`/product-detail/${item._id}`}
+                                                exact
+                                            >
+                                                {index + 1 + page * size}
+                                            </NavLink>
+                                        </th>
+                                        <th>{item.name}</th>
+                                        <th>{item.code}</th>
+                                        <th>{item?.brand?.name}</th>
+                                        <th>
+                                            <div className="flex justify-center">
+                                                <img
+                                                    className="img-fluid"
+                                                    style={{
+                                                        width: "50px",
+                                                        height: "50px",
+                                                    }}
+                                                    src={item?.image}
+                                                    alt=""
+                                                />
+                                            </div>
+                                        </th>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {products &&
-                                        products.map((item, index) => (
-                                            <tr key={index}>
-                                                <th scope="row">
-                                                    <NavLink
-                                                        to={`/product-detail/${item.id}`}
-                                                        exact
-                                                    >
-                                                        #{index + 1}
-                                                    </NavLink>
-                                                </th>
-                                                <th>{item.name}</th>
-                                                <th>{item.code}</th>
-                                                <th>{item.brand}</th>
-                                                <th>
-                                                    {" "}
-                                                    <img
-                                                        className="img-fluid"
-                                                        style={{
-                                                            width: "100px",
-                                                            height: "100px",
-                                                        }}
-                                                        src={item.image}
-                                                        alt=""
-                                                    />
-                                                </th>
-                                            </tr>
-                                        ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <nav aria-label="Page navigation flex justify-center">
-                    <ul className="flex justify-center pagination mt-3 w-full flex justify-center gap-2">
-                        <li
-                            className={
-                                page === 0 ? "page-item disabled" : "page-item"
-                            }
-                        >
-                            <button
-                                className="page-link"
-                                style={{ borderRadius: 50 }}
-                                onClick={() => onChangePage(0)}
+                <nav
+                    aria-label="Page navigation"
+                    className="flex items-center justify-between !mt-10 !mb-20"
+                >
+                    <div className="w-[100px]" />
+
+                    <div className="flex-1 flex justify-center items-center">
+                        <div className="flex pagination gap-4">
+                            <li
+                                className={
+                                    page === 0
+                                        ? "page-item disabled"
+                                        : "page-item"
+                                }
                             >
-                                {`<<`}
-                            </button>
-                        </li>
-                        {rows}
-                        <li
-                            className={
-                                page === total
-                                    ? "page-item disabled"
-                                    : "page-item"
-                            }
-                        >
-                            <button
-                                className="page-link"
-                                style={{ borderRadius: 50 }}
-                                onClick={() => onChangePage(total)}
+                                <button
+                                    className="page-link"
+                                    style={{ borderRadius: 50 }}
+                                    onClick={() => onChangePage(0)}
+                                >
+                                    {`<<`}
+                                </button>
+                            </li>
+                            {rows}
+                            <li
+                                className={
+                                    page === total - 1
+                                        ? "page-item disabled"
+                                        : "page-item"
+                                }
                             >
-                                {`>>`}
-                            </button>
-                        </li>
-                    </ul>
+                                <button
+                                    className="page-link"
+                                    style={{ borderRadius: 50 }}
+                                    onClick={() => onChangePage(page + 1)}
+                                >
+                                    {`>>`}
+                                </button>
+                            </li>
+                        </div>
+                    </div>
+
+                    <div className="w-[100px] flex justify-end">
+                        <select
+                            className="py-2 pl-2 border border-gray-100 rounded-[6px]"
+                            onChange={(e) => setSize(e.target.value)}
+                            value={size}
+                        >
+                            <option value={5}>5</option>
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={50}>50</option>
+                            <option value={100}>100</option>
+                        </select>
+                    </div>
                 </nav>
             </div>
             <Modal show={show} onHide={handleClose}>

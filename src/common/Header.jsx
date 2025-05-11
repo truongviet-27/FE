@@ -91,10 +91,14 @@ const Header = (props) => {
     };
 
     return (
-        <div className="mini-card">
-            <nav className="navbar navbar-expand-md">
+        <div className="mini-card fixed z-99 w-full !p-0 !px-10 !rounded-[0px]">
+            <nav className="navbar navbar-expand-md !p-0">
                 <div className="navbar-brand">
-                    <img src={logo} width={50} height={50} alt="logo" />
+                    <img
+                        src={logo}
+                        className="!w-[80px] !h-[80px]"
+                        alt="logo"
+                    />
                 </div>
                 <div className="flex items-center flex-1">
                     <ul className="navbar-nav justify-center flex-2">

@@ -36,8 +36,8 @@ const ChangePassword = (props) => {
             <div className="container py-5 h-100">
                 <div className="row d-flex justify-content-center align-items-center h-100">
                     <div className="col-12 col-md-8 col-lg-6 col-xl-5">
-                        <div className="card bg-dark text-white" style={{ borderRadius: "1rem" }}>
-                            <div className="card-body p-5 text-center">
+                        <div className="border border-white !p-20 bg-dark text-white" style={{ borderRadius: "1rem" }}>
+                            <div className="text-center">
                                 <h2 className="fw-bold mb-4 text-uppercase">Đổi mật khẩu</h2>
                                 <form onSubmit={handleSubmit(signInHandler)} className="needs-validation">
                                     <div className="form-outline form-white mb-4">
@@ -127,7 +127,7 @@ const ChangePassword = (props) => {
                                     </div>
 
                                     <p className="small mb-5 pb-lg-2">
-                                        <NavLink className="text-black-50" to="/forgot-password">
+                                        <NavLink className="text-white" to="/forgot-password">
                                             Quên mật khẩu?
                                         </NavLink>
                                     </p>

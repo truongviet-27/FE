@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { getVouchers } from "../../../api/VoucherApi";
 import formatDate from "../../../utils/convertDate";
+import { toast } from "react-toastify";
 
 const Voucher = () => {
     const [voucher, setVoucher] = useState();
@@ -33,10 +34,14 @@ const Voucher = () => {
     }, [page, size]);
 
     const onLoad = () => {
-        getVouchers(page, size).then((resp) => {
-            setVoucher(resp.data.content);
-            setTotal(resp.data.totalPages);
-        });
+        getVouchers(page, size)
+            .then((resp) => {
+                setVoucher(resp.data.content);
+                setTotal(resp.data.totalPages);
+            })
+            .catch((error) => {
+                toast.warning(error.response.data.message);
+            });
     };
 
     return (

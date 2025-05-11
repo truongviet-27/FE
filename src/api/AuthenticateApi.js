@@ -18,6 +18,11 @@ export const signIn = async (data) => {
     const url = "/api/v1/user/login";
     return await Instance.post(url, data);
 };
+
+export const resetPassword = async (data) => {
+    const url = "/api/v1/user/reset-password";
+    return await Instance.post(url, data);
+};
 export const changePassword = async (data) => {
     const url = "/api/v1/user/change-password";
     return await Instance.put(url, data);

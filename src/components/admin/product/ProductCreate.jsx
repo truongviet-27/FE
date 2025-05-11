@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import "../../../components/admin/image/CardProfile.css";
 import { getBrands } from "../../../api/BrandApi";
 import { getSale } from "../../../api/SaleApi";
@@ -26,12 +26,12 @@ const ProductForm = () => {
             .then((resp) => setBrand(resp.data.content))
             .catch((error) => console.log(error));
 
-        getSale(0, 8)
+        getSale(0, 10, true)
             .then((resp) => setSale(resp.data.content))
             .catch((error) => console.log(error));
 
         getCategory(0, 20)
-            .then((resp) => setCategory(resp.data.content ?? []))
+            .then((resp) => setValue("category", resp.data.content ?? []))
             .catch((error) => console.log(error));
     }, []);
 
@@ -39,7 +39,30 @@ const ProductForm = () => {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm();
+        setValue,
+        control,
+        getValues,
+    } = useForm({
+        defaultValues: {
+            attribute: [{}],
+        },
+    });
+
+    const { fields: fieldsCategoryId } = useFieldArray({
+        name: "category",
+        control,
+        keyName: "key",
+    });
+
+    const {
+        fields: filedsAttribute,
+        append,
+        remove,
+    } = useFieldArray({
+        name: "attribute",
+        control,
+        keyName: "key",
+    });
 
     const onFileChange = (event) => {
         const images = Array.from(event.target.files);
@@ -59,6 +82,7 @@ const ProductForm = () => {
     };
 
     const submitHandler = (data) => {
+        console.log(data, "xxxxxxxxxx");
         if (image.length < 1) {
             toast.warning("Cần tải lên ảnh của sản phẩm");
         } else {
@@ -87,9 +111,10 @@ const ProductForm = () => {
                 formData.append("name", data.name);
                 formData.append("code", data.code);
                 formData.append("description", data.description);
-                formData.append("brandId", data.brand);
-                formData.append("saleId", data.sale);
-                formData.append("categoryId", data.category);
+                formData.append("brand", data.brand);
+                formData.append("sale", data.sale);
+                formData.append("category", JSON.stringify(data.category));
+                formData.append("attribute", JSON.stringify(data.attribute));
 
                 // Thêm từng hình ảnh vào FormData
                 image.forEach((img, index) => {
@@ -97,76 +122,76 @@ const ProductForm = () => {
                 });
 
                 // Thêm các thuộc tính sản phẩm vào FormData dưới dạng các cặp key-value
-                const attributes = [
-                    {
-                        size: data.size1,
-                        price: data.price1,
-                        stock: data.quantity1,
-                    },
-                    {
-                        size: data.size2,
-                        price: data.price2,
-                        stock: data.quantity2,
-                    },
-                    {
-                        size: data.size3,
-                        price: data.price3,
-                        stock: data.quantity3,
-                    },
-                    {
-                        size: data.size4,
-                        price: data.price4,
-                        stock: data.quantity4,
-                    },
-                    {
-                        size: data.size5,
-                        price: data.price5,
-                        stock: data.quantity5,
-                    },
-                    {
-                        size: data.size6,
-                        price: data.price6,
-                        stock: data.quantity6,
-                    },
-                    {
-                        size: data.size7,
-                        price: data.price7,
-                        stock: data.quantity7,
-                    },
-                    {
-                        size: data.size8,
-                        price: data.price8,
-                        stock: data.quantity8,
-                    },
-                    {
-                        size: data.size9,
-                        price: data.price9,
-                        stock: data.quantity9,
-                    },
-                    {
-                        size: data.size10,
-                        price: data.price10,
-                        stock: data.quantity10,
-                    },
-                ].slice(0, count);
+                // const attributes = [
+                //     {
+                //         size: data.size1,
+                //         price: data.price1,
+                //         stock: data.quantity1,
+                //     },
+                //     {
+                //         size: data.size2,
+                //         price: data.price2,
+                //         stock: data.quantity2,
+                //     },
+                //     {
+                //         size: data.size3,
+                //         price: data.price3,
+                //         stock: data.quantity3,
+                //     },
+                //     {
+                //         size: data.size4,
+                //         price: data.price4,
+                //         stock: data.quantity4,
+                //     },
+                //     {
+                //         size: data.size5,
+                //         price: data.price5,
+                //         stock: data.quantity5,
+                //     },
+                //     {
+                //         size: data.size6,
+                //         price: data.price6,
+                //         stock: data.quantity6,
+                //     },
+                //     {
+                //         size: data.size7,
+                //         price: data.price7,
+                //         stock: data.quantity7,
+                //     },
+                //     {
+                //         size: data.size8,
+                //         price: data.price8,
+                //         stock: data.quantity8,
+                //     },
+                //     {
+                //         size: data.size9,
+                //         price: data.price9,
+                //         stock: data.quantity9,
+                //     },
+                //     {
+                //         size: data.size10,
+                //         price: data.price10,
+                //         stock: data.quantity10,
+                //     },
+                // ].slice(0, count);
 
-                attributes.forEach((attribute, index) => {
-                    formData.append(`attribute[${index}].size`, attribute.size);
-                    formData.append(
-                        `attribute[${index}].price`,
-                        attribute.price
-                    );
-                    formData.append(
-                        `attribute[${index}].stock`,
-                        attribute.stock
-                    );
-                });
+                // attributes.forEach((attribute, index) => {
+                //     formData.append(`attribute[${index}].size`, attribute.size);
+                //     formData.append(
+                //         `attribute[${index}].price`,
+                //         attribute.price
+                //     );
+                //     formData.append(
+                //         `attribute[${index}].stock`,
+                //         attribute.stock
+                //     );
+                // });
 
                 // Gửi yêu cầu tạo sản phẩm
                 createProduct(formData)
                     .then(() => {
                         toast.success("Thêm mới sản phẩm thành công");
-                        history.push("/admin/products");
+                        history.push("/admin/product");
                     })
                     .catch((error) => toast.error(error.response.data.message));
             }
@@ -174,7 +199,14 @@ const ProductForm = () => {
     };
 
     const changeCountHandler = (value) => {
-        setCount(value);
+        if (value - getValues("attribute").length < 0) {
+            remove();
+        }
+        Array.from({
+            length: value - getValues("attribute").length,
+        }).forEach(() => {
+            append({});
+        });
     };
 
     const goBack = () => {
@@ -273,12 +305,11 @@ const ProductForm = () => {
                                         required: true,
                                     })}
                                 >
-                                    {brand &&
-                                        brand.map((item, index) => (
-                                            <option value={item.id} key={index}>
-                                                {item.name}
-                                            </option>
-                                        ))}
+                                    {brand?.map((item, index) => (
+                                        <option value={item._id} key={item._id}>
+                                            {item.name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="col-sm-6 mt-4">
@@ -291,16 +322,11 @@ const ProductForm = () => {
                                         required: true,
                                     })}
                                 >
-                                    {sale &&
-                                        sale.map((item, index) => (
-                                            <option
-                                                value={item.id}
-                                                key={index}
-                                                selected={item.id === 1}
-                                            >
-                                                {item.name} - {item.discount} %
-                                            </option>
-                                        ))}
+                                    {sale?.map((item, index) => (
+                                        <option value={item._id} key={item._id}>
+                                            {item.name} - {item.discount} %
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="col-12 mt-4">
@@ -308,24 +334,26 @@ const ProductForm = () => {
                                     Loại sản phẩm
                                 </label>{" "}
                                 <br />
-                                {category?.map((item, index) => (
-                                    <div
-                                        className="col-2 form-check form-check-inline mr-5"
-                                        key={index}
-                                    >
-                                        <input
-                                            className="form-check-input"
-                                            type="checkbox"
-                                            value={item.id}
-                                            {...register("category", {
-                                                required: true,
-                                            })}
-                                        />
-                                        <label className="form-check-label">
-                                            {item.name}
-                                        </label>
-                                    </div>
-                                ))}
+                                <div className="flex items-center gap-4">
+                                    {fieldsCategoryId?.map((item, index) => (
+                                        <div
+                                            className="flex items-center gap-2"
+                                            key={item._id}
+                                        >
+                                            <input
+                                                className="form-check-input !-mt-1"
+                                                type="checkbox"
+                                                value={item._id}
+                                                {...register("category", {
+                                                    required: true,
+                                                })}
+                                            />
+                                            <label className="form-check-label">
+                                                {item.name}
+                                            </label>
+                                        </div>
+                                    ))}
+                                </div>
                                 {errors.category && (
                                     <div
                                         className="alert alert-danger"
@@ -427,14 +455,16 @@ const ProductForm = () => {
                         </div>
                     </div>
                     <div className={`col-12`}>
-                        <div className={`card mr-5 col-12`}>
-                            <h4 className="d-flex justify-content-between align-items-center mb-1">
+                        <div
+                            className={`border border-gray-200 !py-5 !px-5 rounded-2xl !mt-4`}
+                        >
+                            <h4 className="d-flex justify-content-between align-items-center mb-4">
                                 <span className="text-dark">
                                     Chi tiết sản phẩm
                                 </span>{" "}
                                 <br />
                             </h4>
-                            <span className="text-dark">Số lượng</span> <br />
+                            <label className="mb-2">Số lượng</label>
                             <select
                                 className="form-control mb-2"
                                 onChange={(e) =>
@@ -449,20 +479,26 @@ const ProductForm = () => {
                             </select>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4">
-                            {count >= 1 && (
-                                <div className="card mr-3 col-sm-12 col-md-6 !w-full">
-                                    <div className="form-row">
+                        <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-5 gap-4">
+                            {filedsAttribute.map((item, index) => {
+                                return (
+                                    <div
+                                        key={item.key}
+                                        className="border border-gray-200 py-4 px-2 rounded-2xl !mt-4 form-row"
+                                    >
                                         <div className="form-group col-md-12 mb-3">
                                             <label className="mb-2">Size</label>
                                             <input
                                                 type="number"
                                                 className="form-control"
-                                                {...register("size1", {
-                                                    required: true,
-                                                    min: 36,
-                                                    max: 45,
-                                                })}
+                                                {...register(
+                                                    `attribute.${index}.size`,
+                                                    {
+                                                        required: true,
+                                                        min: 36,
+                                                        max: 45,
+                                                    }
+                                                )}
                                             />
                                             {errors.size1 && (
                                                 <p className="text-danger mt-2">
@@ -477,10 +513,13 @@ const ProductForm = () => {
                                             <input
                                                 type="number"
                                                 className="form-control"
-                                                {...register("price1", {
-                                                    required: true,
-                                                    min: 1,
-                                                })}
+                                                {...register(
+                                                    `attribute.${index}.price`,
+                                                    {
+                                                        required: true,
+                                                        min: 1,
+                                                    }
+                                                )}
                                             />
                                             {errors.price1 && (
                                                 <p className="text-danger mt-2">
@@ -495,10 +534,13 @@ const ProductForm = () => {
                                             <input
                                                 type="number"
                                                 className="form-control"
-                                                {...register("quantity1", {
-                                                    required: true,
-                                                    min: 1,
-                                                })}
+                                                {...register(
+                                                    `attribute.${index}.quantity`,
+                                                    {
+                                                        required: true,
+                                                        min: 1,
+                                                    }
+                                                )}
                                             />
                                             {errors.quantity1 && (
                                                 <p className="text-danger mt-2">
@@ -507,553 +549,501 @@ const ProductForm = () => {
                                             )}
                                         </div>
                                     </div>
-                                </div>
-                            )}
-                            {count >= 2 && (
-                                <div className="card mr-3 col-sm-12 col-md-6 !w-full">
-                                    <div className="form-row">
-                                        <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">Size</label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("size2", {
-                                                    required: true,
-                                                    min: 36,
-                                                    max: 45,
-                                                })}
-                                            />
-                                            {errors.size2 && (
-                                                <p className="text-danger mt-2">
-                                                    Size giày trong khoảng 36-45
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">
-                                                Giá(Vnđ)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("price2", {
-                                                    required: true,
-                                                    min: 1,
-                                                })}
-                                            />
-                                            {errors.price2 && (
-                                                <p className="text-danger mt-2">
-                                                    Giá sản phẩm lớn hơn 0
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="form-group col-md-12">
-                                            <label className="mb-2">
-                                                Số lượng
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("quantity2", {
-                                                    required: true,
-                                                    min: 1,
-                                                })}
-                                            />
-                                            {errors.quantity2 && (
-                                                <p className="text-danger mt-2">
-                                                    Số lượng sản phẩm lớn hơn 1
-                                                </p>
-                                            )}
-                                        </div>
+                                );
+                            })}
+                            {/* {count >= 1 && (
+                               
+                            )} */}
+                            {/* {count >= 2 && (
+                                <div className="border border-gray-200 py-4 px-2 rounded-2xl !mt-4 form-row">
+                                    <div className="form-group col-md-12 mb-3">
+                                        <label className="mb-2">Size</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("size2", {
+                                                required: true,
+                                                min: 36,
+                                                max: 45,
+                                            })}
+                                        />
+                                        {errors.size2 && (
+                                            <p className="text-danger mt-2">
+                                                Size giày trong khoảng 36-45
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="form-group col-md-12 mb-3">
+                                        <label className="mb-2">Giá(Vnđ)</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("price2", {
+                                                required: true,
+                                                min: 1,
+                                            })}
+                                        />
+                                        {errors.price2 && (
+                                            <p className="text-danger mt-2">
+                                                Giá sản phẩm lớn hơn 0
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="form-group col-md-12">
+                                        <label className="mb-2">Số lượng</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("quantity2", {
+                                                required: true,
+                                                min: 1,
+                                            })}
+                                        />
+                                        {errors.quantity2 && (
+                                            <p className="text-danger mt-2">
+                                                Số lượng sản phẩm lớn hơn 1
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             )}
                             {count >= 3 && (
-                                <div className="card mr-3 col-sm-12 col-md-6 !w-full">
-                                    <div className="form-row">
-                                        <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">Size</label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("size3", {
-                                                    required: true,
-                                                    min: 36,
-                                                    max: 45,
-                                                })}
-                                            />
-                                            {errors.size3 && (
-                                                <p className="text-danger mt-2">
-                                                    Size giày trong khoảng 36-45
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">
-                                                Giá(Vnđ)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("price3", {
-                                                    required: true,
-                                                    min: 1,
-                                                })}
-                                            />
-                                            {errors.price3 && (
-                                                <p className="text-danger mt-2">
-                                                    Giá sản phẩm lớn hơn 0
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="form-group col-md-12">
-                                            <label className="mb-2">
-                                                Số lượng
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("quantity3", {
-                                                    required: true,
-                                                    min: 1,
-                                                })}
-                                            />
-                                            {errors.quantity3 && (
-                                                <p className="text-danger mt-2">
-                                                    Số lượng sản phẩm lớn hơn 1
-                                                </p>
-                                            )}
-                                        </div>
+                                <div className="border border-gray-200 py-4 px-2 rounded-2xl !mt-4 form-row">
+                                    <div className="form-group col-md-12 mb-3">
+                                        <label className="mb-2">Size</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("size3", {
+                                                required: true,
+                                                min: 36,
+                                                max: 45,
+                                            })}
+                                        />
+                                        {errors.size3 && (
+                                            <p className="text-danger mt-2">
+                                                Size giày trong khoảng 36-45
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="form-group col-md-12 mb-3">
+                                        <label className="mb-2">Giá(Vnđ)</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("price3", {
+                                                required: true,
+                                                min: 1,
+                                            })}
+                                        />
+                                        {errors.price3 && (
+                                            <p className="text-danger mt-2">
+                                                Giá sản phẩm lớn hơn 0
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="form-group col-md-12">
+                                        <label className="mb-2">Số lượng</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("quantity3", {
+                                                required: true,
+                                                min: 1,
+                                            })}
+                                        />
+                                        {errors.quantity3 && (
+                                            <p className="text-danger mt-2">
+                                                Số lượng sản phẩm lớn hơn 1
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             )}
                             {count >= 4 && (
-                                <div className="card mr-3 col-sm-12 col-md-6 !w-full">
-                                    <div className="form-row">
-                                        <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">Size</label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("size4", {
-                                                    required: true,
-                                                    min: 36,
-                                                    max: 45,
-                                                })}
-                                            />
-                                            {errors.size4 && (
-                                                <p className="text-danger mt-2">
-                                                    Size giày trong khoảng 36-45
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">
-                                                Giá(Vnđ)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("price4", {
-                                                    required: true,
-                                                    min: 1,
-                                                })}
-                                            />
-                                            {errors.price4 && (
-                                                <p className="text-danger mt-2">
-                                                    Giá sản phẩm lớn hơn 0
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="form-group col-md-12">
-                                            <label className="mb-2">
-                                                Số lượng
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("quantity4", {
-                                                    required: true,
-                                                    min: 1,
-                                                })}
-                                            />
-                                            {errors.quantity4 && (
-                                                <p className="text-danger mt-2">
-                                                    Số lượng sản phẩm lớn hơn 1
-                                                </p>
-                                            )}
-                                        </div>
+                                <div className="border border-gray-200 py-4 px-2 rounded-2xl !mt-4 form-row">
+                                    <div className="form-group col-md-12 mb-3">
+                                        <label className="mb-2">Size</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("size4", {
+                                                required: true,
+                                                min: 36,
+                                                max: 45,
+                                            })}
+                                        />
+                                        {errors.size4 && (
+                                            <p className="text-danger mt-2">
+                                                Size giày trong khoảng 36-45
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="form-group col-md-12 mb-3">
+                                        <label className="mb-2">Giá(Vnđ)</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("price4", {
+                                                required: true,
+                                                min: 1,
+                                            })}
+                                        />
+                                        {errors.price4 && (
+                                            <p className="text-danger mt-2">
+                                                Giá sản phẩm lớn hơn 0
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="form-group col-md-12">
+                                        <label className="mb-2">Số lượng</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("quantity4", {
+                                                required: true,
+                                                min: 1,
+                                            })}
+                                        />
+                                        {errors.quantity4 && (
+                                            <p className="text-danger mt-2">
+                                                Số lượng sản phẩm lớn hơn 1
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             )}
                             {count >= 5 && (
-                                <div className="card mr-3 col-sm-12 col-md-6 !w-full">
-                                    <div className="form-row">
-                                        <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">Size</label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("size5", {
-                                                    required: true,
-                                                    min: 36,
-                                                    max: 45,
-                                                })}
-                                            />
-                                            {errors.size5 && (
-                                                <p className="text-danger mt-2">
-                                                    Size giày trong khoảng 36-45
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">
-                                                Giá(Vnđ)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("price5", {
-                                                    required: true,
-                                                    min: 1,
-                                                })}
-                                            />
-                                            {errors.price5 && (
-                                                <p className="text-danger mt-2">
-                                                    Giá sản phẩm lớn hơn 0
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="form-group col-md-12">
-                                            <label className="mb-2">
-                                                Số lượng
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("quantity5", {
-                                                    required: true,
-                                                    min: 1,
-                                                })}
-                                            />
-                                            {errors.quantity5 && (
-                                                <p className="text-danger mt-2">
-                                                    Số lượng sản phẩm lớn hơn 1
-                                                </p>
-                                            )}
-                                        </div>
+                                <div className="border border-gray-200 py-4 px-2 rounded-2xl !mt-4 form-row">
+                                    <div className="form-group col-md-12 mb-3">
+                                        <label className="mb-2">Size</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("size5", {
+                                                required: true,
+                                                min: 36,
+                                                max: 45,
+                                            })}
+                                        />
+                                        {errors.size5 && (
+                                            <p className="text-danger mt-2">
+                                                Size giày trong khoảng 36-45
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="form-group col-md-12 mb-3">
+                                        <label className="mb-2">Giá(Vnđ)</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("price5", {
+                                                required: true,
+                                                min: 1,
+                                            })}
+                                        />
+                                        {errors.price5 && (
+                                            <p className="text-danger mt-2">
+                                                Giá sản phẩm lớn hơn 0
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="form-group col-md-12">
+                                        <label className="mb-2">Số lượng</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("quantity5", {
+                                                required: true,
+                                                min: 1,
+                                            })}
+                                        />
+                                        {errors.quantity5 && (
+                                            <p className="text-danger mt-2">
+                                                Số lượng sản phẩm lớn hơn 1
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             )}
                             {count >= 6 && (
-                                <div className="card mr-3 col-sm-12 col-md-6 !w-full">
-                                    <div className="form-row">
-                                        <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">Size</label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("size6", {
-                                                    required: true,
-                                                    min: 36,
-                                                    max: 45,
-                                                })}
-                                            />
-                                            {errors.size6 && (
-                                                <p className="text-danger mt-2">
-                                                    Size giày trong khoảng 36-45
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">
-                                                Giá(Vnđ)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("price6", {
-                                                    required: true,
-                                                    min: 1,
-                                                })}
-                                            />
-                                            {errors.price6 && (
-                                                <p className="text-danger mt-2">
-                                                    Giá sản phẩm lớn hơn 0
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="form-group col-md-12">
-                                            <label className="mb-2">
-                                                Số lượng
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("quantity6", {
-                                                    required: true,
-                                                    min: 1,
-                                                })}
-                                            />
-                                            {errors.quantity6 && (
-                                                <p className="text-danger mt-2">
-                                                    Số lượng sản phẩm lớn hơn 1
-                                                </p>
-                                            )}
-                                        </div>
+                                <div className="border border-gray-200 py-4 px-2 rounded-2xl !mt-4 form-row">
+                                    <div className="form-group col-md-12 mb-3">
+                                        <label className="mb-2">Size</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("size6", {
+                                                required: true,
+                                                min: 36,
+                                                max: 45,
+                                            })}
+                                        />
+                                        {errors.size6 && (
+                                            <p className="text-danger mt-2">
+                                                Size giày trong khoảng 36-45
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="form-group col-md-12 mb-3">
+                                        <label className="mb-2">Giá(Vnđ)</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("price6", {
+                                                required: true,
+                                                min: 1,
+                                            })}
+                                        />
+                                        {errors.price6 && (
+                                            <p className="text-danger mt-2">
+                                                Giá sản phẩm lớn hơn 0
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="form-group col-md-12">
+                                        <label className="mb-2">Số lượng</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("quantity6", {
+                                                required: true,
+                                                min: 1,
+                                            })}
+                                        />
+                                        {errors.quantity6 && (
+                                            <p className="text-danger mt-2">
+                                                Số lượng sản phẩm lớn hơn 1
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             )}
                             {count >= 7 && (
-                                <div className="card mr-3 col-sm-12 col-md-6 !w-full">
-                                    <div className="form-row">
-                                        <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">Size</label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("size7", {
-                                                    required: true,
-                                                    min: 36,
-                                                    max: 45,
-                                                })}
-                                            />
-                                            {errors.size7 && (
-                                                <p className="text-danger mt-2">
-                                                    Size giày trong khoảng 36-45
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">
-                                                Giá(Vnđ)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("price7", {
-                                                    required: true,
-                                                    min: 1,
-                                                })}
-                                            />
-                                            {errors.price7 && (
-                                                <p className="text-danger mt-2">
-                                                    Giá sản phẩm lớn hơn 0
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="form-group col-md-12">
-                                            <label className="mb-2">
-                                                Số lượng
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("quantity7", {
-                                                    required: true,
-                                                    min: 1,
-                                                })}
-                                            />
-                                            {errors.quantity7 && (
-                                                <p className="text-danger mt-2">
-                                                    Số lượng sản phẩm lớn hơn 1
-                                                </p>
-                                            )}
-                                        </div>
+                                <div className="border border-gray-200 py-4 px-2 rounded-2xl !mt-4 form-row">
+                                    <div className="form-group col-md-12 mb-3">
+                                        <label className="mb-2">Size</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("size7", {
+                                                required: true,
+                                                min: 36,
+                                                max: 45,
+                                            })}
+                                        />
+                                        {errors.size7 && (
+                                            <p className="text-danger mt-2">
+                                                Size giày trong khoảng 36-45
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="form-group col-md-12 mb-3">
+                                        <label className="mb-2">Giá(Vnđ)</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("price7", {
+                                                required: true,
+                                                min: 1,
+                                            })}
+                                        />
+                                        {errors.price7 && (
+                                            <p className="text-danger mt-2">
+                                                Giá sản phẩm lớn hơn 0
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="form-group col-md-12">
+                                        <label className="mb-2">Số lượng</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("quantity7", {
+                                                required: true,
+                                                min: 1,
+                                            })}
+                                        />
+                                        {errors.quantity7 && (
+                                            <p className="text-danger mt-2">
+                                                Số lượng sản phẩm lớn hơn 1
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             )}
                             {count >= 8 && (
-                                <div className="card mr-3 col-sm-12 col-md-6 !w-full">
-                                    <div className="form-row">
-                                        <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">Size</label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("size8", {
-                                                    required: true,
-                                                    min: 36,
-                                                    max: 45,
-                                                })}
-                                            />
-                                            {errors.size8 && (
-                                                <p className="text-danger mt-2">
-                                                    Size giày trong khoảng 36-45
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">
-                                                Giá(Vnđ)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("price8", {
-                                                    required: true,
-                                                    min: 1,
-                                                })}
-                                            />
-                                            {errors.price8 && (
-                                                <p className="text-danger mt-2">
-                                                    Giá sản phẩm lớn hơn 0
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="form-group col-md-12">
-                                            <label className="mb-2">
-                                                Số lượng
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("quantity8", {
-                                                    required: true,
-                                                    min: 1,
-                                                })}
-                                            />
-                                            {errors.quantity8 && (
-                                                <p className="text-danger mt-2">
-                                                    Số lượng sản phẩm lớn hơn 1
-                                                </p>
-                                            )}
-                                        </div>
+                                <div className="border border-gray-200 py-4 px-2 rounded-2xl !mt-4 form-row">
+                                    <div className="form-group col-md-12 mb-3">
+                                        <label className="mb-2">Size</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("size8", {
+                                                required: true,
+                                                min: 36,
+                                                max: 45,
+                                            })}
+                                        />
+                                        {errors.size8 && (
+                                            <p className="text-danger mt-2">
+                                                Size giày trong khoảng 36-45
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="form-group col-md-12 mb-3">
+                                        <label className="mb-2">Giá(Vnđ)</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("price8", {
+                                                required: true,
+                                                min: 1,
+                                            })}
+                                        />
+                                        {errors.price8 && (
+                                            <p className="text-danger mt-2">
+                                                Giá sản phẩm lớn hơn 0
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="form-group col-md-12">
+                                        <label className="mb-2">Số lượng</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("quantity8", {
+                                                required: true,
+                                                min: 1,
+                                            })}
+                                        />
+                                        {errors.quantity8 && (
+                                            <p className="text-danger mt-2">
+                                                Số lượng sản phẩm lớn hơn 1
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             )}
                             {count >= 9 && (
-                                <div className="card mr-3 col-sm-12 col-md-6 !w-full">
-                                    <div className="form-row">
-                                        <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">Size</label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("size9", {
-                                                    required: true,
-                                                    min: 36,
-                                                    max: 45,
-                                                })}
-                                            />
-                                            {errors.size9 && (
-                                                <p className="text-danger mt-2">
-                                                    Size giày trong khoảng 36-45
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">
-                                                Giá(Vnđ)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("price9", {
-                                                    required: true,
-                                                    min: 1,
-                                                })}
-                                            />
-                                            {errors.price9 && (
-                                                <p className="text-danger mt-2">
-                                                    Giá sản phẩm lớn hơn 0
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="form-group col-md-12">
-                                            <label className="mb-2">
-                                                Số lượng
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("quantity9", {
-                                                    required: true,
-                                                    validate: (value) =>
-                                                        value >= 1,
-                                                    min: 1,
-                                                })}
-                                            />
-                                            {errors.quantity9 && (
-                                                <p className="text-danger mt-2">
-                                                    Số lượng sản phẩm lớn hơn 1
-                                                </p>
-                                            )}
-                                        </div>
+                                <div className="border border-gray-200 py-4 px-2 rounded-2xl !mt-4 form-row">
+                                    <div className="form-group col-md-12 mb-3">
+                                        <label className="mb-2">Size</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("size9", {
+                                                required: true,
+                                                min: 36,
+                                                max: 45,
+                                            })}
+                                        />
+                                        {errors.size9 && (
+                                            <p className="text-danger mt-2">
+                                                Size giày trong khoảng 36-45
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="form-group col-md-12 mb-3">
+                                        <label className="mb-2">Giá(Vnđ)</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("price9", {
+                                                required: true,
+                                                min: 1,
+                                            })}
+                                        />
+                                        {errors.price9 && (
+                                            <p className="text-danger mt-2">
+                                                Giá sản phẩm lớn hơn 0
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="form-group col-md-12">
+                                        <label className="mb-2">Số lượng</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("quantity9", {
+                                                required: true,
+                                                validate: (value) => value >= 1,
+                                                min: 1,
+                                            })}
+                                        />
+                                        {errors.quantity9 && (
+                                            <p className="text-danger mt-2">
+                                                Số lượng sản phẩm lớn hơn 1
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             )}
                             {count >= 10 && (
-                                <div className="card mr-3 col-sm-12 col-md-6 !w-full">
-                                    <div className="form-row">
-                                        <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">Size</label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("size10", {
-                                                    required: true,
-                                                    min: 36,
-                                                    max: 45,
-                                                })}
-                                            />
-                                            {errors.size10 && (
-                                                <p className="text-danger mt-2">
-                                                    Size giày trong khoảng 36-45
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">
-                                                Giá(Vnđ)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("price10", {
-                                                    required: true,
-                                                    min: 1,
-                                                })}
-                                            />
-                                            {errors.price10 && (
-                                                <p className="text-danger mt-2">
-                                                    Giá sản phẩm lớn hơn 0
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="form-group col-md-12">
-                                            <label className="mb-2">
-                                                Số lượng
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register("quantity10", {
-                                                    required: true,
-                                                    min: 1,
-                                                })}
-                                            />
-                                            {errors.quantity10 && (
-                                                <p className="text-danger mt-2">
-                                                    Số lượng sản phẩm lớn hơn 1
-                                                </p>
-                                            )}
-                                        </div>
+                                <div className="border border-gray-200 py-4 px-2 rounded-2xl !mt-4 form-row">
+                                    <div className="form-group col-md-12 mb-3">
+                                        <label className="mb-2">Size</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("size10", {
+                                                required: true,
+                                                min: 36,
+                                                max: 45,
+                                            })}
+                                        />
+                                        {errors.size10 && (
+                                            <p className="text-danger mt-2">
+                                                Size giày trong khoảng 36-45
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="form-group col-md-12 mb-3">
+                                        <label className="mb-2">Giá(Vnđ)</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("price10", {
+                                                required: true,
+                                                min: 1,
+                                            })}
+                                        />
+                                        {errors.price10 && (
+                                            <p className="text-danger mt-2">
+                                                Giá sản phẩm lớn hơn 0
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="form-group col-md-12">
+                                        <label className="mb-2">Số lượng</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            {...register("quantity10", {
+                                                required: true,
+                                                min: 1,
+                                            })}
+                                        />
+                                        {errors.quantity10 && (
+                                            <p className="text-danger mt-2">
+                                                Số lượng sản phẩm lớn hơn 1
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     </div>
+                    <div className="flex justify-center">
+                        <button
+                            className="btn btn-primary btn-lg mt-4 mb-4"
+                            type="submit"
+                            style={{ borderRadius: 50 }}
+                        >
+                            Thêm mới
+                        </button>
+                    </div>
                 </form>
-            </div>
-            <div className="flex justify-center">
-                <button
-                    className="btn btn-primary btn-lg mt-4 mb-4"
-                    type="submit"
-                    style={{ borderRadius: 50 }}
-                >
-                    Thêm mới
-                </button>
             </div>
         </div>
     );

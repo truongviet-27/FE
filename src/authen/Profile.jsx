@@ -12,7 +12,9 @@ const Profile = (props) => {
     const [userInfo, setUserInfo] = useState();
 
     useEffect(() => {
-        getAccountDetailByAccountId(localStorage.getItem("userId"))
+        getAccountDetailByAccountId(
+            JSON.parse(localStorage.getItem("user"))?._id
+        )
             .then((res) => {
                 reset(res.data.data);
                 setUserInfo(res.data.data);
@@ -29,8 +31,6 @@ const Profile = (props) => {
         getValues,
         reset,
     } = useForm();
-
-    console.log(getValues("gender"), "gender");
 
     const onSubmitHandler = (data) => {
         const updatedData = { ...data, id: userInfo?.id };

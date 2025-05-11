@@ -114,72 +114,66 @@ const Product = () => {
                             </select>
                         </div>
                     </div>
-                    <div className="card__body">
-                        <div>
-                            <div className="table-wrapper">
-                                <table className="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">STT</th>
-                                            <th scope="col">Tên sản phẩm</th>
-                                            <th scope="col">Mã sản phẩm</th>
-                                            <th scope="col">Thương hiệu</th>
-                                            <th scope="col">Hình ảnh</th>
+                    <div className="overflow-y-auto max-h-[500px]">
+                        <table className="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th scope="col">STT</th>
+                                    <th scope="col">Tên sản phẩm</th>
+                                    <th scope="col">Mã sản phẩm</th>
+                                    <th scope="col">Thương hiệu</th>
+                                    <th scope="col">Hình ảnh</th>
 
-                                            <th scope="col">Trạng thái</th>
-                                            <th scope="col">Cập nhật</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="">
-                                        {products?.map((item, index) => (
-                                            <tr key={index}>
-                                                <th scope="row">
-                                                    <NavLink
-                                                        to={`/admin/product/product-view/${item._id}`}
-                                                        exact
-                                                    >
-                                                        {index +
-                                                            1 +
-                                                            page * size}
-                                                    </NavLink>
-                                                </th>
-                                                <th>{item.name}</th>
-                                                <th>{item.code}</th>
-                                                <th>{item?.brand?.name}</th>
-                                                <th className="flex items-center justify-center h-[60px] border-0">
-                                                    <img
-                                                        className="img-fluid"
-                                                        style={{
-                                                            width: "50px",
-                                                            height: "50px",
-                                                        }}
-                                                        src={item.image}
-                                                        alt=""
-                                                    />
-                                                </th>
-                                                {/* <th>{formatCurrency(item.price)}</th> */}
-                                                <th>
-                                                    {item.isActive
-                                                        ? "Đang bán"
-                                                        : "Dừng bán"}
-                                                </th>
-                                                <th>
-                                                    <NavLink
-                                                        to={`/admin/product/product-detail/${item._id}`}
-                                                        exact
-                                                    >
-                                                        <i
-                                                            className="fa fa-pencil-square-o"
-                                                            aria-hidden="true"
-                                                        ></i>
-                                                    </NavLink>
-                                                </th>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                                    <th scope="col">Trạng thái</th>
+                                    <th scope="col">Cập nhật</th>
+                                </tr>
+                            </thead>
+                            <tbody className="">
+                                {products?.map((item, index) => (
+                                    <tr key={index}>
+                                        <th scope="row">
+                                            <NavLink
+                                                to={`/admin/product/product-view/${item._id}`}
+                                                exact
+                                            >
+                                                {index + 1 + page * size}
+                                            </NavLink>
+                                        </th>
+                                        <th>{item.name}</th>
+                                        <th>{item.code}</th>
+                                        <th>{item?.brand?.name}</th>
+                                        <th className="flex items-center justify-center h-[60px] border-0">
+                                            <img
+                                                className="img-fluid"
+                                                style={{
+                                                    width: "50px",
+                                                    height: "50px",
+                                                }}
+                                                src={item.image}
+                                                alt=""
+                                            />
+                                        </th>
+                                        {/* <th>{formatCurrency(item.price)}</th> */}
+                                        <th>
+                                            {item.isActive
+                                                ? "Đang bán"
+                                                : "Dừng bán"}
+                                        </th>
+                                        <th>
+                                            <NavLink
+                                                to={`/admin/product/product-detail/${item._id}`}
+                                                exact
+                                            >
+                                                <i
+                                                    className="fa fa-pencil-square-o"
+                                                    aria-hidden="true"
+                                                ></i>
+                                            </NavLink>
+                                        </th>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 <nav

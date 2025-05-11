@@ -1,15 +1,15 @@
-import React, { useState } from "react";
-import { NavLink, useHistory } from "react-router-dom";
-import "./signin.css";
 import "font-awesome/css/font-awesome.min.css";
-import { signIn, verifyOtp } from "../api/AuthenticateApi";
+import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
-import { getAccountDetailByAccountId, getInformation } from "../api/AccountApi";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import OTPInput from "react-otp-input";
+import { NavLink, useHistory } from "react-router-dom";
+import { toast } from "react-toastify";
+import "../../../authen/signin.css";
+import { getAccountDetailByAccountId } from "../../../api/AccountApi";
+import { signIn, verifyOtp } from "../../../api/AuthenticateApi";
 
-const SignIn = (props) => {
+const SignInAdmin = (props) => {
     const history = useHistory();
     const [showPassword, setShowPassword] = useState(false);
     const [isShowOtp, setIsShowOtp] = useState(false);
@@ -248,45 +248,13 @@ const SignIn = (props) => {
                                         </>
                                     )}
 
-                                    <p className="small mb-5 pb-lg-2">
-                                        <NavLink
-                                            className="text-white"
-                                            to="/forgot-password"
-                                        >
-                                            Quên mật khẩu?
-                                        </NavLink>
-                                    </p>
-
                                     <button
-                                        className="btn btn-outline-light btn-lg px-5"
+                                        className="btn btn-outline-light btn-lg px-5 mt-5"
                                         type="submit"
                                     >
                                         Đăng nhập
                                     </button>
                                 </form>
-
-                                <div className="d-flex justify-content-center text-center mt-4 pt-1">
-                                    <a href="#!" className="text-white mx-2">
-                                        <i className="fab fa-facebook-f fa-lg" />
-                                    </a>
-                                    <a href="#!" className="text-white mx-2">
-                                        <i className="fab fa-twitter fa-lg" />
-                                    </a>
-                                    <a href="#!" className="text-white mx-2">
-                                        <i className="fab fa-google fa-lg" />
-                                    </a>
-                                </div>
-                            </div>
-                            <div>
-                                <p className="mb-0">
-                                    Chưa có tài khoản?{" "}
-                                    <NavLink
-                                        to="/register"
-                                        className="text-white-50 fw-bold"
-                                    >
-                                        Đăng kí ngay
-                                    </NavLink>
-                                </p>
                             </div>
                         </div>
                     </div>
@@ -296,4 +264,4 @@ const SignIn = (props) => {
     );
 };
 
-export default SignIn;
+export default SignInAdmin;

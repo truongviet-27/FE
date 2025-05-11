@@ -4,7 +4,7 @@ import "./Blog.css";
 const Blog = (props) => {
 
   return (
-    <div className="col-10 offset-1 card">
+    <div className="col-12 border border-gray-200 rounded-2xl !p-10 !my-10">
       <h4 className="text-uppercase text-primary">Cam kết sản phẩm</h4>
       <p>1 . Tất cả sản phẩm Sneaker bán ra 100% là Chính Hãng , được nhập 100% từ các nước như MỸ, ANH, NHẬT, HÀN, VIỆT NAM… Full Box, tem tag giấy gói. Giấy giữ form giày sẽ bỏ khi vận chuyển, khách hàng yêu cầu vẫn có.</p>
       <p>2 . Tất cả sản phẩm được nhập từ website Adidas US, Adidas UK, Adidas Japan, Adidas Korea, Adidas Việt Nam</p>
