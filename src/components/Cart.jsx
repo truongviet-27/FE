@@ -36,13 +36,11 @@ const Cart = (props) => {
 
     useEffect(() => {
         onLoad();
-    }, []);
+    }, [props.user]);
 
     const onLoad = () => {
-        if (localStorage.getItem("user")) {
-            getCartItemByAccountId(
-                JSON.parse(localStorage.getItem("user"))._id
-            ).then((resp) => {
+        if (props?.user) {
+            getCartItemByAccountId(localStorage.getItem("id")).then((resp) => {
                 setCart(
                     resp.data.content.map((item) => ({
                         ...item,

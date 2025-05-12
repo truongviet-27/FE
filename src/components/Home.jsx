@@ -1,17 +1,17 @@
-import { NavLink } from "react-router-dom";
 import { Carousel } from "antd";
 import "antd/dist/reset.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
-import first from "../static/images/slider_6.jpg";
+import React, { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
+import { toast } from "react-toastify";
+import { getAllProducts, toggleLikeProduct } from "../api/ProductApi";
+import "../static/css/home.css";
 import second from "../static/images/slider_2_image.jpg";
 import third from "../static/images/slider_4_image.jpg";
+import first from "../static/images/slider_6.jpg";
 import fourth from "../static/images/slider_7.jpg";
-import React, { useState, useEffect } from "react";
-import { getAllProducts, toggleLikeProduct } from "../api/ProductApi";
 import ChatAI from "./ChatAI";
-import "../static/css/home.css";
-import { toast } from "react-toastify";
 
 const Home = (props) => {
     const [products, setProducts] = useState([]);
@@ -33,21 +33,18 @@ const Home = (props) => {
         </li>
     ));
 
+    console.log(localStorage.getItem("id"), 'localStorage.getItem("id")');
+
     useEffect(() => {
         const token = localStorage.getItem("token") || "";
         console.log("TOKEN HOME:", token);
-        getAllProducts(
-            page,
-            10,
-            true,
-            JSON.parse(localStorage.getItem("user"))?._id
-        )
+        getAllProducts(page, 10, true, localStorage.getItem("id"))
             .then((response) => {
                 setProducts(response.data.content); // Lưu các sản phẩm vào state
                 setTotal(response.data.totalPages);
             })
             .catch(() => toast.warning("Không có sản phẩm!!"));
-    }, [page, localStorage.getItem("token")]);
+    }, [page, localStorage.getItem("token"), props?.user]);
 
     const onChangePage = (page) => {
         setPage(page);
@@ -55,6 +52,8 @@ const Home = (props) => {
 
     const handleLike = (productId, currentLikeStatus) => {
         const token = localStorage.getItem("token");
+
+        console.log(!currentLikeStatus, currentLikeStatus, "currentLikeStatus");
 
         if (!token) {
             toast.warning("Vui lòng đăng nhập trước khi yêu thích sản phẩm");
@@ -64,15 +63,12 @@ const Home = (props) => {
         toggleLikeProduct(productId, !currentLikeStatus, token)
             .then((response) => {
                 toast.success(response.data.message);
-                getAllProducts(
-                    page,
-                    10,
-                    true,
-                    JSON.parse(localStorage.getItem("user"))._id
-                ).then((response) => {
-                    setProducts(response.data.content);
-                    setTotal(response.data.totalPages);
-                });
+                getAllProducts(page, 10, true, localStorage.getItem("id")).then(
+                    (response) => {
+                        setProducts(response.data.content);
+                        setTotal(response.data.totalPages);
+                    }
+                );
             })
             .catch((error) => {
                 console.error("Lỗi khi thực hiện thao tác like: ", error);

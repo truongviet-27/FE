@@ -65,6 +65,7 @@ const Product = (props) => {
     const [price, setPrice] = useState([]);
     const [min, setMin] = useState(0);
     const [max, setMax] = useState(0);
+    const [isFilter, setIsFilter] = useState(false);
 
     useEffect(() => {
         getBrands(0, 100).then((response) => {
@@ -99,15 +100,47 @@ const Product = (props) => {
         toggleLikeProduct(productId, !currentLikeStatus, token)
             .then((response) => {
                 toast.success(response.data.message);
-                getAllProducts(
-                    page,
-                    10,
-                    true,
-                    JSON.parse(localStorage.getItem("user"))._id
-                ).then((response) => {
-                    setProducts(response?.data?.content);
-                    setTotal(response?.data.totalPages);
-                });
+                if (
+                    categoryIds.length === 0 &&
+                    brandIds.length === 0 &&
+                    price.length === 0
+                ) {
+                    getAllProducts(
+                        page,
+                        10,
+                        true,
+                        localStorage.getItem("id")
+                    ).then((response) => {
+                        setProducts(response?.data.content);
+                        setTotal(response.data.totalPages);
+                    });
+                } else {
+                    const data = {
+                        page: page,
+                        size: 10,
+                        categoryIds: categoryIds.length > 0 ? categoryIds : [],
+                        brandIds: brandIds.length > 0 ? brandIds : [],
+                        min: min,
+                        max: max,
+                        userId: localStorage.getItem("id"),
+                    };
+                    filterProducts(data)
+                        .then((resp) => {
+                            setProducts(resp?.data.content);
+                            setTotal(resp.data.totalPages);
+                        })
+                        .catch((error) => {
+                            setProducts([]);
+                            setTotal(0);
+                            toast.error("Không tìm thấy sản phẩm ");
+                        });
+                }
+                // getAllProducts(page, 10, true, localStorage.getItem("id")).then(
+                //     (response) => {
+                //         setProducts(response?.data?.content);
+                //         setTotal(response?.data.totalPages);
+                //     }
+                // );
             })
             .catch((error) => {
                 console.error("Lỗi khi thực hiện thao tác like: ", error);
@@ -120,28 +153,27 @@ const Product = (props) => {
             brandIds.length === 0 &&
             price.length === 0
         ) {
-            getAllProducts(
-                page,
-                10,
-                true,
-                JSON.parse(localStorage.getItem("user"))?._id
-            ).then((response) => {
-                setProducts(response?.data.content);
-                setTotal(response.data.totalPages);
-            });
+            getAllProducts(page, 10, true, localStorage.getItem("id")).then(
+                (response) => {
+                    setProducts(response?.data.content);
+                    setTotal(response.data.totalPages);
+                }
+            );
         } else {
             const data = {
                 page: page,
-                count: count,
+                size: 10,
                 categoryIds: categoryIds.length > 0 ? categoryIds : [],
                 brandIds: brandIds.length > 0 ? brandIds : [],
                 min: min,
                 max: max,
+                userId: localStorage.getItem("id"),
             };
             filterProducts(data)
                 .then((resp) => {
                     setProducts(resp?.data.content);
                     setTotal(resp.data.totalPages);
+                    toast.success(resp.data.message);
                 })
                 .catch((error) => {
                     setProducts([]);
@@ -150,6 +182,8 @@ const Product = (props) => {
                 });
         }
     }, [page, categoryIds, brandIds, price, localStorage.getItem("token")]);
+
+    console.log(products, "products");
 
     const onChangePage = (page) => {
         setPage(page);

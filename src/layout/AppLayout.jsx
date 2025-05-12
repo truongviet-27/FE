@@ -3,7 +3,7 @@ import React, { useEffect, useLayoutEffect } from "react";
 import "../assets/boxicons-2.0.7/css/boxicons.min.css";
 import "../assets/css/grid.css";
 import "../assets/css/index.css";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { Switch, Route } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import { Button, Form } from "react-bootstrap";
@@ -26,6 +26,7 @@ import Order from "../components/Order";
 import ChangePassword from "../authen/ChangePassword";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 import DashboardAdmin from "../components/admin/dashboard/DashboardAdmin";
 import ProductCreate from "../components/admin/product/ProductCreate";
@@ -63,6 +64,7 @@ import EditAccount from "../components/admin/account/EditAccount";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import SignInAdmin from "../components/admin/signIn/SignInAdmin";
 import Banner from "../common/Banner";
+import { getAccountDetailByAccountId } from "../api/AccountApi";
 // import ChatAI from "../component/ChatAI";
 
 const UserLayout = () => {
@@ -76,7 +78,8 @@ const UserLayout = () => {
     const location = useLocation();
     const isAdminRoute = location.pathname.startsWith("/admin");
     const isHome = location.pathname === "/";
-    const isAdmin = JSON.parse(localStorage.getItem("user"))?.role === "ADMIN";
+    const isAdmin = user?.role === "ADMIN";
+    const [token, setToken] = localStorage.getItem("token") ?? "";
 
     const [year, setYear] = useState();
 
@@ -90,23 +93,32 @@ const UserLayout = () => {
         if (!isAdmin && isAdminRoute) {
             history.push("/admin/sign-in");
         }
-    }, [localStorage.getItem("user")]);
+    }, [user]);
 
     useEffect(() => {
-        const savedUser = localStorage.getItem("user");
-        console.log(savedUser);
-        if (savedUser) {
-            setUser(JSON.parse(savedUser));
-        }
-    }, []);
+        if (!localStorage.getItem("token")) return;
+
+        const fetchUserById = async () => {
+            try {
+                const decoded = jwtDecode(localStorage.getItem("token"));
+                const userId = decoded.id;
+                if (!userId) {
+                    toast.error("Phiên đăng nhập của bạn đã hết!");
+                    return;
+                }
+                const res = await getAccountDetailByAccountId(userId);
+                setUser(res.data.data);
+            } catch (err) {
+                toast.error("Lỗi rồi!");
+                console.error(err);
+            }
+        };
+
+        fetchUserById();
+    }, [token]);
 
     const userHandler = (user) => {
         setUser(user);
-        if (user) {
-            localStorage.setItem("user", JSON.stringify(user));
-        } else {
-            localStorage.removeItem("user");
-        }
     };
 
     const refresh = (data) => {

@@ -11,19 +11,6 @@ const Profile = (props) => {
     const history = useHistory();
     const [userInfo, setUserInfo] = useState();
 
-    useEffect(() => {
-        getAccountDetailByAccountId(
-            JSON.parse(localStorage.getItem("user"))?._id
-        )
-            .then((res) => {
-                reset(res.data.data);
-                setUserInfo(res.data.data);
-                // eslint-disable-next-line react/prop-types
-                props.userHandler(res.data.data);
-            })
-            .catch((error) => console.error(error));
-    }, []);
-
     const {
         register,
         handleSubmit,
@@ -39,14 +26,31 @@ const Profile = (props) => {
                 toast.success("Cập nhật thông tin thành công!");
                 // eslint-disable-next-line react/prop-types
                 props.refresh(false);
-                getInformation(localStorage.getItem("token"))
-                    // eslint-disable-next-line react/prop-types
-                    .then((res) => props.userHandler(res.data))
-                    .catch((error) => console.error(error));
+                // getInformation(localStorage.getItem("token"))
+                //     // eslint-disable-next-line react/prop-types
+                //     .then((res) => props.userHandler(res.data))
+                //     .catch((error) => console.error(error));
                 history.push("/profile");
             })
             .catch((error) => toast.error(error.response.data.message));
     };
+    
+    useEffect(() => {
+        // getAccountDetailByAccountId(
+        //     JSON.parse(localStorage.getItem("user"))?._id
+        // )
+        //     .then((res) => {
+        //         reset(res.data.data);
+        //         setUserInfo(res.data.data);
+        //         // eslint-disable-next-line react/prop-types
+        //         props.userHandler(res.data.data);
+        //     })
+        //     .catch((error) => console.error(error));
+        if (props.user) {
+            reset(props.user);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <div className="profile-container">

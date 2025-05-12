@@ -19,7 +19,7 @@ const user_menu = [
         url: "/",
     },
 ];
-const token = localStorage.getItem("token");
+// const token = localStorage.getItem("token");
 
 const not_menu = [
     {
@@ -47,23 +47,20 @@ const Header = (props) => {
         }
     };
 
-    const [user, setUser] = useState(null);
+    // const [user, setUser] = useState(null);
+    const { user } = props;
     const [curr_user, setCurrUser] = useState({
         display_name: "Tài khoản",
         image: user_image,
     });
 
     useEffect(() => {
-        const storedUser = JSON.parse(localStorage.getItem("user"));
-        console.log(storedUser);
-        if (storedUser) {
-            console.log("TEN" + storedUser.display_name);
-            setUser(storedUser); // Cập nhật trạng thái `user` một lần.
-            // eslint-disable-next-line react/prop-types
-            props.userHandler(storedUser);
+        // const storedUser = JSON.parse(localStorage.getItem("user"));
+        // console.log(storedUser);
+        if (props.user) {
             setCurrUser({
-                display_name: storedUser.fullName || "Tài khoản",
-                image: storedUser.image || user_image,
+                display_name: user.fullName || "Tài khoản",
+                image: user.image || user_image,
             });
         } else {
             setCurrUser({
@@ -71,22 +68,16 @@ const Header = (props) => {
                 image: user_image,
             });
         }
-    }, []); // Chỉ chạy một lần khi component được mount.
+    }, []);
 
     const signOutHandler = () => {
-        // eslint-disable-next-line react/prop-types
         props.refresh(false);
         toast.success("Tài khoản đã được đăng xuất.");
         localStorage.removeItem("token");
-        localStorage.removeItem("username");
-        localStorage.removeItem("password");
-        localStorage.removeItem("user");
-        setUser(null);
         setCurrUser({
             display_name: "Tài khoản",
             image: user_image,
         });
-        // eslint-disable-next-line react/prop-types
         props.userHandler(null);
     };
 
@@ -189,18 +180,18 @@ const Header = (props) => {
                         <Dropdown
                             customToggle={() => (
                                 <div className="topnav__right-user flex flex-wrap justify-center">
-                                    <div className="topnav__right-user__image">
+                                    <div className="topnav__right-user__image !mr-0">
                                         <img src={avt} alt="user avatar" />
                                     </div>
                                     <div className="topnav__right-user__name">
-                                        {curr_user.display_name}
+                                        {user?.fullName}
                                     </div>
                                 </div>
                             )}
                             contentData={user ? user_menu : not_menu}
                             renderItems={(item, index) => (
                                 <NavLink
-                                    to={item.url}
+                                    to={item?.url}
                                     key={index}
                                     exact
                                     onClick={
@@ -208,8 +199,8 @@ const Header = (props) => {
                                     }
                                 >
                                     <div className="notification-item">
-                                        <i className={item.icon}></i>
-                                        <span>{item.content}</span>
+                                        <i className={item?.icon}></i>
+                                        <span>{item?.content}</span>
                                     </div>
                                 </NavLink>
                             )}

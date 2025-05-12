@@ -28,29 +28,42 @@ const SignIn = (props) => {
 
         if (isShowOtp) {
             verifyOtp(userFlag)
-                .then((res) => {
+                .then(async (res) => {
                     const accessToken = res.data.data.accessToken;
+                    const refreshToken = res.data.data.refreshToken;
+                    const id = res.data.data.id;
+
                     if (!accessToken) {
                         throw new Error("Token không hợp lệ");
                     }
                     localStorage.setItem("token", accessToken);
-                    return getAccountDetailByAccountId(res.data.data.id);
-                })
-                .then((res) => {
-                    const user = res.data.data;
-                    // eslint-disable-next-line react/prop-types
-                    props.userHandler(user);
-                    // Kiểm tra role và điều hướng
-                    if (user.role === "ADMIN") {
+                    localStorage.setItem("refreshToken", refreshToken);
+                    localStorage.setItem("id", id);
+
+                    // const user = await getAccountDetailByAccountId(
+                    //     res.data.data.id
+                    // );
+
+                    // return user.data;
+                    if (props?.user?.role === "ADMIN") {
                         history.push("/admin/dashboard");
-                    } else if (user.role === "CUSTOMER") {
+                    } else if (props?.user?.role === "CUSTOMER") {
                         history.push("/");
                         window.location.reload();
                     } else {
-                        throw new Error("Role không hợp lệ");
+                        history.push("/");
+                        return;
                     }
+
                     toast.success("Đăng nhập thành công!");
                 })
+                // .then((res) => {
+                //     // console.log(res.data, "xxxxxxxxxx");
+                //     // const user = res.data;
+                //     // eslint-disable-next-line react/prop-types
+                //     // props.userHandler(user);
+                //     // Kiểm tra role và điều hướng
+                // })
                 .catch((error) => {
                     toast.error(
                         error.response?.data?.message ||

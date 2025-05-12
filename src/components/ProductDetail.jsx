@@ -45,14 +45,7 @@ const ProductDetail = (props) => {
                 5,
                 item._id,
                 item.brand._id,
-                JSON.parse(localStorage.getItem("user"))?._id
-            );
-
-            console.log(
-                page === totalPages - 1,
-                "xxxxxxxxxx",
-                page,
-                totalPages
+                localStorage.getItem("id")
             );
             setRelate(res.data.content);
             setTotalPages(res.data.totalPages);
@@ -96,7 +89,7 @@ const ProductDetail = (props) => {
                     5,
                     res.data.data._id,
                     res.data.data.brand._id,
-                    JSON.parse(localStorage.getItem("user"))?._id
+                    localStorage.getItem("id")
                 )
                     .then((resp) => {
                         setRelate(resp.data.content);
@@ -161,7 +154,7 @@ const ProductDetail = (props) => {
                     5,
                     item._id,
                     item.brand._id,
-                    JSON.parse(localStorage.getItem("user"))?._id
+                    localStorage.getItem("id")
                 ).then((response) => {
                     setRelate(response.data.content);
                     // setTotal(response.data.totalPages);
