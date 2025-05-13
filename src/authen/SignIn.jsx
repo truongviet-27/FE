@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { getAccountDetailByAccountId, getInformation } from "../api/AccountApi";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import OTPInput from "react-otp-input";
+import Cookies from "js-cookie";
 
 const SignIn = (props) => {
     const history = useHistory();
@@ -37,7 +38,10 @@ const SignIn = (props) => {
                         throw new Error("Token không hợp lệ");
                     }
                     localStorage.setItem("token", accessToken);
-                    localStorage.setItem("refreshToken", refreshToken);
+                    Cookies.set("refreshToken", refreshToken, {
+                        secure: true,
+                        sameSite: "Strict",
+                    });
                     localStorage.setItem("id", id);
 
                     // const user = await getAccountDetailByAccountId(

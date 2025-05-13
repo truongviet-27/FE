@@ -4,6 +4,10 @@ export const registerAccount = async (data) => {
     const url = `/api/v1/user/create`;
     return await Instance.post(url, data);
 };
+export const refreshToken = async (data) => {
+    const url = `/api/v1/user/refresh-token`;
+    return await Instance.post(url, data);
+};
 export const sendOtp = async (data) => {
     const url = "/api/v1/user/send-otp";
     return await Instance.post(url, data);
