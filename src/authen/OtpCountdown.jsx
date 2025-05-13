@@ -26,7 +26,7 @@ export default function OtpCountdown({ otpExpire }) {
 
     return (
         <div>
-            OTP expires in: <strong>{formatTime(timeLeft)}</strong>
+            Mã OTP còn hiệu lực: <strong>{formatTime(timeLeft)}</strong>
         </div>
     );
 }

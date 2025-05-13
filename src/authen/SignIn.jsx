@@ -1,19 +1,20 @@
-import React, { useState } from "react";
-import { NavLink, useHistory } from "react-router-dom";
-import "./signin.css";
 import "font-awesome/css/font-awesome.min.css";
-import { signIn, verifyOtp } from "../api/AuthenticateApi";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
-import { getAccountDetailByAccountId, getInformation } from "../api/AccountApi";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import OTPInput from "react-otp-input";
+import { NavLink, useHistory } from "react-router-dom";
+import { toast } from "react-toastify";
+import { signIn, verifyOtp } from "../api/AuthenticateApi";
+import "./signin.css";
 import Cookies from "js-cookie";
+import OtpCountdown from "./OtpCountdown";
 
 const SignIn = (props) => {
     const history = useHistory();
     const [showPassword, setShowPassword] = useState(false);
     const [isShowOtp, setIsShowOtp] = useState(false);
+    const [otpExpire, setOtpExpire] = useState("");
     const {
         register,
         handleSubmit,
@@ -44,11 +45,8 @@ const SignIn = (props) => {
                     });
                     localStorage.setItem("id", id);
 
-                    // const user = await getAccountDetailByAccountId(
-                    //     res.data.data.id
-                    // );
+                    toast.success("Đăng nhập thành công!");
 
-                    // return user.data;
                     if (props?.user?.role === "ADMIN") {
                         history.push("/admin/dashboard");
                     } else if (props?.user?.role === "CUSTOMER") {
@@ -58,16 +56,7 @@ const SignIn = (props) => {
                         history.push("/");
                         return;
                     }
-
-                    toast.success("Đăng nhập thành công!");
                 })
-                // .then((res) => {
-                //     // console.log(res.data, "xxxxxxxxxx");
-                //     // const user = res.data;
-                //     // eslint-disable-next-line react/prop-types
-                //     // props.userHandler(user);
-                //     // Kiểm tra role và điều hướng
-                // })
                 .catch((error) => {
                     toast.error(
                         error.response?.data?.message ||
@@ -79,6 +68,7 @@ const SignIn = (props) => {
                 .then((res) => {
                     toast.success(res.data.message);
                     setIsShowOtp(true);
+                    setOtpExpire(res.data.data);
                 })
                 .catch((error) => {
                     toast.error(
@@ -107,7 +97,7 @@ const SignIn = (props) => {
                                     className="needs-validation"
                                 >
                                     {isShowOtp ? (
-                                        <div className="flex justify-center !my-20">
+                                        <div className="flex flex-col gap-14 justify-center !my-20">
                                             <Controller
                                                 name="otp"
                                                 control={control}
@@ -168,6 +158,9 @@ const SignIn = (props) => {
                                                         )}
                                                     </div>
                                                 )}
+                                            />
+                                            <OtpCountdown
+                                                otpExpire={otpExpire}
                                             />
                                         </div>
                                     ) : (

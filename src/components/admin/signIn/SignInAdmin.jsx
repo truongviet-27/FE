@@ -1,18 +1,21 @@
 import "font-awesome/css/font-awesome.min.css";
-import React, { useState } from "react";
+import Cookies from "js-cookie";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import OTPInput from "react-otp-input";
-import { NavLink, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
-import "../../../authen/signin.css";
-import { getAccountDetailByAccountId } from "../../../api/AccountApi";
 import { signIn, verifyOtp } from "../../../api/AuthenticateApi";
+import "../../../authen/signin.css";
+import { NavLink } from "react-bootstrap";
+import OtpCountdown from "../../../authen/OtpCountdown";
 
 const SignInAdmin = (props) => {
     const history = useHistory();
     const [showPassword, setShowPassword] = useState(false);
     const [isShowOtp, setIsShowOtp] = useState(false);
+    const [otpExpire, setOtpExpire] = useState("");
     const {
         register,
         handleSubmit,
@@ -28,28 +31,31 @@ const SignInAdmin = (props) => {
 
         if (isShowOtp) {
             verifyOtp(userFlag)
-                .then((res) => {
+                .then(async (res) => {
                     const accessToken = res.data.data.accessToken;
+                    const refreshToken = res.data.data.refreshToken;
+                    const id = res.data.data.id;
+
                     if (!accessToken) {
                         throw new Error("Token không hợp lệ");
                     }
                     localStorage.setItem("token", accessToken);
-                    return getAccountDetailByAccountId(res.data.data.id);
-                })
-                .then((res) => {
-                    const user = res.data.data;
-                    // eslint-disable-next-line react/prop-types
-                    props.userHandler(user);
-                    // Kiểm tra role và điều hướng
-                    if (user.role === "ADMIN") {
+                    Cookies.set("refreshToken", refreshToken, {
+                        secure: true,
+                        sameSite: "Strict",
+                    });
+                    localStorage.setItem("id", id);
+
+                    toast.success("Đăng nhập thành công!");
+                    if (props?.user?.role === "ADMIN") {
                         history.push("/admin/dashboard");
-                    } else if (user.role === "CUSTOMER") {
+                    } else if (props?.user?.role === "CUSTOMER") {
                         history.push("/");
                         window.location.reload();
                     } else {
-                        throw new Error("Role không hợp lệ");
+                        history.push("/admin/dashboard");
+                        return;
                     }
-                    toast.success("Đăng nhập thành công!");
                 })
                 .catch((error) => {
                     toast.error(
@@ -62,6 +68,7 @@ const SignInAdmin = (props) => {
                 .then((res) => {
                     toast.success(res.data.message);
                     setIsShowOtp(true);
+                    setOtpExpire(res.data.data);
                 })
                 .catch((error) => {
                     toast.error(
@@ -75,8 +82,8 @@ const SignInAdmin = (props) => {
     return (
         <section className="vh-100 gradient-custom">
             <div className="container py-5 h-100">
-                <div className="row d-flex justify-content-center align-items-center h-100">
-                    <div className="col-12 col-md-8 col-lg-6 col-xl-5">
+                <div className="flex justify-center items-center h-100">
+                    <div className="col-12 col-md-8 col-lg-6 col-xl-5 !w-full">
                         <div
                             className="border border-white !p-10 bg-dark text-white"
                             style={{ borderRadius: "1rem" }}
@@ -90,7 +97,7 @@ const SignInAdmin = (props) => {
                                     className="needs-validation"
                                 >
                                     {isShowOtp ? (
-                                        <div className="flex justify-center !my-20">
+                                        <div className="flex flex-col gap-14 justify-center !my-20">
                                             <Controller
                                                 name="otp"
                                                 control={control}
@@ -151,6 +158,9 @@ const SignInAdmin = (props) => {
                                                         )}
                                                     </div>
                                                 )}
+                                            />
+                                            <OtpCountdown
+                                                otpExpire={otpExpire}
                                             />
                                         </div>
                                     ) : (

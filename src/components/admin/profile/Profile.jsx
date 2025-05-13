@@ -1,15 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { NavLink, useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
-import { getAccountDetailByAccountId, getInformation } from "../api/AccountApi";
-import { updateProfile } from "../api/AuthenticateApi";
-import { NavLink } from "react-router-dom";
-import formatDateInputToUTC from "../utils/formatDateInputToUTC";
-import RenderInput from "./RenderInput";
-// import "./profile.css"; // Sử dụng CSS riêng cho giao diện Profile
+import { getAccountDetailByAccountId } from "../../../api/AccountApi";
+import RenderInput from "../../../authen/RenderInput";
+import { updateProfile } from "../../../api/AuthenticateApi";
 
-const Profile = (props) => {
+const ProfileAdmin = (props) => {
     const history = useHistory();
 
     const methods = useForm();
@@ -32,14 +29,13 @@ const Profile = (props) => {
                 props.refresh(false);
                 const res = await getAccountDetailByAccountId(data.userId);
                 props.userHandler(res.data.data);
-                history.push("/");
+                history.push("/admin/dashboard");
             })
             .catch((error) => toast.error(error.response.data.message));
     };
 
     useEffect(() => {
         if (props.user) {
-            console.log(props.user, "props.user");
             reset(props.user);
         }
     }, [props.user]);
@@ -327,4 +323,4 @@ const Profile = (props) => {
     );
 };
 
-export default Profile;
+export default ProfileAdmin;

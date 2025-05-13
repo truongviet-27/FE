@@ -34,7 +34,6 @@ const Register = () => {
     const onSubmitHandler = (data) => {
         registerAccount({
             ...data,
-            birthday: formatDateInputToUTC(data.birthday),
             avatar: "123",
         })
             .then(() => {

@@ -14,13 +14,15 @@ const NewAccount = () => {
     } = useForm();
 
     const onSubmitHandler = (data) => {
-        console.log(data);
-        createAccount(data)
+        createAccount({
+            ...data,
+            avatar: "test",
+        })
             .then(() => {
                 toast.success("Thêm tài khoản thành công.");
                 history.push("/admin/account");
             })
-            .catch((error) => toast.error(error.response.data.Errors));
+            .catch((error) => toast.error(error.response.data.message));
     };
 
     const goBack = () => {
@@ -183,11 +185,11 @@ const NewAccount = () => {
                         <input
                             type="date"
                             className="form-control"
-                            {...register("birthdate", {
+                            {...register("birthday", {
                                 required: true,
                             })}
                         />
-                        {errors.birthDate && (
+                        {errors.birthday && (
                             <div className="alert alert-danger" role="alert">
                                 Ngày sinh không hợp lệ!
                             </div>

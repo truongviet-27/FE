@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { NavLink, useHistory } from "react-router-dom";
 import "./signin.css";
-import 'font-awesome/css/font-awesome.min.css';
+import "font-awesome/css/font-awesome.min.css";
 import { changePassword } from "../api/AuthenticateApi";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -24,10 +24,13 @@ const ChangePassword = (props) => {
         changePassword(userFlag)
             .then(() => {
                 toast.success("Đổi mật khẩu thành công!");
-                history.push("/sign-in");
+                history.push("/profile");
             })
             .catch((error) => {
-                toast.error(error.response?.data?.message || "Đã xảy ra lỗi. Vui lòng thử lại.");
+                toast.error(
+                    error.response?.data?.message ||
+                        "Đã xảy ra lỗi. Vui lòng thử lại."
+                );
             });
     };
 
@@ -36,12 +39,23 @@ const ChangePassword = (props) => {
             <div className="container py-5 h-100">
                 <div className="row d-flex justify-content-center align-items-center h-100">
                     <div className="col-12 col-md-8 col-lg-6 col-xl-5">
-                        <div className="border border-white !p-20 bg-dark text-white" style={{ borderRadius: "1rem" }}>
+                        <div
+                            className="border border-white !p-20 bg-dark text-white"
+                            style={{ borderRadius: "1rem" }}
+                        >
                             <div className="text-center">
-                                <h2 className="fw-bold mb-4 text-uppercase">Đổi mật khẩu</h2>
-                                <form onSubmit={handleSubmit(signInHandler)} className="needs-validation">
+                                <h2 className="fw-bold mb-4 text-uppercase">
+                                    Đổi mật khẩu
+                                </h2>
+                                <form
+                                    onSubmit={handleSubmit(signInHandler)}
+                                    className="needs-validation"
+                                >
                                     <div className="form-outline form-white mb-4">
-                                        <label className="form-label" htmlFor="username">
+                                        <label
+                                            className="form-label"
+                                            htmlFor="username"
+                                        >
                                             Tài khoản
                                         </label>
                                         <input
@@ -49,90 +63,140 @@ const ChangePassword = (props) => {
                                             id="username"
                                             className="form-control form-control-lg"
                                             {...register("username", {
-                                                required: "Tài khoản không được để trống!",
+                                                required:
+                                                    "Tài khoản không được để trống!",
                                                 pattern: {
                                                     value: /^\s*\S+.*/,
-                                                    message: "Tài khoản không hợp lệ!",
+                                                    message:
+                                                        "Tài khoản không hợp lệ!",
                                                 },
                                             })}
                                         />
                                         {errors.username && (
-                                            <div className="alert alert-danger" role="alert">
+                                            <div
+                                                className="alert alert-danger"
+                                                role="alert"
+                                            >
                                                 {errors.username.message}
                                             </div>
                                         )}
                                     </div>
                                     <div className="form-outline form-white mb-4">
-                                        <label className="form-label" htmlFor="password">
+                                        <label
+                                            className="form-label"
+                                            htmlFor="password"
+                                        >
                                             Mật khẩu hiện tại
                                         </label>
                                         <div className="input-group">
                                             <input
-                                                type={showPassword ? "text" : "password"}
+                                                type={
+                                                    showPassword
+                                                        ? "text"
+                                                        : "password"
+                                                }
                                                 id="password"
                                                 className="form-control form-control-lg"
                                                 {...register("password", {
-                                                    required: "Mật khẩu không được để trống!",
+                                                    required:
+                                                        "Mật khẩu không được để trống!",
                                                     pattern: {
                                                         value: /^\s*\S+.*/,
-                                                        message: "Mật khẩu không hợp lệ!",
+                                                        message:
+                                                            "Mật khẩu không hợp lệ!",
                                                     },
                                                 })}
                                             />
                                             {errors.password && (
-                                                <div className="alert alert-danger" role="alert">
+                                                <div
+                                                    className="alert alert-danger"
+                                                    role="alert"
+                                                >
                                                     {errors.password.message}
                                                 </div>
                                             )}
                                             <span
                                                 className="input-group-text"
                                                 style={{ cursor: "pointer" }}
-                                                onClick={() => setShowPassword(!showPassword)}
+                                                onClick={() =>
+                                                    setShowPassword(
+                                                        !showPassword
+                                                    )
+                                                }
                                             >
-                                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                                {showPassword ? (
+                                                    <FaEyeSlash />
+                                                ) : (
+                                                    <FaEye />
+                                                )}
                                             </span>
                                         </div>
-
                                     </div>
                                     <div className="form-outline form-white mb-4">
-                                        <label className="form-label" htmlFor="password">
+                                        <label
+                                            className="form-label"
+                                            htmlFor="password"
+                                        >
                                             Mật khẩu mới
                                         </label>
                                         <div className="input-group">
                                             <input
-                                                type={showPassword ? "text" : "password"}
+                                                type={
+                                                    showPassword
+                                                        ? "text"
+                                                        : "password"
+                                                }
                                                 id="newPassword"
                                                 className="form-control form-control-lg"
                                                 {...register("newPassword", {
-                                                    required: "Mật khẩu không được để trống!",
+                                                    required:
+                                                        "Mật khẩu không được để trống!",
                                                     pattern: {
                                                         value: /^\s*\S+.*/,
-                                                        message: "Mật khẩu không hợp lệ!",
+                                                        message:
+                                                            "Mật khẩu không hợp lệ!",
                                                     },
                                                 })}
                                             />
                                             {errors.password && (
-                                                <div className="alert alert-danger" role="alert">
+                                                <div
+                                                    className="alert alert-danger"
+                                                    role="alert"
+                                                >
                                                     {errors.password.message}
                                                 </div>
                                             )}
                                             <span
                                                 className="input-group-text"
                                                 style={{ cursor: "pointer" }}
-                                                onClick={() => setShowPassword(!showPassword)}
+                                                onClick={() =>
+                                                    setShowPassword(
+                                                        !showPassword
+                                                    )
+                                                }
                                             >
-                                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                                {showPassword ? (
+                                                    <FaEyeSlash />
+                                                ) : (
+                                                    <FaEye />
+                                                )}
                                             </span>
                                         </div>
                                     </div>
 
                                     <p className="small mb-5 pb-lg-2">
-                                        <NavLink className="text-white" to="/forgot-password">
+                                        <NavLink
+                                            className="text-white"
+                                            to="/forgot-password"
+                                        >
                                             Quên mật khẩu?
                                         </NavLink>
                                     </p>
 
-                                    <button className="btn btn-outline-light btn-lg px-5" type="submit">
+                                    <button
+                                        className="btn btn-outline-light btn-lg px-5"
+                                        type="submit"
+                                    >
                                         Cập nhật mật khẩu
                                     </button>
                                 </form>
@@ -152,7 +216,10 @@ const ChangePassword = (props) => {
                             <div>
                                 <p className="mb-0">
                                     Chưa có tài khoản?{" "}
-                                    <NavLink to="/register" className="text-white-50 fw-bold">
+                                    <NavLink
+                                        to="/register"
+                                        className="text-white-50 fw-bold"
+                                    >
                                         Đăng kí ngay
                                     </NavLink>
                                 </p>

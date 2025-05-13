@@ -60,6 +60,8 @@ const Account = () => {
         //     .catch((error) => console.log(error));
     };
 
+    console.log(role, "role");
+
     const getAccountByRoleHandler = (value) => {
         setRole(value);
         if (value === "TẤT CẢ") {
@@ -67,7 +69,7 @@ const Account = () => {
             onLoad();
         } else {
             setPage(0);
-            getAccountByRole(0, 9, value)
+            getAccountByRole(page, size, value)
                 .then((resp) => setAccount(resp.data.content))
                 .catch((error) => toast.warning(error.response.data.message));
         }
@@ -150,11 +152,11 @@ const Account = () => {
                                     </th>
                                     <th scope="row">{item.username}</th>
                                     <td style={{ width: "200px" }}>
-                                        {item.fullName}
+                                        {item?.userDetail.fullName}
                                     </td>
-                                    <td>{item.gender}</td>
-                                    <td>{item.phone}</td>
-                                    <td>{item.email}</td>
+                                    <td>{item?.userDetail?.gender}</td>
+                                    <td>{item?.userDetail?.phone}</td>
+                                    <td>{item?.email}</td>
                                     <td>
                                         <Badge
                                             type={roleName[item.role]}

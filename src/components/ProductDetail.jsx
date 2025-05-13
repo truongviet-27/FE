@@ -884,7 +884,7 @@ const ProductDetail = (props) => {
                         </div>
                     </div>
                     {/* Sản phẩm gợi ý */}
-                    <div className="col-12 mt-5 border border-gray-200 rounded-2xl !p-10">
+                    <div className="col-12 mt-5 border border-gray-200 rounded-2xl !p-10 !mb-20">
                         <div className="text-center">
                             <p style={{ fontSize: "34px" }}>Sản phẩm gợi ý</p>
                         </div>

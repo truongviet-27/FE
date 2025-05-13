@@ -65,6 +65,7 @@ import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import SignInAdmin from "../components/admin/signIn/SignInAdmin";
 import Banner from "../common/Banner";
 import { getAccountDetailByAccountId } from "../api/AccountApi";
+import ProfileAdmin from "../components/admin/profile/Profile";
 // import ChatAI from "../component/ChatAI";
 
 const UserLayout = () => {
@@ -74,26 +75,28 @@ const UserLayout = () => {
     const [cartItem, setCartItem] = useState([]);
     const [outStock, setOutStock] = useState([]);
     const [buy, setBuy] = useState([]);
-    const [size, setSize] = useState("");
     const location = useLocation();
     const isAdminRoute = location.pathname.startsWith("/admin");
     const isHome = location.pathname === "/";
+    const isLogin = localStorage.getItem("id") ?? "";
     const isAdmin = user?.role === "ADMIN";
-    const [token, setToken] = localStorage.getItem("token") ?? "";
+
+    const token = localStorage.getItem("token") ?? "";
 
     const [year, setYear] = useState();
 
     const history = useHistory();
 
+    console.log(user, isAdmin, isAdminRoute, "isAdmin");
+
     const yearHandler = (value) => {
         setYear(value);
     };
-
     useLayoutEffect(() => {
-        if (!isAdmin && isAdminRoute) {
+        if (!isLogin && isAdminRoute) {
             history.push("/admin/sign-in");
         }
-    }, [user]);
+    }, [isLogin]);
 
     useEffect(() => {
         if (!localStorage.getItem("token")) return;
@@ -102,10 +105,6 @@ const UserLayout = () => {
             try {
                 const decoded = jwtDecode(localStorage.getItem("token"));
                 const userId = decoded.id;
-                if (!userId) {
-                    toast.error("Phiên đăng nhập của bạn đã hết!");
-                    return;
-                }
                 const res = await getAccountDetailByAccountId(userId);
                 setUser(res.data.data);
             } catch (err) {
@@ -182,12 +181,12 @@ const UserLayout = () => {
                     refresh={refresh}
                 />
             )}
-            {isAdminRoute && isAdmin && <Sidebar user={user} />}
+            {isAdminRoute && isLogin && <Sidebar user={user} />}
             <div className={`${isAdminRoute ? "flex-1" : "!pt-[120px]"} `}>
-                {isAdminRoute && isAdmin && (
+                {isAdminRoute && isLogin && (
                     <TopNav user={user} userHandler={userHandler} />
                 )}
-                {isAdminRoute && !isAdmin && (
+                {isAdminRoute && (
                     <Route path="/admin/sign-in" exact>
                         <SignInAdmin userHandler={userHandler} />
                     </Route>
@@ -364,6 +363,13 @@ const UserLayout = () => {
                         </Route>
                         <Route path={`/admin/account/account-detail/:id`} exact>
                             <EditAccount />
+                        </Route>
+                        <Route path={`/admin/profile`} exact>
+                            <ProfileAdmin
+                                user={user}
+                                refresh={refresh}
+                                userHandler={userHandler}
+                            />
                         </Route>
                         {/* <Route path={`/chat/ai`} exact>
                             <ChatAI></ChatAI>

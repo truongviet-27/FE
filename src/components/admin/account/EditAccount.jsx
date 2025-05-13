@@ -29,14 +29,16 @@ const EditAccount = () => {
 
     const onSubmitHandler = (data) => {
         const result = {
-            id: data.id,
-            isActive: data.isActive,
+            _id: data._id,
+            isActive: data.isActive === true ? true : false,
             fullName: data.fullName,
             gender: data.gender,
             phone: data.phone,
             email: data.email,
             address: data.address,
-            birthDate: data.birthDate,
+            birthday: data.birthday,
+            username: data.username,
+            userId: data.userId,
         };
         updateAccount(result)
             .then(() => {
@@ -169,11 +171,11 @@ const EditAccount = () => {
                         <input
                             type="date"
                             className="form-control"
-                            {...register("birthDate", {
+                            {...register("birthday", {
                                 required: true,
                             })}
                         />
-                        {errors.birthDate && (
+                        {errors.birthday && (
                             <div className="alert alert-danger" role="alert">
                                 Ngày sinh không hợp lệ!
                             </div>
@@ -187,8 +189,8 @@ const EditAccount = () => {
                                 required: true,
                             })}
                         >
-                            <option value="true">Hoạt động</option>
-                            <option value="false">Không hoạt động</option>
+                            <option value={true}>Hoạt động</option>
+                            <option value={false}>Không hoạt động</option>
                         </select>
                     </div>
                 </div>

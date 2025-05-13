@@ -66,8 +66,8 @@ Instance.interceptors.response.use(
                 const res = await refreshToken({
                     refreshToken: Cookies.get("refreshToken"),
                 }); // gọi refresh token
-                const newAccessToken = res.data.accessToken;
-                localStorage.setItem("accessToken", newAccessToken);
+                const newAccessToken = res.data.data;
+                localStorage.setItem("token", newAccessToken);
 
                 Instance.defaults.headers.Authorization = `Bearer ${newAccessToken}`;
                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import Cookies from "js-cookie";
+import { useEffect, useState } from "react";
 import { NavLink, useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import Dropdown from "../components/admin/dropdown/Dropdown";
@@ -6,7 +7,6 @@ import "../static/css/style.css";
 import avt from "../static/images/default-avatar-2.png";
 import logo from "../static/images/logo-5.jpg";
 import user_image from "../static/images/puma.jpg";
-
 const user_menu = [
     {
         icon: "bx bx-user",
@@ -55,8 +55,6 @@ const Header = (props) => {
     });
 
     useEffect(() => {
-        // const storedUser = JSON.parse(localStorage.getItem("user"));
-        // console.log(storedUser);
         if (props.user) {
             setCurrUser({
                 display_name: user.fullName || "Tài khoản",
@@ -74,6 +72,8 @@ const Header = (props) => {
         props.refresh(false);
         toast.success("Tài khoản đã được đăng xuất.");
         localStorage.removeItem("token");
+        localStorage.removeItem("id");
+        Cookies.remove("refreshToken");
         setCurrUser({
             display_name: "Tài khoản",
             image: user_image,

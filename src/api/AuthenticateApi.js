@@ -36,7 +36,7 @@ export const forgotPassword = async (data) => {
     const url = "/api/v1/user/forgot-password";
     return await Instance.post(url, data);
 };
-export const updatepProfile = async (data) => {
+export const updateProfile = async (data) => {
     const url = `/api/v1/user/update-profile`;
     return await Instance.put(url, data);
 };

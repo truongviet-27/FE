@@ -1,26 +1,27 @@
-import React, { useState, useEffect } from "react";
-import "./topnav.css";
-import Dropdown from "../dropdown/Dropdown";
-import avt from "../../../static/images/default-avatar-2.png";
+import Cookies from "js-cookie";
+import { useEffect, useState } from "react";
 import { Link, NavLink, useHistory } from "react-router-dom";
-
-import user_menu from "../../../assets/JsonData/user_menus.json";
+import { toast } from "react-toastify";
 import {
     loadNotification,
-    readNotification,
     pushNotification,
+    readNotification,
 } from "../../../api/NotificationApi";
-import { toast } from "react-toastify";
+import user_menu from "../../../assets/JsonData/user_menus.json";
+import avt from "../../../static/images/default-avatar-2.png";
+import Dropdown from "../dropdown/Dropdown";
+import user_image from "../../../static/images/puma.jpg";
+import "./topnav.css";
 
 const TopNav = (props) => {
     const [notifications, setNotifications] = useState([]);
     const [key, setKey] = useState("");
-    const [user, setUser] = useState(null);
     const [curr_user, setCurrUser] = useState({
         display_name: "Tài khoản",
-        // image: user_image,
+        image: user_image,
     });
     const history = useHistory();
+
     const renderNotificationItem = (item, index) => (
         <NavLink
             to={
@@ -66,35 +67,26 @@ const TopNav = (props) => {
             .then(() => console.log(id))
             .catch((error) => console.log(error));
     };
+
+    console.log(props.user, "user");
+
     const renderUserToggle = (user) => (
         <div className="topnav__right-user">
             <div className="topnav__right-user__image">
                 <img src={avt} alt="avt" />
             </div>
-            <div className="topnav__right-user__name">{user.display_name}</div>
+            <div className="topnav__right-user__name">
+                {props?.user?.fullName}
+            </div>
         </div>
     );
 
-    // const loadData = async () => {
-    //   await loadNotification()
-    //     .then((resp) => setNotifications(resp.data))
-    //     .catch((error) => console.log(error));
-
-    //   await pushNotification()
-    //     .then((resp) => {
-    //       resp.data.map((item) => (
-    //         item.type == 1 ? toast.success(item.content) : toast.warning(item.content)
-    //       ))
-    //     })
-    //     .catch((error) => console.log(error));
-    // };
-
-    // useEffect(() => {
-    //   window.setInterval(loadData, 1000);
-    // }, []);
-
     const renderUserMenu = (item, index) => (
-        <Link to={"/sign-in"} key={index} onClick={signOutHandler}>
+        <Link
+            to={item.path}
+            key={index}
+            onClick={index === 3 && signOutHandler}
+        >
             <div className="notification-item">
                 <i className={item.icon}></i>
                 <span>{item.content}</span>
@@ -104,34 +96,11 @@ const TopNav = (props) => {
 
     const signOutHandler = () => {
         localStorage.removeItem("token");
-        localStorage.removeItem("username");
-        localStorage.removeItem("password");
+        localStorage.removeItem("id");
+        Cookies.remove("refreshToken");
+        toast.success("Tài khoản đã được đăng xuất.");
         props.userHandler(null);
-        history.push("/sign-in");
     };
-
-    // const readHandler = (id) => {
-    //   readNotification(id)
-    //     .then(() => console.log(id))
-    //     .catch((error) => console.log(error));
-    // }
-    // const curr_user = {
-    //   display_name: props.user.fullName,
-    //   image: user_image,
-    // };
-    useEffect(() => {
-        const storedUser = JSON.parse(localStorage.getItem("user"));
-        console.log(storedUser);
-        if (storedUser) {
-            console.log("TEN" + storedUser.display_name);
-            setUser(storedUser); // Cập nhật trạng thái `user` một lần.
-            props.userHandler(storedUser);
-            setCurrUser({
-                display_name: storedUser.fullName || "Tài khoản",
-                // image: storedUser.image || user_image,
-            });
-        }
-    }, []); // Chỉ chạy một lần khi component được mount.
 
     const searchHandler = (key) => {
         history.push(`/search/${key}`);
@@ -149,7 +118,7 @@ const TopNav = (props) => {
                     placeholder="Search here..."
                     onChange={(e) => keyHanlder(e.target.value)}
                 />
-                <i className="bx bx-search"></i>
+                <i className="bx bx-search" onClick={searchHandler}></i>
             </div>
             <div className="topnav__right">
                 <div className="topnav__right-item">

@@ -60,7 +60,7 @@ const Product = (props) => {
     const [page, setPage] = useState(0);
     const [total, setTotal] = useState({});
     const [categories, setCategories] = useState([]);
-    const [categoryIds, setCategory] = useState([]);
+    const [categoryIds, setCategoryIds] = useState([]);
     const [brandIds, setBrandIds] = useState([]);
     const [price, setPrice] = useState([]);
     const [min, setMin] = useState(0);
@@ -192,9 +192,9 @@ const Product = (props) => {
     const chooseCategoryHandler = (value) => {
         const index = categoryIds.indexOf(value);
         if (index > -1) {
-            setCategory(categoryIds.filter((i) => i !== value));
+            setCategoryIds(categoryIds.filter((i) => i !== value));
         } else {
-            setCategory([...categoryIds, value]);
+            setCategoryIds([...categoryIds, value]);
         }
         onChangePage(0);
     };
@@ -225,10 +225,10 @@ const Product = (props) => {
         onChangePage(0);
     };
     return (
-        <div>
-            <div className="mt-5">
+        <div className="col-12">
+            <div className="mt-5 !px-5">
                 <div className="row">
-                    <div className="col-2 lg:col-3 md:col-4">
+                    <div className="col-2 lg:col-3 md:col-4 !mb-20">
                         <Collapse accordion>
                             <Panel header="Thương hiệu" key="1">
                                 <ul className="list-group flex flex-col gap-2">
@@ -259,7 +259,7 @@ const Product = (props) => {
                                     {categories?.map((item, index) => (
                                         <button
                                             className={`!text-[14px] !px-4 text-black ${
-                                                categories.includes(item?._id)
+                                                categoryIds.includes(item?._id)
                                                     ? `!bg-neutral-300`
                                                     : ``
                                             }`}
@@ -316,167 +316,6 @@ const Product = (props) => {
                                     Sản phẩm nổi bật
                                 </h4>
                             </div>
-                            {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 !mt-10">
-                                {products?.map((item, index) => (
-                                    <div
-                                        key={item._id}
-                                        className="border border-gray-200 p-4 rounded-2xl"
-                                    >
-                                        <div className="d-flex justify-content-between position-absolute">
-                                            <div className="label-new">
-                                                <span
-                                                    className="text-white small d-flex align-items-center px-2 py-1"
-                                                    style={{
-                                                        backgroundColor:
-                                                            "yellowgreen",
-                                                    }}
-                                                >
-                                                    <i
-                                                        className="fa fa-star"
-                                                        aria-hidden="true"
-                                                    ></i>
-                                                    <span className="ml-1">
-                                                        Mới
-                                                    </span>
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <NavLink
-                                            to={`/product-detail/${item?._id}`}
-                                        >
-                                            <img
-                                                src={item?.image}
-                                                style={{
-                                                    width: 150,
-                                                    height: 150,
-                                                }}
-                                                alt={item?.name}
-                                            />
-                                        </NavLink>
-                                        <div className="card-body px-2 pb-2 pt-1">
-                                            <div className="d-flex justify-content-between">
-                                                <div>
-                                                    <p className="h4 text-primary">
-                                                        {(
-                                                            (item?.price *
-                                                                (100 -
-                                                                    item?.discount)) /
-                                                            100
-                                                        )?.toLocaleString()}{" "}
-                                                        Đ
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <p className="text-warning d-flex align-items-center mb-2">
-                                                <i
-                                                    className="fa fa-star"
-                                                    aria-hidden="true"
-                                                ></i>
-                                                <i
-                                                    className="fa fa-star"
-                                                    aria-hidden="true"
-                                                ></i>
-                                                <i
-                                                    className="fa fa-star"
-                                                    aria-hidden="true"
-                                                ></i>
-                                                <i
-                                                    className="fa fa-star"
-                                                    aria-hidden="true"
-                                                ></i>
-                                                <i
-                                                    className="fa fa-star"
-                                                    aria-hidden="true"
-                                                ></i>
-                                            </p>
-                                            <p className="mb-0">
-                                                <strong>
-                                                    <NavLink
-                                                        to={`/product-detail/${item?._id}`}
-                                                        className="text-secondary"
-                                                    >
-                                                        {item?.name}
-                                                    </NavLink>
-                                                </strong>
-                                            </p>
-                                            <p className="mb-1">
-                                                <small>
-                                                    <NavLink
-                                                        to="#"
-                                                        className="text-secondary"
-                                                    >
-                                                        {item?.brand?.name}
-                                                    </NavLink>
-                                                </small>
-                                            </p>
-                                            <div className="d-flex mb-3 justify-content-between">
-                                                <div>
-                                                    <p className="mb-0 small">
-                                                        <b>Yêu thích: </b>{" "}
-                                                        {item?.view} lượt
-                                                    </p>
-                                                    <p className="mb-0 small">
-                                                        <b>Giá gốc: </b>{" "}
-                                                        {item?.price?.toLocaleString()}{" "}
-                                                        Đ
-                                                    </p>
-                                                    <p className="mb-0 small text-danger">
-                                                        <span className="font-weight-bold">
-                                                            Tiết kiệm:
-                                                            {(item?.discount *
-                                                                item?.price) /
-                                                                100}
-                                                        </span>{" "}
-                                                        ({item?.discount}%)
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="d-flex justify-content-between">
-                                                <div className="col px-0">
-                                                    <NavLink
-                                                        to={`/product-detail/${item?._id}`}
-                                                        exact
-                                                        className="btn btn-outline-primary btn-block"
-                                                    >
-                                                        <span className="!mr-2">
-                                                            Thêm vào giỏ
-                                                        </span>
-                                                        <i
-                                                            className="fa fa-shopping-basket"
-                                                            aria-hidden="true"
-                                                        />
-                                                    </NavLink>
-                                                </div>
-                                                <div className="ml-2">
-                                                    <NavLink
-                                                        to="#"
-                                                        className="btn btn-outline-success"
-                                                        data-toggle="tooltip"
-                                                        data-placement="left"
-                                                        title="Add to Wishlist"
-                                                        onClick={() =>
-                                                            handleLike(
-                                                                item?._id,
-                                                                item?.liked
-                                                            )
-                                                        }
-                                                    >
-                                                        <i
-                                                            className={`fa fa-heart ${
-                                                                item?.liked
-                                                                    ? "text-danger"
-                                                                    : ""
-                                                            }`}
-                                                            aria-hidden="true"
-                                                        ></i>
-                                                    </NavLink>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div> */}
-
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 !mt-10">
                                 {products?.map((item) => (
                                     <div className="mb-3" key={item._id}>

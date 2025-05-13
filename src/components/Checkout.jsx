@@ -614,10 +614,12 @@ const Checkout = (props) => {
     const textHandler = (value) => {
         setText(value);
     };
+
+    console.log(props.user, "props.user");
     const onLoad = () => {
         getAllProvince().then((resp) => setInfo(resp.data));
         if (props.user) {
-            getCartItemByAccountId(props.user._id).then((resp) => {
+            getCartItemByAccountId(props.user.userId).then((resp) => {
                 setCart(
                     resp.data.content.filter((item) =>
                         props.buy.includes(item._id + "")
@@ -795,15 +797,13 @@ const Checkout = (props) => {
         }
     };
 
-    cart, "cart";
-
     return (
         <div className="pb-3 container-fluid">
             <div className="py-3 col-10 offset-1 text-center">
                 <h2 className="text-danger">Thông tin mua hàng</h2>
                 {loading && <Spinner></Spinner>}
             </div>
-            <div className="border">
+            <div className="border rounded-2xl">
                 <div className="flex flex-col-reverse lg:flex-row gap-8 xl:gap-14 !px-20 xl:!px-10 2xl:!px-20 !py-10">
                     <div className="lg:w-full xl:w-4/7 2xl:w-5/8">
                         <form
