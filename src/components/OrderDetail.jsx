@@ -11,6 +11,8 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import "../index.css";
 import { blue } from "@mui/material/colors";
+import formatDateInputToUTC from "../utils/formatDateInputToUTC";
+import formatDate from "../utils/convertDate";
 
 const OrderDetail = (props) => {
     const [orderDetail, setOrderDetail] = useState([]);
@@ -82,15 +84,21 @@ const OrderDetail = (props) => {
         onLoad();
     }, []);
 
+    console.log(total, "total");
+
     const onLoad = () => {
         getOrderById(orderId).then((resp) => {
-            setOrder(resp.data);
-            setSale(resp.data.discount ? resp.data.discount : 0);
-            setTotal(resp.data.total);
+            setOrder(resp.data.data);
+            setSale(
+                resp.data.data?.voucher?.discount
+                    ? resp.data.data?.voucher?.discount
+                    : 0
+            );
+            setTotal(resp.data.data?.total);
         });
         getOrderDetailByOrderId(orderId).then((resp) => {
-            setOrderDetail(resp.data);
-            const result = resp.data.reduce(
+            setOrderDetail(resp.data.content);
+            const result = resp.data.content.reduce(
                 (price, item) => price + item.sellPrice * item.quantity,
                 0
             );
@@ -103,11 +111,14 @@ const OrderDetail = (props) => {
             <div className="row">
                 {/* Order Information */}
                 <div className="col-lg-8">
-                    <Card className="order-card mb-4">
-                        <Card.Body>
-                            <h4 className="text-primary">
-                                <FaTruck className="mr-2" /> Chi tiết đơn hàng
-                            </h4>
+                    <div className="mb-4">
+                        <div className="p-4">
+                            <div className="flex items-center gap-2 mb-3 text-[19px]">
+                                <FaTruck className="mr-2 text-primary" />
+                                <span className="text-primary font-bold">
+                                    Chi tiết đơn hàng
+                                </span>
+                            </div>
                             <table className="table table-striped table-hover">
                                 <thead className="thead-dark">
                                     <tr>
@@ -121,7 +132,10 @@ const OrderDetail = (props) => {
                                 </thead>
                                 <tbody>
                                     {orderDetail.map((item, index) => (
-                                        <tr key={index} className="table-row">
+                                        <tr
+                                            key={item._id}
+                                            className="table-row"
+                                        >
                                             <td
                                                 style={{
                                                     textAlign: "center",
@@ -129,7 +143,7 @@ const OrderDetail = (props) => {
                                                     height: "100px",
                                                 }}
                                             >
-                                                {item.attribute.name}
+                                                {item.attribute.product.name}
                                             </td>
                                             <td
                                                 style={{
@@ -141,10 +155,7 @@ const OrderDetail = (props) => {
                                                 {" "}
                                                 <img
                                                     src={item.image}
-                                                    style={{
-                                                        width: 150,
-                                                        height: 150,
-                                                    }}
+                                                    className="w-[70px] h-[70px]"
                                                 />
                                             </td>
                                             <td
@@ -154,7 +165,7 @@ const OrderDetail = (props) => {
                                                     height: "100px",
                                                 }}
                                             >
-                                                {item.attributeSize}
+                                                {item.attribute.size}
                                             </td>
                                             <td
                                                 style={{
@@ -192,32 +203,43 @@ const OrderDetail = (props) => {
                                     ))}
                                 </tbody>
                             </table>
-                            <div className="text-right">
-                                <p>
-                                    Tạm tính:{" "}
-                                    {amount && amount.toLocaleString()} đ
-                                </p>
-                                <p>
-                                    Giảm giá: -{" "}
-                                    {sale
-                                        ? (
-                                              (amount * sale) /
-                                              100
-                                          ).toLocaleString()
-                                        : 0}{" "}
-                                    đ
-                                </p>
+                            <div className="flex flex-col gap-3 text-right">
+                                <div className="flex gap-2 justify-end">
+                                    <span className="font-medium">
+                                        Tạm tính:
+                                    </span>{" "}
+                                    <span>{amount?.toLocaleString()}</span>{" "}
+                                    <span>đ</span>
+                                </div>
+                                {sale ? (
+                                    <div className="flex gap-2 justify-end">
+                                        <span className="font-medium">
+                                            Giảm giá: -
+                                        </span>
+                                        <span>
+                                            {sale
+                                                ? (
+                                                      (amount * sale) /
+                                                      100
+                                                  ).toLocaleString()
+                                                : 0}
+                                        </span>
+                                        <span>đ</span>
+                                    </div>
+                                ) : (
+                                    <></>
+                                )}
+
                                 <h5 className="text-danger">
-                                    Tổng cộng: {total && total.toLocaleString()}{" "}
-                                    đ
+                                    Tổng cộng: {total?.toLocaleString()} đ
                                 </h5>
                             </div>
-                        </Card.Body>
-                    </Card>
+                        </div>
+                    </div>
 
                     <div className="row">
                         <div className="col-md-6">
-                            <Card className="mb-4 order-card">
+                            <div className="mb-4">
                                 <Card.Body>
                                     <h5 className="text-primary">
                                         <FaMoneyCheckAlt className="mr-2" />{" "}
@@ -253,24 +275,22 @@ const OrderDetail = (props) => {
                                         )}
                                     </p>
                                 </Card.Body>
-                            </Card>
+                            </div>
                         </div>
                         <div className="col-md-6">
-                            <Card className="mb-4 order-card">
-                                <Card.Body>
+                            <div className="mb-4">
+                                <div>
                                     <h5 className="text-primary">
                                         Trạng thái đơn hàng
                                     </h5>
                                     <p className="text-info">
-                                        {order && order.orderStatusName}
+                                        {order?.orderStatus?.name}
                                     </p>
                                     <p className="text-info">
-                                        {order &&
-                                        order.shipDate &&
-                                        order.orderStatusName ==
-                                            "Đang vận chuyển"
+                                        {order?.shipDate &&
+                                        order.orderStatus?.name == "SHIPPING"
                                             ? `Ngày nhận dự kiến: ${new Date(
-                                                  order.shipDate
+                                                  order?.shipDate
                                               ).toLocaleDateString("vi-VN", {
                                                   day: "2-digit",
                                                   month: "2-digit",
@@ -286,40 +306,57 @@ const OrderDetail = (props) => {
                                             <>Lí do hủy : {order.description}</>
                                         )}
                                     </p>
-                                </Card.Body>
-                            </Card>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     {/* Delivery Method */}
-                    <Card className="mb-4 order-card">
-                        <Card.Body>
+                    <div className="mb-4">
+                        <div>
                             <h5 className="text-primary">
                                 Phương thức thanh toán
                             </h5>
                             <p className="text-info">{order.payment}</p>
-                        </Card.Body>
-                    </Card>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Customer Information */}
                 <div className="col-lg-4">
-                    <Card className="mb-4 order-card">
-                        <Card.Body>
+                    <div className="mb-4">
+                        <div>
                             <h5 className="text-danger">Thông tin mua hàng</h5>
-                            <p>Ngày mua hàng:{order.createdAt} </p>
-                            <p>Người nhận: {order.fullName}</p>
-                            <p>Email: {order.email}</p>
-                        </Card.Body>
-                    </Card>
+                            <div className="flex items-center gap-2 mb-3">
+                                <span className="font-medium">
+                                    Ngày mua hàng:
+                                </span>
+                                <span>{formatDate(order.createdAt, true)}</span>
+                            </div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <span className="font-medium">Người nhận:</span>
+                                <span>{order.fullName}</span>
+                            </div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <span className="font-medium">Email:</span>
+                                <span>{order.email}</span>
+                            </div>
+                        </div>
+                    </div>
 
-                    <Card className="mb-4 order-card">
-                        <Card.Body>
+                    <div className="mb-4">
+                        <div>
                             <h5 className="text-danger">Địa chỉ nhận hàng</h5>
-                            <p>SDT: {order.phone}</p>
-                            <p>DC: {order.address}</p>
-                        </Card.Body>
-                    </Card>
+                            <div className="flex items-center gap-2 mb-3">
+                                <span className="font-medium">SDT:</span>
+                                <span>{order.phone}</span>
+                            </div>
+                            <div className="flex gap-2 mb-3">
+                                <span className="font-medium">ĐC:</span>
+                                <span>{order.address}</span>
+                            </div>
+                        </div>
+                    </div>
 
                     {/* Buttons for actions */}
                 </div>

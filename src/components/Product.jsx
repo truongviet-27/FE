@@ -212,7 +212,6 @@ const Product = (props) => {
     };
     const choosePriceHandler = (value) => {
         const index = price.indexOf(value);
-        console.log(index, "index");
         if (index > -1) {
             setPrice([]);
             setMin(0);
@@ -283,13 +282,9 @@ const Product = (props) => {
                                     {prices?.map((item, index) => (
                                         <button
                                             className={`!text-[14px] !px-4 !text-left !text-black ${
-                                                (prices.includes(item?._id)
+                                                price.includes(`${index}`)
                                                     ? `!bg-neutral-300`
-                                                    : ``,
-                                                console.log(
-                                                    prices.includes(item?._id),
-                                                    "xxxxxxx"
-                                                ))
+                                                    : ``
                                             } w-full`}
                                             onClick={() =>
                                                 choosePriceHandler(item.value)

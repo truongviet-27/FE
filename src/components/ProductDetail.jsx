@@ -1,23 +1,21 @@
-import { React, useState, useEffect, useRef } from "react";
-import { NavLink } from "react-router-dom";
-import {
-    getProductById,
-    relateProduct,
-    getRecommendation,
-    toggleLikeProduct,
-    getAllProducts,
-} from "../api/ProductApi";
-import { useParams } from "react-router-dom";
-import { modifyCartItem, modifyCartItemFromDetail } from "../api/CartApi";
-import { toast } from "react-toastify";
-import { getAttribute, getAttributeById } from "../api/AttributeApi";
-import { isEnoughCartItem } from "../api/CartApi";
+import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import Table from "react-bootstrap/Table";
-import { getCartItemByAccountId } from "../api/CartApi";
-import { Flex } from "antd";
-import InfiniteScroll from "react-infinite-scroll-component";
+import { NavLink, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import { getAttributeById } from "../api/AttributeApi";
+import {
+    getCartItemByAccountId,
+    isEnoughCartItem,
+    modifyCartItemFromDetail,
+} from "../api/CartApi";
+import {
+    getProductById,
+    getRecommendation,
+    relateProduct,
+    toggleLikeProduct,
+} from "../api/ProductApi";
 
 const ProductDetail = (props) => {
     const { id } = useParams();

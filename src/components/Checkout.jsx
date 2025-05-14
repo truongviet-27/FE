@@ -611,6 +611,8 @@ const Checkout = (props) => {
         onLoad();
     }, [props.user]);
 
+    console.log(text, "text");
+
     const textHandler = (value) => {
         setText(value);
     };
@@ -702,63 +704,46 @@ const Checkout = (props) => {
 
     const onSubmitHandler = (data) => {
         setLoading(true);
-        if (voucher.length > 0) {
-            getVoucherByCode(voucher)
-                .then(() => {
-                    setLoading(true);
+        console.log(data, cart, "data");
+        if (voucher) {
+            const order = {
+                address: `${data.address}, ${data.ward}, ${data.district}, ${data.province}`,
+                fullName: data.name,
+                phone: data.phone,
+                email: data.email,
+                note: data.note,
+                total: amount,
+                isPending: false,
+                payment: data.payment,
+                voucherId: voucherItem._id,
+                orderDetails: cart.map((item) => ({
+                    _id: item._id,
+                    quantity: item.quantity,
+                    originPrice: item.attribute.price,
+                    sellPrice: item.lastPrice,
+                    attributeId: item.attribute._id,
+                })),
+            };
 
-                    setTimeout(() => {
-                        setLoading(false);
-                    }, 10000);
+            console.log(order, "order");
 
-                    const order = {
-                        fullName: data.name,
-                        phone: data.phone,
-                        address: `${data.address}, ${data.ward}, ${data.district}, ${data.province}`,
-                        email: data.email,
-                        total: amount,
-                        note: data.note,
-                        isPending: false,
-                        payment: data.payment,
-                        accountId: props.user ? props.user.id : -1,
-                        code: voucher,
-                        orderDetails: cart.map((item) => ({
-                            quantity: item.quantity,
-                            originPrice: item.price,
-                            sellPrice:
-                                (item.price * (100 - item.discount)) / 100,
-                            attributeId: item.id,
-                        })),
-                    };
-                    console.log(order);
-
-                    createOrder(order)
-                        .then((resp) => {
-                            toast.success("Đặt hàng thành công");
-                            props.clearHandler();
-                            history.push(`/order/detail/${resp.data.id}`);
-                        })
-                        .catch(() => {
-                            toast.error(
-                                "Sản phẩm không tồn tại hoặc số lượng không đủ"
-                            );
-                            history.push("/cart");
-                        })
-                        .finally(() => {
-                            setLoading(false); // Đảm bảo khi API xong, loading sẽ tắt
-                        });
+            createOrder(order)
+                .then((resp) => {
+                    toast.success("Đặt hàng thành công");
+                    props.clearHandler();
+                    history.push(`/order/detail/${resp.data.data._id}`);
                 })
-                .catch((error) => {
-                    handleCloseFirst();
-                    toast.error(error.response.data.Errors);
-                    refreshVoucherHandler();
+                .catch(() => {
+                    toast.error(
+                        "Sản phẩm không tồn tại hoặc số lượng không đủ"
+                    );
+                    history.push("/cart");
+                })
+                .finally(() => {
                     setLoading(false);
                 });
         } else {
             setLoading(true);
-            setTimeout(() => {
-                setLoading(false);
-            }, 14000);
 
             const order = {
                 fullName: data.name,
@@ -769,13 +754,11 @@ const Checkout = (props) => {
                 note: data.note,
                 isPending: false,
                 payment: data.payment,
-                accountId: props.user ? props.user.id : -1,
-                code: voucher,
                 orderDetails: cart.map((item) => ({
                     quantity: item.quantity,
-                    originPrice: item.price,
-                    sellPrice: (item.price * (100 - item.discount)) / 100,
-                    attributeId: item.id,
+                    originPrice: item.attribute.price,
+                    sellPrice: item.lastPrice,
+                    attributeId: item.attribute._id,
                 })),
             };
 
@@ -783,7 +766,7 @@ const Checkout = (props) => {
                 .then((resp) => {
                     toast.success("Đặt hàng thành công");
                     props.clearHandler();
-                    history.push(`/order/detail/${resp.data.id}`);
+                    history.push(`/order/detail/${resp.data.data._id}`);
                 })
                 .catch(() => {
                     toast.success(
@@ -792,13 +775,13 @@ const Checkout = (props) => {
                     history.push("/cart");
                 })
                 .finally(() => {
-                    setLoading(false); // Đảm bảo khi API xong, loading sẽ tắt
+                    setLoading(false);
                 });
         }
     };
 
     return (
-        <div className="pb-3 container-fluid">
+        <div className="pb-3 container-fluid !mb-20 !px-20">
             <div className="py-3 col-10 offset-1 text-center">
                 <h2 className="text-danger">Thông tin mua hàng</h2>
                 {loading && <Spinner></Spinner>}
@@ -836,15 +819,11 @@ const Checkout = (props) => {
                                             disabled
                                             hidden
                                         ></option>
-                                        {info &&
-                                            info.map((item, index) => (
-                                                <option
-                                                    key={index}
-                                                    value={item.id}
-                                                >
-                                                    {item.name}
-                                                </option>
-                                            ))}
+                                        {info?.map((item, index) => (
+                                            <option key={index} value={item.id}>
+                                                {item.name}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
                                 <div className="col-sm-6">
@@ -869,18 +848,14 @@ const Checkout = (props) => {
                                             disabled
                                             hidden
                                         ></option>
-                                        {district &&
-                                            district.map((item, index) => (
-                                                <option
-                                                    key={index}
-                                                    value={item.id}
-                                                >
-                                                    {item.name}
-                                                </option>
-                                            ))}
+                                        {district?.map((item, index) => (
+                                            <option key={index} value={item.id}>
+                                                {item.name}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
-                                <div className="col-sm-6 mt-2">
+                                <div className="col-sm-12 mt-2">
                                     <label
                                         htmlFor="lastName"
                                         className="form-label"
@@ -899,15 +874,14 @@ const Checkout = (props) => {
                                             disabled
                                             hidden
                                         ></option>
-                                        {ward &&
-                                            ward.map((item, index) => (
-                                                <option
-                                                    value={item.name}
-                                                    key={index}
-                                                >
-                                                    {item.name}
-                                                </option>
-                                            ))}
+                                        {ward?.map((item, index) => (
+                                            <option
+                                                value={item.name}
+                                                key={index}
+                                            >
+                                                {item.name}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
                                 <div className="col-12 mt-2">
@@ -987,7 +961,7 @@ const Checkout = (props) => {
                                         </div>
                                     )}
                                 </div>
-                                <div className="col-sm-6 mt-2">
+                                <div className="col-sm-12 mt-2">
                                     <label
                                         htmlFor="lastName"
                                         className="form-label"
@@ -1031,17 +1005,199 @@ const Checkout = (props) => {
                                     />
                                 </div>
                             </div>
-                            <label
-                                htmlFor="lastName"
-                                className="form-label mt-3"
-                            >
-                                <strong>Phương thức thanh toán</strong>
-                            </label>
+                            <div className="flex justify-start">
+                                <button
+                                    className="order-btn btn btn-primary btn-lg mt-4"
+                                    type="submit"
+                                >
+                                    Đặt hàng
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div className="lg:w-full xl:w-3/7 2xl:w-3/8">
+                        <div>
+                            <div className="flex items-center justify-between">
+                                <h4 className="flex items-center mb-3 gap-2">
+                                    <span className="text-dark">
+                                        Giỏ hàng của bạn
+                                    </span>
+                                    <span className="badge bg-primary rounded-pill">
+                                        {cart.length}
+                                    </span>
+                                </h4>
+                                <NavLink
+                                    to="/cart"
+                                    className={`${
+                                        cart.length === 0
+                                            ? "mb-2 mr-5 disabled"
+                                            : "mb-2 mr-5"
+                                    } font-medium`}
+                                    exact
+                                >
+                                    Quay về giỏ hàng
+                                </NavLink>
+                            </div>
+                            <ul className="list-group mb-3">
+                                {cart?.map((item, index) => (
+                                    <li
+                                        className="list-group-item !flex !items-start justify-between"
+                                        key={item._id}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <div>
+                                                <img
+                                                    className="w-[50px] h-[50px] border"
+                                                    src={item?.main}
+                                                    style={{
+                                                        width: "60px",
+                                                        height: "70px",
+                                                    }}
+                                                    alt="ảnh"
+                                                />
+                                            </div>
+                                            <div className="flex flex-col gap-1">
+                                                <div className="!mr-4">
+                                                    <span className="text-[15px] font-medium">
+                                                        {item?.product?.name}
+                                                    </span>
+                                                </div>
+                                                <span>
+                                                    <span className="text-[15px] font-medium">
+                                                        Size:
+                                                    </span>{" "}
+                                                    {item?.attribute?.size}
+                                                </span>
+                                                <div className="text-muted flex gap-1 text-[14px]">
+                                                    <span>
+                                                        {item.lastPrice.toLocaleString()}
+                                                    </span>
+                                                    <span>x</span>
+                                                    <span>{item.quantity}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2 text-[15px] font-medium">
+                                            <span>
+                                                {(
+                                                    item.lastPrice *
+                                                    item.quantity
+                                                ).toLocaleString()}
+                                            </span>
+                                            <span>{"VNĐ"}</span>
+                                        </div>
+                                    </li>
+                                ))}
+                                <li className="list-group-item flex bg-light">
+                                    <div className="text-success">
+                                        <div className="flex justify-between">
+                                            <div>
+                                                <h6 className="my-2">
+                                                    Mã giảm giá
+                                                </h6>
+                                                <input
+                                                    className="form-control my-2"
+                                                    value={voucher}
+                                                    disabled={flag}
+                                                    type="text"
+                                                    onChange={(e) =>
+                                                        voucherHandler(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                            </div>
+
+                                            {!!voucherItem && (
+                                                <div className="mt-2 text-black">
+                                                    <div className="flex justify-between gap-4">
+                                                        <span className="font-medium">
+                                                            Mã giảm giá:{" "}
+                                                        </span>
+                                                        <span>
+                                                            {voucherItem?.code}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex justify-between gap-4">
+                                                        <span className="font-medium">
+                                                            Giảm giá:
+                                                        </span>
+                                                        <span>
+                                                            {
+                                                                voucherItem?.discount
+                                                            }
+                                                            %
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex justify-between gap-4">
+                                                        <span className="font-medium">
+                                                            Thời hạn:{" "}
+                                                        </span>
+                                                        <span>
+                                                            {formatDate(
+                                                                voucherItem?.expireDate
+                                                            )}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex gap-3 mt-2 mb-3">
+                                            <button
+                                                type="button"
+                                                className="btn btn-primary mr-3"
+                                                onClick={useVoucherHandler}
+                                            >
+                                                Áp dụng
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="btn btn-primary"
+                                                onClick={refreshVoucherHandler}
+                                            >
+                                                Làm mới
+                                            </button>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li className="list-group-item d-flex justify-content-between font-medium">
+                                    <span>Tổng tiền (VNĐ)</span>
+                                    <strong>
+                                        {amount &&
+                                            (amount + sub).toLocaleString()}
+                                    </strong>
+                                </li>
+                                {sub && (
+                                    <li className="list-group-item d-flex justify-content-between font-medium">
+                                        <span>Giá giảm (VNĐ)</span>
+                                        <strong>
+                                            - {sub.toLocaleString()}
+                                        </strong>
+                                    </li>
+                                )}
+                                {sub && (
+                                    <li className="list-group-item d-flex justify-content-between font-medium">
+                                        <span>Thành tiền (VNĐ)</span>
+                                        <strong>
+                                            {amount && amount.toLocaleString()}
+                                        </strong>
+                                    </li>
+                                )}
+                            </ul>
+                        </div>
+                        <div className="!mt-10">
+                            <h4 className="d-flex justify-content-between align-items-center mb-3">
+                                <span className="text-dark">
+                                    Phương thức thanh toán
+                                </span>
+                                <span className="badge bg-primary rounded-pill"></span>
+                            </h4>
                             <div className="form-check">
                                 <input
                                     className="form-check-input"
                                     type="radio"
-                                    value="Thanh toán khi giao hàng(COD)"
+                                    value="COD"
                                     {...register("payment", { required: true })}
                                     defaultChecked={true}
                                     onChange={(e) =>
@@ -1051,7 +1207,7 @@ const Checkout = (props) => {
                                 <label className="form-check-label">
                                     Thanh toán khi giao hàng(COD) <br />
                                 </label>
-                                {text === "Thanh toán khi giao hàng(COD)" && (
+                                {text === "COD" && (
                                     <div className="alert alert-dark">
                                         <p>
                                             Bạn được KIỂM TRA hàng và thanh toán
@@ -1064,7 +1220,7 @@ const Checkout = (props) => {
                                 <input
                                     className="form-check-input"
                                     type="radio"
-                                    value="Chuyển khoản qua ngân hàng"
+                                    value="BANK"
                                     {...register("payment", { required: true })}
                                     onChange={(e) =>
                                         textHandler(e.target.value)
@@ -1073,7 +1229,7 @@ const Checkout = (props) => {
                                 <label className="form-check-label">
                                     Chuyển khoản qua ngân hàng <br />
                                 </label>
-                                {text === "Chuyển khoản qua ngân hàng" && (
+                                {text === "BANK" && (
                                     <div className="alert alert-dark">
                                         <p>
                                             Vui lòng ghi lại MÃ ĐƠN HÀNG và SỐ
@@ -1090,191 +1246,31 @@ const Checkout = (props) => {
                                     </div>
                                 )}
                             </div>
-                            <button
-                                className="order-btn btn btn-primary btn-lg mt-4 mb-4"
-                                type="submit"
-                            >
-                                Đặt hàng
-                            </button>
-                        </form>
-                    </div>
-                    <div className="lg:w-full xl:w-3/7 2xl:w-3/8">
-                        <div className="flex items-center justify-between">
-                            <h4 className="flex items-center mb-3">
-                                <span className="text-dark">
-                                    Giỏ hàng của bạn
-                                </span>
-                                <span className="badge bg-primary rounded-pill">
-                                    {cart.length}
-                                </span>
-                            </h4>
-                            <NavLink
-                                to="/cart"
-                                className={`${
-                                    cart.length === 0
-                                        ? "mb-2 mr-5 disabled"
-                                        : "mb-2 mr-5"
-                                } font-medium`}
-                                exact
-                            >
-                                Quay về giỏ hàng
-                            </NavLink>
+                            <div className="form-check mt-2">
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    value="VNPAY"
+                                    {...register("payment", { required: true })}
+                                    onChange={(e) =>
+                                        textHandler(e.target.value)
+                                    }
+                                />
+                                <label className="form-check-label">
+                                    Thanh toán qua ví VNPay <br />
+                                </label>
+                            </div>
                         </div>
-                        <ul className="list-group mb-3">
-                            {cart?.map((item, index) => (
-                                <li
-                                    className="list-group-item !flex !items-start justify-between"
-                                    key={item._id}
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <div>
-                                            <img
-                                                className="w-[50px] h-[50px] border"
-                                                src={item?.main}
-                                                style={{
-                                                    width: "50px",
-                                                    height: "50px",
-                                                }}
-                                                alt="ảnh"
-                                            />
-                                        </div>
-                                        <div>
-                                            <h6 className="my-0 flex gap-1">
-                                                <span>
-                                                    {item?.product?.name}
-                                                </span>
-                                                <span>-</span>
-                                                <span>
-                                                    Size:{" "}
-                                                    {item?.attribute?.size}
-                                                </span>
-                                            </h6>
-                                            <div className="text-muted flex gap-1 mt-2 text-[14px]">
-                                                <span>
-                                                    {item.lastPrice.toLocaleString()}
-                                                </span>
-                                                <span>x</span>
-                                                <span>{item.quantity}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="flex gap-2 text-[15px] font-medium">
-                                        <span>
-                                            {(
-                                                item.lastPrice * item.quantity
-                                            ).toLocaleString()}
-                                        </span>
-                                        <span>{"VNĐ"}</span>
-                                    </div>
-                                </li>
-                            ))}
-                            <li className="list-group-item flex bg-light">
-                                <div className="text-success">
-                                    <div className="flex justify-between">
-                                        <div>
-                                            <h6 className="my-2">
-                                                Mã giảm giá
-                                            </h6>
-                                            <input
-                                                className="form-control my-2"
-                                                value={voucher}
-                                                disabled={flag}
-                                                type="text"
-                                                onChange={(e) =>
-                                                    voucherHandler(
-                                                        e.target.value
-                                                    )
-                                                }
-                                            />
-                                        </div>
-
-                                        {!!voucherItem && (
-                                            <div className="mt-2 text-black">
-                                                <div className="flex justify-between gap-4">
-                                                    <span className="font-medium">
-                                                        Mã giảm giá:{" "}
-                                                    </span>
-                                                    <span>
-                                                        {voucherItem?.code}
-                                                    </span>
-                                                </div>
-                                                <div className="flex justify-between gap-4">
-                                                    <span className="font-medium">
-                                                        Giảm giá:
-                                                    </span>
-                                                    <span>
-                                                        {voucherItem?.discount}%
-                                                    </span>
-                                                </div>
-                                                <div className="flex justify-between gap-4">
-                                                    <span className="font-medium">
-                                                        Thời hạn:{" "}
-                                                    </span>
-                                                    <span>
-                                                        {formatDate(
-                                                            voucherItem?.expireDate
-                                                        )}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="flex gap-3 mt-2 mb-3">
-                                        <button
-                                            type="button"
-                                            className="btn btn-primary mr-3"
-                                            onClick={useVoucherHandler}
-                                        >
-                                            Áp dụng
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="btn btn-primary"
-                                            onClick={refreshVoucherHandler}
-                                        >
-                                            Làm mới
-                                        </button>
-                                    </div>
-                                </div>
-                            </li>
-                            {sub && (
-                                <li className="list-group-item d-flex justify-content-between">
-                                    <span>Giá giảm (VNĐ)</span>
-                                    <strong>- {sub.toLocaleString()}</strong>
-                                </li>
-                            )}
-                            <li className="list-group-item d-flex justify-content-between font-medium">
-                                <span>Tổng tiền (VNĐ)</span>
-                                <strong>
-                                    {amount && amount.toLocaleString()}
-                                </strong>
-                            </li>
-                        </ul>
                     </div>
                 </div>
             </div>
-            {/* <Modal show={showFirst} onHide={handleCloseFirst}>
-        <Modal.Header closeButton>
-          <Modal.Title style={{ textAlign: "center" }}>
-            Bạn đã chắc chắn chưa?
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="danger"
-            onClick={() => onSubmitHandler(obj)}
-          >
-            Xác nhận
-          </Button>
-          <Button variant="primary" onClick={handleCloseFirst}>
-            Đóng
-          </Button>
-        </Modal.Footer>
-      </Modal> */}
             <Modal show={showFirst} onHide={handleCloseFirst}>
-                <Modal.Header closeButton>
+                <Modal.Header
+                    closeButton
+                    onHide={() => {
+                        setShowFirst(false);
+                    }}
+                >
                     <Modal.Title style={{ textAlign: "center" }}>
                         Bạn đã chắc chắn chưa?
                     </Modal.Title>
