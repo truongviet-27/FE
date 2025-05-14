@@ -1031,53 +1031,65 @@ const Checkout = (props) => {
                                     />
                                 </div>
                             </div>
-                            {/* <label htmlFor="lastName" className="form-label mt-3">
-                  <strong>Phương thức thanh toán</strong>
-                </label>
-                <div className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    value="Thanh toán khi giao hàng(COD)"
-                    {...register("payment", { required: true })}
-                    defaultChecked={true}
-                    onChange={(e) => textHandler(e.target.value)}
-                  />
-                  <label className="form-check-label">
-                    Thanh toán khi giao hàng(COD) <br />
-                  </label>
-                  {text === "Thanh toán khi giao hàng(COD)" && (
-                    <div className="alert alert-dark">
-                      <p>Bạn được KIỂM TRA hàng và thanh toán khi nhận được hàng</p>
-                    </div>
-                  )}
-                </div>
-                <div className="form-check mt-2">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    value="Chuyển khoản qua ngân hàng"
-                    {...register("payment", { required: true })}
-                    onChange={(e) => textHandler(e.target.value)}
-                  />
-                  <label className="form-check-label">
-                    Chuyển khoản qua ngân hàng <br />
-                  </label>
-                  {text === "Chuyển khoản qua ngân hàng" && (
-                    <div className="alert alert-dark">
-                      <p>
-                        Vui lòng ghi lại MÃ ĐƠN HÀNG và SỐ ĐIỆN THOẠI của bạn vào
-                        mục Nội dung thanh toán. Đơn hàng sẽ đươc giao sau khi tiền
-                        đã được chuyển.
-                      </p>
-                      <p>Ví dụ: 01234 - 0987654321</p>
-                      <p>Thông tin tài khoản:</p>
-                      <p>
-                        Phạm Thanh Phúc - 9091227092002 - MBBank
-                      </p>
-                    </div>
-                  )}
-                </div> */}
+                            <label
+                                htmlFor="lastName"
+                                className="form-label mt-3"
+                            >
+                                <strong>Phương thức thanh toán</strong>
+                            </label>
+                            <div className="form-check">
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    value="Thanh toán khi giao hàng(COD)"
+                                    {...register("payment", { required: true })}
+                                    defaultChecked={true}
+                                    onChange={(e) =>
+                                        textHandler(e.target.value)
+                                    }
+                                />
+                                <label className="form-check-label">
+                                    Thanh toán khi giao hàng(COD) <br />
+                                </label>
+                                {text === "Thanh toán khi giao hàng(COD)" && (
+                                    <div className="alert alert-dark">
+                                        <p>
+                                            Bạn được KIỂM TRA hàng và thanh toán
+                                            khi nhận được hàng
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="form-check mt-2">
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    value="Chuyển khoản qua ngân hàng"
+                                    {...register("payment", { required: true })}
+                                    onChange={(e) =>
+                                        textHandler(e.target.value)
+                                    }
+                                />
+                                <label className="form-check-label">
+                                    Chuyển khoản qua ngân hàng <br />
+                                </label>
+                                {text === "Chuyển khoản qua ngân hàng" && (
+                                    <div className="alert alert-dark">
+                                        <p>
+                                            Vui lòng ghi lại MÃ ĐƠN HÀNG và SỐ
+                                            ĐIỆN THOẠI của bạn vào mục Nội dung
+                                            thanh toán. Đơn hàng sẽ đươc giao
+                                            sau khi tiền đã được chuyển.
+                                        </p>
+                                        <p>Ví dụ: 01234 - 0987654321</p>
+                                        <p>Thông tin tài khoản:</p>
+                                        <p>
+                                            Nguyễn Trường Việt - 100870483156 -
+                                            Vietinbank
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
                             <button
                                 className="order-btn btn btn-primary btn-lg mt-4 mb-4"
                                 type="submit"
