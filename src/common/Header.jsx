@@ -183,7 +183,7 @@ const Header = (props) => {
                                     <div className="topnav__right-user__image !mr-0">
                                         <img src={avt} alt="user avatar" />
                                     </div>
-                                    <div className="topnav__right-user__name">
+                                    <div className="topnav__right-user__name lg:block hidden">
                                         {user?.fullName}
                                     </div>
                                 </div>
