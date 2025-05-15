@@ -140,7 +140,6 @@ const OrderDetail = (props) => {
                                                 style={{
                                                     textAlign: "center",
                                                     verticalAlign: "middle",
-                                                    height: "100px",
                                                 }}
                                             >
                                                 {item.attribute.product.name}
@@ -149,7 +148,6 @@ const OrderDetail = (props) => {
                                                 style={{
                                                     textAlign: "center",
                                                     verticalAlign: "middle",
-                                                    height: "100px",
                                                 }}
                                             >
                                                 {" "}
@@ -162,7 +160,6 @@ const OrderDetail = (props) => {
                                                 style={{
                                                     textAlign: "center",
                                                     verticalAlign: "middle",
-                                                    height: "100px",
                                                 }}
                                             >
                                                 {item.attribute.size}
@@ -171,7 +168,6 @@ const OrderDetail = (props) => {
                                                 style={{
                                                     textAlign: "center",
                                                     verticalAlign: "middle",
-                                                    height: "100px",
                                                 }}
                                             >
                                                 {item.sellPrice.toLocaleString()}
@@ -181,7 +177,6 @@ const OrderDetail = (props) => {
                                                 style={{
                                                     textAlign: "center",
                                                     verticalAlign: "middle",
-                                                    height: "100px",
                                                 }}
                                             >
                                                 {item.quantity}
@@ -190,7 +185,6 @@ const OrderDetail = (props) => {
                                                 style={{
                                                     textAlign: "center",
                                                     verticalAlign: "middle",
-                                                    height: "100px",
                                                 }}
                                             >
                                                 {(

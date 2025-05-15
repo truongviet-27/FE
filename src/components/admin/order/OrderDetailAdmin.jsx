@@ -592,8 +592,8 @@ const OrderDetail = () => {
                     >
                         Chi tiết đơn hàng
                     </p>
-                    <table className="table table-striped table-bordered">
-                        <thead>
+                    <table className="table table-striped table-bordered table-hover">
+                        <thead className="thead-dark">
                             <tr>
                                 <th scope="col">Tên sản phẩm</th>
                                 <th scope="col">Hình ảnh</th>

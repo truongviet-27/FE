@@ -51,8 +51,14 @@ export const countProduct = async () => {
     return await Instance.get(url);
 };
 
-export const getAllProductsByBrand = async (brand, page, size) => {
-    const url = `/api/v1/product/by-brand?brandId=${brand}&page=${page}&size=${size}`;
+export const getAllProductsByBrand = async (
+    brand,
+    page,
+    size,
+    query,
+    search
+) => {
+    const url = `/api/v1/product/by-brand?brandId=${brand}&page=${page}&size=${size}&query=${query}&search=${search}`;
     return await Instance.get(url);
 };
 

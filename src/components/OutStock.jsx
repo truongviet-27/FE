@@ -63,8 +63,8 @@ const OutStock = (props) => {
                         </button>
                     </div>
                     <div className="row col-12 mb-1">
-                        <table className="table table-striped table-bordered">
-                            <thead>
+                        <table className="table table-striped table-bordered table-hover">
+                            <thead className="thead-dark">
                                 <tr>
                                     <th scope="col">Ảnh</th>
                                     <th scope="col">Tên</th>
@@ -74,67 +74,64 @@ const OutStock = (props) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {cart &&
-                                    cart.map((item, index) => (
-                                        <tr key={index}>
-                                            <th scope="row">
-                                                <img
-                                                    className="img-fluid"
-                                                    style={{
-                                                        width: "100px",
-                                                        height: "100px",
-                                                    }}
-                                                    src={require(`../static/images/${item.image}`)}
-                                                    alt=""
-                                                />
-                                            </th>
-                                            <td>
-                                                <h6 className="card-title mt-5 bolder">
-                                                    {item.name}
-                                                </h6>
-                                            </td>
-                                            <td>
-                                                <h6 className="card-title mt-5 bolder">
-                                                    {item.size}
-                                                </h6>
-                                            </td>
-                                            <td>
-                                                {item.quantity > item.stock && (
-                                                    <div className="mt-5 ml-5 row">
-                                                        <h6 className="card-title bolder mr-3">
-                                                            {item.quantity}
-                                                        </h6>
-                                                        <i className="fa fa-arrow-right mr-3"></i>
-                                                        <h6 className="card-title bolder">
-                                                            {item.stock}
-                                                        </h6>
-                                                    </div>
-                                                )}
-                                                {item.quantity <=
-                                                    item.stock && (
-                                                    <div className="mt-5 ml-5 row">
-                                                        <h6 className="card-title bolder mr-3">
-                                                            {item.quantity}
-                                                        </h6>
-                                                    </div>
-                                                )}
-                                            </td>
-                                            <td>
-                                                <h6
-                                                    className={
-                                                        item.quantity >
-                                                        item.stock
-                                                            ? "card-title mt-5 font-weight-bold text-danger"
-                                                            : "card-title font-weight-bold mt-5"
-                                                    }
-                                                >
-                                                    {item.quantity > item.stock
-                                                        ? "Vượt tồn kho"
-                                                        : "Sẵn sàng"}
-                                                </h6>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                {cart?.map((item, index) => (
+                                    <tr key={index}>
+                                        <th scope="row">
+                                            <img
+                                                className="img-fluid"
+                                                style={{
+                                                    width: "100px",
+                                                    height: "100px",
+                                                }}
+                                                src={require(`../static/images/${item.image}`)}
+                                                alt=""
+                                            />
+                                        </th>
+                                        <td>
+                                            <h6 className="card-title mt-5 bolder">
+                                                {item.name}
+                                            </h6>
+                                        </td>
+                                        <td>
+                                            <h6 className="card-title mt-5 bolder">
+                                                {item.size}
+                                            </h6>
+                                        </td>
+                                        <td>
+                                            {item.quantity > item.stock && (
+                                                <div className="mt-5 ml-5 row">
+                                                    <h6 className="card-title bolder mr-3">
+                                                        {item.quantity}
+                                                    </h6>
+                                                    <i className="fa fa-arrow-right mr-3"></i>
+                                                    <h6 className="card-title bolder">
+                                                        {item.stock}
+                                                    </h6>
+                                                </div>
+                                            )}
+                                            {item.quantity <= item.stock && (
+                                                <div className="mt-5 ml-5 row">
+                                                    <h6 className="card-title bolder mr-3">
+                                                        {item.quantity}
+                                                    </h6>
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td>
+                                            <h6
+                                                className={
+                                                    item.quantity > item.stock
+                                                        ? "card-title mt-5 font-weight-bold text-danger"
+                                                        : "card-title font-weight-bold mt-5"
+                                                }
+                                            >
+                                                {item.quantity > item.stock
+                                                    ? "Vượt tồn kho"
+                                                    : "Sẵn sàng"}
+                                            </h6>
+                                        </td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                         <hr className="my-4" />

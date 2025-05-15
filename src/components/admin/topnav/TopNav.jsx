@@ -111,15 +111,15 @@ const TopNav = (props) => {
     };
 
     return (
-        <div className="topnav border-b border-gray-300">
-            <div className="topnav__search">
+        <div className="topnav border-b border-gray-300 !justify-end">
+            {/* <div className="topnav__search">
                 <input
                     type="text"
                     placeholder="Search here..."
                     onChange={(e) => keyHanlder(e.target.value)}
                 />
                 <i className="bx bx-search" onClick={searchHandler}></i>
-            </div>
+            </div> */}
             <div className="topnav__right">
                 <div className="topnav__right-item">
                     {/* dropdown here */}

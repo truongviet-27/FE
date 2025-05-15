@@ -28,8 +28,8 @@ export const getAccountByRole = async (page, size, role) => {
     return await Instance.get(url);
 };
 
-export const getAccounts = async (page, size) => {
-    const url = `/api/v1/user/admin/account/find-all?page=${page}&size=${size}`;
+export const getAccounts = async (page, size, query, search, roleName) => {
+    const url = `/api/v1/user/admin/account/find-all?page=${page}&size=${size}&query=${query}&search=${search}&roleName=${roleName}`;
     return await Instance.get(url);
 };
 

@@ -51,8 +51,8 @@ const ReportProduct = () => {
                     ></i>
                 </button>
                 <div className="card__body">
-                    <table className="table table-bordered">
-                        <thead>
+                    <table className="table table-striped table-bordered table-hover">
+                        <thead className="thead-dark">
                             <tr>
                                 <th scope="col">Mã sản phẩm</th>
                                 <th scope="col">Tên sản phẩm</th>

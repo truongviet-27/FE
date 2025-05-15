@@ -54,8 +54,8 @@ const OrderProduct = () => {
                     ></i>
                 </button>
                 <div className="card__body">
-                    <table className="table table-bordered">
-                        <thead>
+                    <table className="table table-striped table-bordered table-hover">
+                        <thead className="thead-dark">
                             <tr>
                                 <th scope="col">Mã đơn hàng</th>
                                 <th scope="col">Tên khách hàng</th>

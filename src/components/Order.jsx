@@ -165,8 +165,8 @@ const Order = (props) => {
                                 </div>
                             ))}
                         </div>
-                        <table className="table table-striped table-bordered mt-2 text-center">
-                            <thead>
+                        <table className="table table-striped table-bordered table-hover mt-2 text-center">
+                            <thead className="table-dark">
                                 <tr>
                                     <th scope="col">Mã đơn hàng</th>
                                     <th scope="col">Ngày tạo</th>

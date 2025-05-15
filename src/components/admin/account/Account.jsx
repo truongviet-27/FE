@@ -1,29 +1,29 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import {
-    getAccounts,
-    getTotalPage,
-    getAccountByRole,
-} from "../../../api/AccountApi";
+import { getAccounts } from "../../../api/AccountApi";
 
-import Badge from "../badge/Badge";
+import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import Badge from "../badge/Badge";
+import active from "../../../enum/active";
 
 const roleName = {
     CUSTOMER: "success",
     ADMIN: "danger",
 };
-
-const active = {
-    true: "primary",
-    false: "danger",
-};
 const Account = () => {
     const [account, setAccount] = useState();
     const [page, setPage] = useState(0);
     const [total, setTotal] = useState();
-    const [role, setRole] = useState("TẤT CẢ");
     const [size, setSize] = useState(10);
+
+    const { register, handleSubmit, getValues, setValue, watch } = useForm({
+        defaultValues: {
+            query: "",
+            search: "",
+            inlineRadioOptions: "ALL",
+        },
+    });
 
     var rows = new Array(total).fill(0).map((zero, index) => (
         <li
@@ -45,39 +45,59 @@ const Account = () => {
     };
     useEffect(() => {
         onLoad();
-    }, [page, size]);
+    }, [
+        page,
+        size,
+        watch("query"),
+        watch("search"),
+        watch("inlineRadioOptions"),
+    ]);
 
     const onLoad = () => {
-        getAccounts(page, size)
+        getAccounts(
+            page,
+            size,
+            getValues("query"),
+            getValues("search"),
+            getValues("inlineRadioOptions")
+        )
             .then((resp) => {
                 setAccount(resp.data.content);
                 setTotal(resp.data.totalPages);
             })
-            .catch((error) => toast.warning(error.response.data.message));
+            .catch((error) => {
+                console.log(error);
+                toast.error(error.response.data.message);
+            });
 
         // getTotalPage()
         //     .then((resp) => setTotal(resp.data.content))
         //     .catch((error) => console.log(error));
     };
 
-    console.log(role, "role");
+    // const getAccountByRoleHandler = (value) => {
+    //     setRole(value);
+    //     if (value === "ALL") {
+    //         setPage(0);
+    //         onLoad();
+    //     } else {
+    //         setPage(0);
+    //         getAccountByRole(page, size, value)
+    //             .then((resp) => setAccount(resp.data.content))
+    //             .catch((error) => {
+    //                 console.log(error);
+    //                 toast.error(error.response.data.message);
+    //             });
+    //     }
+    // };
 
-    const getAccountByRoleHandler = (value) => {
-        setRole(value);
-        if (value === "TẤT CẢ") {
-            setPage(0);
-            onLoad();
-        } else {
-            setPage(0);
-            getAccountByRole(page, size, value)
-                .then((resp) => setAccount(resp.data.content))
-                .catch((error) => toast.warning(error.response.data.message));
-        }
-    };
+    const onSubmitHandler = handleSubmit((data) => {
+        console.log(data, "data");
+    });
     return (
         <div className="card flex flex-col justify-between !mx-[25px] overflow-y-hidden">
-            <div>
-                <div className="card__header mb-5">
+            <form onSubmit={onSubmitHandler}>
+                <div className="card__header mb-5 flex justify-between items-center">
                     <NavLink
                         to="/admin/account/add-account"
                         className="btn btn-primary"
@@ -85,6 +105,29 @@ const Account = () => {
                     >
                         Thêm tài khoản
                     </NavLink>
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center border border-gray-300 rounded-[6px] mr-2 !pr-2">
+                            <input
+                                type="text"
+                                placeholder="Search here..."
+                                onChange={(e) =>
+                                    setValue("search", e.target.value)
+                                }
+                                className="border-0 py-2 pl-2 rounded-[6px] focus:outline-none !text-[14px]"
+                                {...register("search")}
+                            />
+                            <i className="bx bx-search" />
+                        </div>
+                        <select className="form-control" {...register("query")}>
+                            <option value={""}>--- Lọc ---</option>
+                            <option value={"isActive-true"}>Hoạt động</option>
+                            <option value={"isActive-false"}>
+                                Không hoạt động
+                            </option>
+                            <option value={"username-asc"}>Sắp xếp A-Z</option>
+                            <option value={"username-desc"}>Sắp xếp Z-A</option>
+                        </select>
+                    </div>
                 </div>
                 <div>
                     <div className="mb-3 mt-3">
@@ -93,11 +136,14 @@ const Account = () => {
                                 className="form-check-input"
                                 type="radio"
                                 name="inlineRadioOptions"
-                                value="TẤT CẢ"
+                                value="ALL"
                                 onChange={(event) =>
-                                    getAccountByRoleHandler(event.target.value)
+                                    setValue(
+                                        "inlineRadioOptions",
+                                        event.target.value
+                                    )
                                 }
-                                checked={role === "TẤT CẢ"}
+                                checked={watch("inlineRadioOptions") === "ALL"}
                             />
                             <label className="form-check-label">Tất cả</label>
                         </div>
@@ -108,9 +154,14 @@ const Account = () => {
                                 name="inlineRadioOptions"
                                 value="ADMIN"
                                 onChange={(event) =>
-                                    getAccountByRoleHandler(event.target.value)
+                                    setValue(
+                                        "inlineRadioOptions",
+                                        event.target.value
+                                    )
                                 }
-                                checked={role === "ADMIN"}
+                                checked={
+                                    watch("inlineRadioOptions") === "ADMIN"
+                                }
                             />
                             <label className="form-check-label">ADMIN</label>
                         </div>
@@ -121,49 +172,116 @@ const Account = () => {
                                 name="inlineRadioOptions"
                                 value="CUSTOMER"
                                 onChange={(event) =>
-                                    getAccountByRoleHandler(event.target.value)
+                                    setValue(
+                                        "inlineRadioOptions",
+                                        event.target.value
+                                    )
                                 }
-                                checked={role === "CUSTOMER"}
+                                checked={
+                                    watch("inlineRadioOptions") === "CUSTOMER"
+                                }
                             />
                             <label className="form-check-label">
                                 Khách hàng
                             </label>
                         </div>
                     </div>
-                    <table className="table table-bordered">
-                        <thead>
+                    <table className="table table-striped table-bordered table-hover">
+                        <thead className="thead-dark">
                             <tr>
-                                <th scope="col">STT</th>
-                                <th scope="col">Username</th>
-                                <th scope="col">Họ tên</th>
-                                <th scope="col">Giới tính</th>
-                                <th scope="col">SDT</th>
-                                <th scope="col">Email</th>
-                                <th scope="col">Vai trò</th>
-                                <th scope="col">Trạng thái</th>
-                                <th scope="col">Cập nhật</th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    STT
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Username
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Họ tên
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Giới tính
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    SDT
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Email
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Vai trò
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Trạng thái
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Cập nhật
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             {account?.map((item, index) => (
                                 <tr key={index}>
-                                    <th scope="row">
+                                    <td
+                                        className="text-center align-middle font-bold"
+                                        scope="row"
+                                    >
                                         {index + 1 + page * size}
-                                    </th>
-                                    <th scope="row">{item.username}</th>
-                                    <td style={{ width: "200px" }}>
+                                    </td>
+                                    <td
+                                        className="text-center align-middle"
+                                        scope="row"
+                                    >
+                                        {item.username}
+                                    </td>
+                                    <td
+                                        className="text-center align-middle"
+                                        style={{ width: "200px" }}
+                                    >
                                         {item?.userDetail.fullName}
                                     </td>
-                                    <td>{item?.userDetail?.gender}</td>
-                                    <td>{item?.userDetail?.phone}</td>
-                                    <td>{item?.email}</td>
-                                    <td>
+                                    <td className="text-center align-middle">
+                                        {item?.userDetail?.gender}
+                                    </td>
+                                    <td className="text-center align-middle">
+                                        {item?.userDetail?.phone}
+                                    </td>
+                                    <td className="text-center align-middle">
+                                        {item?.email}
+                                    </td>
+                                    <td className="text-center align-middle">
                                         <Badge
                                             type={roleName[item.role]}
                                             content={item.role}
                                         />
                                     </td>
-                                    <td>
+                                    <td className="text-center align-middle">
                                         <Badge
                                             type={active[item.isActive]}
                                             content={
@@ -173,7 +291,7 @@ const Account = () => {
                                             }
                                         />
                                     </td>
-                                    <td>
+                                    <td className="text-center align-middle">
                                         <NavLink
                                             to={`/admin/account/account-detail/${item._id}`}
                                             exact
@@ -189,7 +307,7 @@ const Account = () => {
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </form>
             <nav
                 aria-label="Page navigation"
                 className="flex items-center justify-between mt-3"

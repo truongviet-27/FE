@@ -31,7 +31,10 @@ const EditSale = () => {
                 toast.success("Cập nhật khuyến mãi thành công.");
                 history.push("/admin/sale");
             })
-            .catch((error) => toast.error(error.response.data.message));
+            .catch((error) => {
+                console.log(error);
+                toast.error(error.response.data.message);
+            });
     };
 
     const goBack = () => {

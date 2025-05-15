@@ -54,8 +54,8 @@ const OrderMonth = (props) => {
                     ></i>
                 </button>
                 <div className="card__body">
-                    <table className="table table-bordered">
-                        <thead>
+                    <table className="table table-striped table-bordered table-hover">
+                        <thead className="thead-dark">
                             <tr>
                                 <th scope="col">Mã đơn hàng</th>
                                 <th scope="col">Tên khách hàng</th>
@@ -66,24 +66,23 @@ const OrderMonth = (props) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {order &&
-                                order.map((item, index) => (
-                                    <tr key={index}>
-                                        <th scope="row">
-                                            <NavLink
-                                                to={`/detail-order/${item.id}`}
-                                                exact
-                                            >
-                                                #OD{item.id}
-                                            </NavLink>
-                                        </th>
-                                        <td>{item.fullname}</td>
-                                        <td>{item.phone}</td>
-                                        <td>{item.address}</td>
-                                        <td>{item.createdAt}</td>
-                                        <td>{item.total}</td>
-                                    </tr>
-                                ))}
+                            {order?.map((item, index) => (
+                                <tr key={index}>
+                                    <th scope="row">
+                                        <NavLink
+                                            to={`/detail-order/${item.id}`}
+                                            exact
+                                        >
+                                            #OD{item.id}
+                                        </NavLink>
+                                    </th>
+                                    <td>{item.fullname}</td>
+                                    <td>{item.phone}</td>
+                                    <td>{item.address}</td>
+                                    <td>{item.createdAt}</td>
+                                    <td>{item.total}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                     <nav aria-label="navigation">

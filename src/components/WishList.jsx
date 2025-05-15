@@ -94,8 +94,8 @@ const WishList = () => {
                 </div>
                 <div className="card__body">
                     <div className="table-wrapper">
-                        <table className="table table-bordered">
-                            <thead>
+                        <table className="table table-striped table-bordered table-hover">
+                            <thead className="thead-dark">
                                 <tr>
                                     <th scope="col">STT</th>
                                     <th scope="col">Tên sản phẩm</th>

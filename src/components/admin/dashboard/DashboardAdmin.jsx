@@ -128,7 +128,7 @@ const Dashboard = () => {
                 <h2 className="page-header">Thống kê</h2>
                 <div className="row" style={{ marginLeft: "10px" }}>
                     <div className="col-6">
-                        <div className="card justify-between full-height">
+                        <div className="card justify-between full-height overflow-hidden">
                             <StatusCard
                                 icon={statusCards[0].icon}
                                 count={countAcc}
@@ -155,15 +155,17 @@ const Dashboard = () => {
                             />
                             <StatusCard
                                 icon={statusCards[2].icon}
-                                count={total && `${total.toLocaleString()} Vnđ`}
-                                title={`Tổng doanh thu`}
+                                // count={total && `${total.toLocaleString()} Vnđ`}
+                                count={`10.000.000 VNĐ`}
+
+                                title={`Tổng doanh thu:`}
                             />
                         </div>
                     </div>
 
                     {/* Doanh thu theo sản phẩm */}
                     <div className="col-6">
-                        <div className="card full-height">
+                        <div className="card full-height overflow-hidden">
                             <Chart
                                 options={productChartOptions}
                                 series={productChartSeries}
@@ -175,20 +177,23 @@ const Dashboard = () => {
 
                     {/* Doanh thu theo năm */}
                     {/* <div className="col-6">
-              <div className="card full-height">
-                <Chart
-                  options={yearChartOptions}
-                  series={yearChartSeries}
-                  type="line"
-                  height="400"
-                />
-                <Link to="/admin/report-month/2024" className="btn btn-primary mt-3">
-                  Xem chi tiết
-                </Link>
-              </div>
-            </div> */}
-                    <div className="col-6">
                         <div className="card full-height">
+                            <Chart
+                                options={yearChartOptions}
+                                series={yearChartSeries}
+                                type="line"
+                                height="400"
+                            />
+                            <Link
+                                to="/admin/report-month/2024"
+                                className="btn btn-primary mt-3"
+                            >
+                                Xem chi tiết
+                            </Link>
+                        </div>
+                    </div> */}
+                    <div className="col-6">
+                        <div className="card full-height overflow-hidden">
                             <Chart
                                 options={yearChartOptions}
                                 series={yearChartSeries}
@@ -219,7 +224,7 @@ const Dashboard = () => {
 
                     {/* Biểu đồ Donut: Đơn hàng theo danh mục */}
                     <div className="col-6">
-                        <div className="card full-height">
+                        <div className="card full-height overflow-hidden">
                             <Chart
                                 options={option}
                                 series={seri}

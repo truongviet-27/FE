@@ -30,7 +30,7 @@ const EditAccount = () => {
     const onSubmitHandler = (data) => {
         const result = {
             _id: data._id,
-            isActive: data.isActive === true ? true : false,
+            isActive: data.isActive,
             fullName: data.fullName,
             gender: data.gender,
             phone: data.phone,

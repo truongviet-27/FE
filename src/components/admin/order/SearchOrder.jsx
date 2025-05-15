@@ -330,8 +330,8 @@ const SearchOrder = () => {
                     {orders && (
                         <div>
                             <div className="table-wrapper">
-                                <table>
-                                    <thead>
+                                <table className="table table-striped table-bordered table-hover">
+                                    <thead className="thead-dark">
                                         <tr>
                                             <th scope="col">Mã đơn hàng</th>
                                             <th scope="col">Ngày mua</th>

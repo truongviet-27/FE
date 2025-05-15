@@ -23,7 +23,10 @@ const NewSale = () => {
                 toast.success("Thêm mới khuyến mãi thành công.");
                 history.push("/admin/sale");
             })
-            .catch((error) => toast.error(error.response.data.Errors));
+            .catch((error) => {
+                console.log(error);
+                toast.error(error.response.data.message);
+            });
     };
 
     const goBack = () => {

@@ -1,13 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { getBrands } from "../../../api/BrandApi";
+import { getBrands, getBrandsAdmin } from "../../../api/BrandApi";
 import formatDate from "../../../utils/convertDate";
+import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+import active from "../../../enum/active";
+import Badge from "../badge/Badge";
 
 const Brand = () => {
     const [brand, setBrand] = useState();
     const [page, setPage] = useState(0);
     const [total, setTotal] = useState();
     const [size, setSize] = useState(10);
+
+    const { register, handleSubmit, getValues, setValue, watch } = useForm({
+        defaultValues: {
+            query: "",
+            search: "",
+        },
+    });
 
     var rows = new Array(total).fill(0).map((zero, index) => (
         <li
@@ -30,19 +41,28 @@ const Brand = () => {
 
     useEffect(() => {
         onLoad();
-    }, [page, size]);
+    }, [page, size, page, size, watch("query"), watch("search")]);
 
     const onLoad = () => {
-        getBrands(page, size).then((resp) => {
-            setBrand(resp.data.content);
-            setTotal(resp.data.totalPages);
-        });
+        getBrandsAdmin(page, size, getValues("query"), getValues("search"))
+            .then((resp) => {
+                setBrand(resp.data.content);
+                setTotal(resp.data.totalPages);
+            })
+            .catch((error) => {
+                console.log(error);
+                toast.error(error.response.data.message);
+            });
     };
+
+    const onSubmitHandler = handleSubmit((data) => {
+        console.log(data, "data");
+    });
 
     return (
         <div className="card flex flex-col justify-between !mx-[25px] overflow-y-hidden">
-            <div>
-                <div className="card__header mb-5">
+            <form onSubmit={onSubmitHandler}>
+                <div className="card__header mb-5 flex justify-between items-center">
                     <NavLink
                         to="/admin/brand/add-brand"
                         className="btn btn-primary"
@@ -50,34 +70,101 @@ const Brand = () => {
                     >
                         Thêm thương hiệu
                     </NavLink>
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center border border-gray-300 rounded-[6px] mr-2 !pr-2">
+                            <input
+                                type="text"
+                                placeholder="Search here..."
+                                onChange={(e) =>
+                                    setValue("search", e.target.value)
+                                }
+                                className="border-0 py-2 pl-2 rounded-[6px] focus:outline-none !text-[14px]"
+                                {...register("search")}
+                            />
+                            <i className="bx bx-search" />
+                        </div>
+                        <select className="form-control" {...register("query")}>
+                            <option value={""}>--- Lọc ---</option>
+                            <option value={"isActive-true"}>Hoạt động</option>
+                            <option value={"isActive-false"}>
+                                Không hoạt động
+                            </option>
+                            <option value={"name-asc"}>Sắp xếp A-Z</option>
+                            <option value={"name-desc"}>Sắp xếp Z-A</option>
+                        </select>
+                    </div>
                 </div>
                 <div className="overflow-y-auto max-h-[500px]">
-                    <table className="table table-bordered w-full">
-                        <thead className="sticky">
+                    <table className="table table-striped table-bordered table-hover">
+                        <thead className="thead-dark">
                             <tr>
-                                <th scope="col">STT</th>
-                                <th scope="col">Tên thương hiệu</th>
-                                <th scope="col">Mô tả</th>
-                                <th scope="col">Ngày tạo</th>
-                                <th scope="col">Trạng thái</th>
-                                <th scope="col">Cập nhật</th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    STT
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Tên thương hiệu
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Mô tả
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Ngày tạo
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Trạng thái
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Cập nhật
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             {brand?.map((item, index) => (
                                 <tr key={index}>
-                                    <th scope="row">
+                                    <td
+                                        className="text-center align-middle font-bold"
+                                        scope="row"
+                                    >
                                         {index + 1 + page * size}
-                                    </th>
-                                    <td>{item.name}</td>
-                                    <td>{item.description}</td>
-                                    <td>{formatDate(item.createdAt)}</td>
-                                    <td>
-                                        {item.isActive
-                                            ? "Hoạt động"
-                                            : "Không hoạt động"}
                                     </td>
-                                    <td>
+                                    <td className="text-center align-middle">
+                                        {item.name}
+                                    </td>
+                                    <td className="text-center align-middle">
+                                        {item.description}
+                                    </td>
+                                    <td className="text-center align-middle">
+                                        {formatDate(item.createdAt)}
+                                    </td>
+                                    <td className="text-center align-middle">
+                                        <Badge
+                                            type={active[item.isActive]}
+                                            content={
+                                                item.isActive
+                                                    ? "Hoạt động"
+                                                    : "Không hoạt động"
+                                            }
+                                        />
+                                    </td>
+                                    <td className="text-center align-middle">
                                         <NavLink
                                             to={`/admin/brand/brand-detail/${item._id}`}
                                         >
@@ -92,7 +179,7 @@ const Brand = () => {
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </form>
             <nav
                 aria-label="Page navigation"
                 className="flex items-center justify-between mt-3"

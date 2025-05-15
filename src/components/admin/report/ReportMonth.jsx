@@ -131,8 +131,8 @@ const ReportMonth = (props) => {
                         <h3 className="text-primary">Đơn hàng trong tháng</h3>
                     </div>
                     <div className="card__body">
-                        <table className="table table-bordered">
-                            <thead>
+                        <table className="table table-striped table-bordered table-hover">
+                            <thead className="thead-dark">
                                 <tr>
                                     <th scope="col">Mã đơn hàng</th>
                                     <th scope="col">Tên khách hàng</th>

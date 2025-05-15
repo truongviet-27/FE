@@ -203,8 +203,8 @@ const Cart = (props) => {
                     <h4 className="text-danger !mb-0">Giỏ hàng của bạn</h4>
                 </div>
                 <div className="">
-                    <table className="table table-striped table-bordered">
-                        <thead>
+                    <table className="table table-striped table-bordered table-hover">
+                        <thead className="table-dark">
                             <tr>
                                 <th scope="col">Chọn</th>
                                 <th scope="col">Ảnh</th>
