@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-import "../../../components/admin/image/CardProfile.css";
 import { getBrands } from "../../../api/BrandApi";
-import { getSale } from "../../../api/SaleApi";
 import { getCategory } from "../../../api/CategoryApi";
+import { getSale } from "../../../api/SaleApi";
+import "../../../components/admin/image/CardProfile.css";
 // import logo from "../../assets/images/logo-sneaker.jpg";
-import { createProduct } from "../../../api/ProductApi";
-import { toast } from "react-toastify";
 import { useHistory } from "react-router-dom";
-import { error } from "jquery";
+import { toast } from "react-toastify";
+import { createProduct } from "../../../api/ProductApi";
 
 const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
@@ -17,7 +16,7 @@ const ProductForm = () => {
     const [brand, setBrand] = useState([]);
     const [sale, setSale] = useState([]);
     const [category, setCategory] = useState([]);
-    const [image, setImage] = useState([]);
+    const [images, setImages] = useState([]);
 
     const history = useHistory();
 
@@ -71,124 +70,47 @@ const ProductForm = () => {
         for (let i of links) {
             if (!i.includes(".jpg") && !i.includes(".png")) {
                 toast.warning("File ảnh không hợp lệ.");
-                setImage([]);
+                setImages([]);
                 flag = true;
                 break;
             }
         }
         if (!flag) {
-            setImage(images);
+            setImages(images);
         }
     };
 
     const submitHandler = (data) => {
-        console.log(data, "xxxxxxxxxx");
-        if (image.length < 1) {
+        if (images.length < 1) {
             toast.warning("Cần tải lên ảnh của sản phẩm");
         } else {
-            const nums = [
-                data.size1,
-                data.size2,
-                data.size3,
-                data.size4,
-                data.size5,
-                data.size6,
-                data.size7,
-                data.size8,
-                data.size9,
-                data.size10,
-            ];
-            const newNums = nums.slice(0, count);
-            const hasDuplicate = newNums.some(
-                (x) => newNums.indexOf(x) !== newNums.lastIndexOf(x)
+            const numbersSize = getValues("attribute").map((item) => item.size);
+
+            const hasDuplicate = numbersSize.some(
+                (item, index) => numbersSize.indexOf(item) !== index
             );
             if (hasDuplicate) {
                 toast.warning("Nhập trùng size. Vui lòng nhập lại!");
             } else {
-                const formData = new FormData();
+                // const formData = new FormData();
 
                 // Thêm các thông tin sản phẩm vào FormData
-                formData.append("name", data.name);
-                formData.append("code", data.code);
-                formData.append("description", data.description);
-                formData.append("brand", data.brand);
-                formData.append("sale", data.sale);
-                formData.append("category", JSON.stringify(data.category));
-                formData.append("attribute", JSON.stringify(data.attribute));
+                // formData.append("name", data.name);
+                // formData.append("code", data.code);
+                // formData.append("description", data.description);
+                // formData.append("brand", data.brand);
+                // formData.append("sale", data.sale);
+                // formData.append("category", JSON.stringify(data.category));
+                // formData.append("attribute", JSON.stringify(data.attribute));
 
-                // Thêm từng hình ảnh vào FormData
-                image.forEach((img, index) => {
-                    formData.append("files", img);
-                });
-
-                // Thêm các thuộc tính sản phẩm vào FormData dưới dạng các cặp key-value
-                // const attributes = [
-                //     {
-                //         size: data.size1,
-                //         price: data.price1,
-                //         stock: data.quantity1,
-                //     },
-                //     {
-                //         size: data.size2,
-                //         price: data.price2,
-                //         stock: data.quantity2,
-                //     },
-                //     {
-                //         size: data.size3,
-                //         price: data.price3,
-                //         stock: data.quantity3,
-                //     },
-                //     {
-                //         size: data.size4,
-                //         price: data.price4,
-                //         stock: data.quantity4,
-                //     },
-                //     {
-                //         size: data.size5,
-                //         price: data.price5,
-                //         stock: data.quantity5,
-                //     },
-                //     {
-                //         size: data.size6,
-                //         price: data.price6,
-                //         stock: data.quantity6,
-                //     },
-                //     {
-                //         size: data.size7,
-                //         price: data.price7,
-                //         stock: data.quantity7,
-                //     },
-                //     {
-                //         size: data.size8,
-                //         price: data.price8,
-                //         stock: data.quantity8,
-                //     },
-                //     {
-                //         size: data.size9,
-                //         price: data.price9,
-                //         stock: data.quantity9,
-                //     },
-                //     {
-                //         size: data.size10,
-                //         price: data.price10,
-                //         stock: data.quantity10,
-                //     },
-                // ].slice(0, count);
-
-                // attributes.forEach((attribute, index) => {
-                //     formData.append(`attribute[${index}].size`, attribute.size);
-                //     formData.append(
-                //         `attribute[${index}].price`,
-                //         attribute.price
-                //     );
-                //     formData.append(
-                //         `attribute[${index}].stock`,
-                //         attribute.stock
-                //     );
+                // images.forEach((img, index) => {
+                //     formData.append("files", img);
                 // });
+                const newData = {
+                    ...data,
+                };
 
-                // Gửi yêu cầu tạo sản phẩm
-                createProduct(formData)
+                createProduct(newData)
                     .then(() => {
                         toast.success("Thêm mới sản phẩm thành công");
                         history.push("/admin/product");
@@ -423,7 +345,7 @@ const ProductForm = () => {
                                             flexWrap: "wrap",
                                         }}
                                     >
-                                        {image?.map((item, index) => (
+                                        {images?.map((item, index) => (
                                             <div
                                                 key={index}
                                                 style={{
@@ -497,10 +419,22 @@ const ProductForm = () => {
                                                         required: true,
                                                         min: 36,
                                                         max: 45,
+                                                        validate: (value) =>
+                                                            getValues(
+                                                                "attribute"
+                                                            )
+                                                                .map(
+                                                                    (item) =>
+                                                                        item.size
+                                                                )
+                                                                .includes(
+                                                                    value
+                                                                ) === false ||
+                                                            "Size đã tồn tại",
                                                     }
                                                 )}
                                             />
-                                            {errors.size1 && (
+                                            {errors.attribute && (
                                                 <p className="text-danger mt-2">
                                                     Size giày trong khoảng 36-45
                                                 </p>
