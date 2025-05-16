@@ -30,9 +30,9 @@ const OrderForm = () => {
     const onLoad = () => {
         getOrderById(id.id)
             .then((resp) => {
-                setOrder(resp.data);
+                setOrder(resp.data.data);
                 reset({
-                    ...resp.data,
+                    ...resp.data.data,
                     orderStatus: resp.data.orderStatus.id,
                 });
                 setAmount(resp.data.total);
@@ -40,8 +40,8 @@ const OrderForm = () => {
             .catch((error) => console.log(error));
         getOrderDetailByOrderId(id.id)
             .then((resp) => {
-                setOrderDetail(resp.data);
-                const result = resp.data.reduce(
+                setOrderDetail(resp.data.content);
+                const result = resp.data.content.reduce(
                     (price, item) => price + item.sellPrice * item.quantity,
                     0
                 );
@@ -70,7 +70,7 @@ const OrderForm = () => {
     return (
         <div className="pb-3 container-fluid card">
             <div className="py-3 col-10 offset-1 text-center">
-                <h2 className="text-danger">Đơn hàng #OD{id.id}</h2>
+                <h2 className="text-danger !mb-0">Đơn hàng #OD{id.id}</h2>
             </div>
             <div className="row">
                 <div className="col-md-5 col-lg-4 order-md-last">
@@ -78,31 +78,29 @@ const OrderForm = () => {
                         <span className="text-dark">Chi tiết đơn hàng</span>
                     </h4>
                     <ul className="list-group mb-3">
-                        {orderDetail &&
-                            orderDetail.map((item, index) => (
-                                <li
-                                    className="list-group-item d-flex justify-content-between lh-sm"
-                                    key={index}
-                                >
-                                    <div>
-                                        <h6 className="my-0">
-                                            {item.attribute.name} - Size{" "}
-                                            {item.attribute.size}
-                                        </h6>
-                                        <small className="text-muted">
-                                            Giá{" "}
-                                            {item.sellPrice.toLocaleString()} x{" "}
-                                            {item.quantity}
-                                        </small>
-                                    </div>
-                                    <strong>
-                                        {(
-                                            item.sellPrice * item.quantity
-                                        ).toLocaleString()}{" "}
-                                        đ
-                                    </strong>
-                                </li>
-                            ))}
+                        {orderDetail?.map((item, index) => (
+                            <li
+                                className="list-group-item d-flex justify-content-between lh-sm"
+                                key={index}
+                            >
+                                <div>
+                                    <h6 className="my-0">
+                                        {item.attribute.name} - Size{" "}
+                                        {item.attribute.size}
+                                    </h6>
+                                    <small className="text-muted">
+                                        Giá {item.sellPrice.toLocaleString()} x{" "}
+                                        {item.quantity}
+                                    </small>
+                                </div>
+                                <strong>
+                                    {(
+                                        item.sellPrice * item.quantity
+                                    ).toLocaleString()}{" "}
+                                    đ
+                                </strong>
+                            </li>
+                        ))}
                         {sub > amount && (
                             <li className="list-group-item d-flex justify-content-between">
                                 <span>Giá giảm (VND)</span>

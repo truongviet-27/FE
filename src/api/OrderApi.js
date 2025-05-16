@@ -52,12 +52,13 @@ export const reportByProduct = async (page, size) => {
 
 export const getOrderByOrderStatusAndYearAndMonth = async (
     status,
+    payment,
     year,
     month,
     page,
     size
 ) => {
-    const url = `/api/v1/order/synthesis/order-by-year-month?id=${status}&year=${year}&month=${month}&page=${page}&size=${size}`;
+    const url = `/api/v1/order/synthesis/order-by-year-month?status=${status}&payment=${payment}&year=${year}&month=${month}&page=${page}&size=${size}`;
     return await Instance.get(url);
 };
 
@@ -93,8 +94,15 @@ export const updateSuccess = async (data) => {
     return await Instance.post(url, data);
 };
 
-export const getAllOrderAndPagination = async (status, payment, page, size) => {
-    const url = `/api/v1/order/page-admin?page=${page}&size=${size}&status=${status}&payment=${payment}`;
+export const getAllOrderAndPagination = async (
+    status,
+    payment,
+    from,
+    to,
+    page,
+    size
+) => {
+    const url = `/api/v1/order/page-admin?page=${page}&size=${size}&status=${status}&payment=${payment}&from=${from}&to=${to}`;
     return await Instance.get(url);
 };
 export const getOrderByOrderStatusBetweenDate = async (

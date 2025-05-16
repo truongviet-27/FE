@@ -179,7 +179,7 @@ const Header = (props) => {
                         {/* Dropdown Tên Tài Khoản */}
                         <Dropdown
                             customToggle={() => (
-                                <div className="topnav__right-user flex flex-wrap justify-center">
+                                <div className="topnav__right-user flex flex-wrap justify-center gap-2">
                                     <div className="topnav__right-user__image !mr-0">
                                         <img src={avt} alt="user avatar" />
                                     </div>

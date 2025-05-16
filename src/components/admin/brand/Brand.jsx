@@ -4,7 +4,7 @@ import { getBrands, getBrandsAdmin } from "../../../api/BrandApi";
 import formatDate from "../../../utils/convertDate";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import active from "../../../enum/active";
+import { active } from "../../../enum/active";
 import Badge from "../badge/Badge";
 
 const Brand = () => {

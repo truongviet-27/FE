@@ -168,62 +168,108 @@ const Order = (props) => {
                         <table className="table table-striped table-bordered table-hover mt-2 text-center">
                             <thead className="table-dark">
                                 <tr>
-                                    <th scope="col">Mã đơn hàng</th>
-                                    <th scope="col">Ngày tạo</th>
-                                    <th scope="col">Tình trạng thanh toán</th>
-                                    <th scope="col">Tình trạng vận chuyển</th>
-                                    <th scope="col">Tổng tiền</th>
-                                    <th scope="col">Hủy</th>
+                                    <th
+                                        scope="col"
+                                        className="text-center align-middle"
+                                    >
+                                        Mã đơn hàng
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="text-center align-middle"
+                                    >
+                                        Ngày tạo
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="text-center align-middle"
+                                    >
+                                        Tình trạng thanh toán
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="text-center align-middle"
+                                    >
+                                        Trạng thái đơn hàng
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="text-center align-middle"
+                                    >
+                                        Đơn vị vận chuyển
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="text-center align-middle"
+                                    >
+                                        Ngày giao hàng
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="text-center align-middle"
+                                    >
+                                        Tổng tiền
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="text-center align-middle"
+                                    >
+                                        Hủy
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {order?.map((item, index) => (
                                     <tr key={index}>
-                                        <th scope="row">
-                                            <h6 className="card-title mt-2 bolder">
-                                                <NavLink
-                                                    to={`/order/detail/${item._id}`}
-                                                    exact
-                                                >
-                                                    {item.code}
-                                                </NavLink>
-                                            </h6>
-                                        </th>
-                                        <td>
-                                            <h6 className="card-title mt-2 bolder">
-                                                {formatDate(
-                                                    item.createdAt,
-                                                    true
-                                                )}
-                                            </h6>
+                                        <td
+                                            className="text-center align-middle font-bold"
+                                            scope="row"
+                                        >
+                                            <NavLink
+                                                to={`/order/detail/${item._id}`}
+                                                exact
+                                            >
+                                                {item.code}
+                                            </NavLink>
                                         </td>
-                                        <td>
-                                            {item.isPending ? (
-                                                <h6 className="card-title mt-2 bolder text-success">
-                                                    Đã thanh toán
-                                                </h6>
-                                            ) : (
-                                                <h6 className="card-title mt-2 bolder text-danger">
-                                                    Chưa thanh toán
-                                                </h6>
-                                            )}
+                                        <td className="text-center align-middle font-bold">
+                                            {formatDate(item.createdAt, true)}
                                         </td>
-                                        <td>
-                                            <h6 className="card-title mt-2 bolder">
-                                                {item.orderStatusName}
-                                            </h6>
+                                        <td
+                                            className={`text-center align-middle font-bold ${
+                                                item.isPending
+                                                    ? "text-success"
+                                                    : "text-danger"
+                                            }`}
+                                        >
+                                            {item.isPending
+                                                ? "Đã thanh toán"
+                                                : "Chưa thanh toán"}
                                         </td>
-                                        <td>
-                                            <h6 className="card-title mt-2 bolder">
-                                                {item.total.toLocaleString()} ₫
-                                            </h6>
+                                        <td className="text-center align-middle font-bold">
+                                            {item?.orderStatus?.name}
                                         </td>
-                                        <td>
+                                        <td className="text-center align-middle font-bold">
+                                            {item?.shipment?.name}
+                                        </td>
+                                        <td className="text-center align-middle font-bold">
+                                            {formatDate(item?.shipDate)}
+                                        </td>
+                                        <td className="text-center align-middle font-bold">
+                                            {item.total.toLocaleString()} ₫
+                                        </td>
+                                        <td className="text-center align-middle font-bold">
                                             <button
-                                                className="btn btn-light"
+                                                className="btn btn-light !cursor-not-allowed"
                                                 onClick={() =>
                                                     handleShowFouth(item.id, 5)
                                                 }
+                                                disabled={[
+                                                    "CANCELLED",
+                                                    "DELIVERED",
+                                                ].includes(
+                                                    item?.orderStatus?.code
+                                                )}
                                             >
                                                 <i
                                                     className="fa fa-ban text-danger"

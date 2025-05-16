@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { getSale } from "../../../api/SaleApi";
 import { toast } from "react-toastify";
 import Badge from "../badge/Badge";
-import active from "../../../enum/active";
+import { active } from "../../../enum/active";
 import { useForm } from "react-hook-form";
 
 const Sale = () => {

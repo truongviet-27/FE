@@ -49,7 +49,7 @@ const EditCategory = () => {
                         aria-hidden="true"
                     ></i>
                 </button>
-                <h2 className="text-danger">Loại sản phẩm</h2>
+                <h2 className="text-danger !mb-0">Loại sản phẩm</h2>
                 <div className="w-[60px]"></div>
             </div>
             <form

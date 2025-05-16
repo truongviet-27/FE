@@ -9,7 +9,6 @@ import {
     isEnoughCartItem,
 } from "../api/CartApi";
 import { toast } from "react-toastify";
-import { useQuery } from "react-query";
 
 const Cart = (props) => {
     const [cart, setCart] = useState([]);
@@ -207,67 +206,92 @@ const Cart = (props) => {
                     <table className="table table-striped table-bordered table-hover">
                         <thead className="table-dark">
                             <tr>
-                                <th scope="col">Chọn</th>
-                                <th scope="col">Ảnh</th>
-                                <th scope="col">Tên</th>
-                                <th scope="col">Size</th>
-                                <th scope="col">Đơn giá</th>
-                                <th scope="col">Số lượng</th>
-                                <th scope="col">Thành tiền</th>
-                                <th scope="col">Xoá</th>
+                                <th
+                                    className="text-center align-middle"
+                                    scope="col"
+                                >
+                                    Chọn
+                                </th>
+                                <th
+                                    className="text-center align-middle"
+                                    scope="col"
+                                >
+                                    Ảnh
+                                </th>
+                                <th
+                                    className="text-center align-middle"
+                                    scope="col"
+                                >
+                                    Tên
+                                </th>
+                                <th
+                                    className="text-center align-middle"
+                                    scope="col"
+                                >
+                                    Size
+                                </th>
+                                <th
+                                    className="text-center align-middle"
+                                    scope="col"
+                                >
+                                    Đơn giá
+                                </th>
+                                <th
+                                    className="text-center align-middle"
+                                    scope="col"
+                                >
+                                    Số lượng
+                                </th>
+                                <th
+                                    className="text-center align-middle"
+                                    scope="col"
+                                >
+                                    Thành tiền
+                                </th>
+                                <th
+                                    className="text-center align-middle"
+                                    scope="col"
+                                >
+                                    Xoá
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             {cart?.map((item, index) => (
                                 <tr key={item._id}>
-                                    <th>
-                                        <div className="flex items-center justify-center h-[50px]">
-                                            <input
-                                                className="form-check-input ml-1"
-                                                type="checkbox"
-                                                value={item?._id}
-                                                id="defaultCheck1"
-                                                onClick={buyHandler}
-                                            />
-                                        </div>
-                                    </th>
-                                    <th>
-                                        <div className="flex items-center justify-center h-[50px]">
+                                    <td className="text-center align-middle font-bold">
+                                        <input
+                                            className="form-check-input ml-1"
+                                            type="checkbox"
+                                            value={item?._id}
+                                            id="defaultCheck1"
+                                            onClick={buyHandler}
+                                        />
+                                    </td>
+                                    <td className="text-center align-middle font-bold">
+                                        <div className="flex items-center justify-center h-[80px]">
                                             <img
                                                 className="img-fluid"
                                                 style={{
-                                                    width: "50px",
-                                                    height: "50px",
+                                                    width: "70px",
+                                                    height: "70px",
                                                 }}
                                                 src={item?.image}
                                                 alt=""
                                             />
                                         </div>
-                                    </th>
-                                    <td>
-                                        <div className="flex items-center justify-center h-[50px]">
-                                            <h6 className="card-title bolder">
-                                                {item?.product?.name}
-                                            </h6>
-                                        </div>
                                     </td>
-                                    <td>
-                                        <div className="flex items-center justify-center h-[50px]">
-                                            <h6 className="card-title bolder">
-                                                {item?.attribute?.size}
-                                            </h6>
-                                        </div>
+                                    <td className="text-center align-middle font-bold">
+                                        {item?.product?.name}
                                     </td>
-                                    <td>
-                                        <div className="flex items-center justify-center h-[50px]">
-                                            <h6 className="card-title bolder">
-                                                {item?.lastPrice?.toLocaleString()}{" "}
-                                                đ
-                                            </h6>
-                                        </div>
+                                    <td className="text-center align-middle font-bold">
+                                        {item?.attribute?.size}
                                     </td>
-                                    <td>
-                                        <div className="flex items-center justify-center gap-2 h-[50px]">
+                                    <td className="text-center align-middle font-bold">
+                                        {item?.lastPrice?.toLocaleString()} đ
+                                    </td>
+                                    <td className="text-center align-middle font-bold">
+                                        <div className="flex items-center justify-center gap-2">
                                             <button
                                                 className="btn btn-outline-dark"
                                                 onClick={() =>
@@ -307,19 +331,14 @@ const Cart = (props) => {
                                             </button>
                                         </div>
                                     </td>
-                                    <td>
-                                        <div className="flex items-center justify-center h-[50px]">
-                                            <h6 className="card-title bolder">
-                                                {(
-                                                    item?.quantity *
-                                                    item?.lastPrice
-                                                ).toLocaleString()}{" "}
-                                                đ
-                                            </h6>
-                                        </div>
+                                    <td className="text-center align-middle font-bold">
+                                        {(
+                                            item?.quantity * item?.lastPrice
+                                        ).toLocaleString()}
+                                        đ
                                     </td>
-                                    <td>
-                                        <div className="flex items-center justify-center h-[50px]">
+                                    <td className="text-center align-middle font-bold">
+                                        <div className="flex items-center justify-center">
                                             <button
                                                 className="border-0 pl-4"
                                                 style={{

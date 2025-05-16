@@ -6,7 +6,7 @@ import { NavLink } from "react-router-dom";
 import { getBrands } from "../../../api/BrandApi";
 import { toast } from "react-toastify";
 import Badge from "../badge/Badge";
-import active from "../../../enum/active";
+import { active } from "../../../enum/active";
 import { useForm } from "react-hook-form";
 
 const Product = () => {
@@ -243,12 +243,12 @@ const Product = () => {
                                         <td className="text-center align-middle">
                                             {item?.brand?.name}
                                         </td>
-                                        <td className="text-center align-middle flex items-center justify-center h-[60px] border-0">
+                                        <td className="text-center align-middle flex items-center justify-center h-[80px] border-0">
                                             <img
                                                 className="img-fluid"
                                                 style={{
-                                                    width: "50px",
-                                                    height: "50px",
+                                                    width: "70px",
+                                                    height: "70px",
                                                 }}
                                                 src={item.image}
                                                 alt=""

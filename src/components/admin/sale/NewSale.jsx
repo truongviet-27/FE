@@ -44,7 +44,7 @@ const NewSale = () => {
                             aria-hidden="true"
                         ></i>
                     </button>
-                    <h2 className="text-danger">Khuyến mãi</h2>
+                    <h2 className="text-danger !mb-0">Khuyến mãi</h2>
                     <div className="w-[60px]"></div>
                 </div>
             </div>

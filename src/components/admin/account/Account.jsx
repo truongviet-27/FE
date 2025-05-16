@@ -5,7 +5,7 @@ import { getAccounts } from "../../../api/AccountApi";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Badge from "../badge/Badge";
-import active from "../../../enum/active";
+import { active } from "../../../enum/active";
 
 const roleName = {
     CUSTOMER: "success",

@@ -39,7 +39,7 @@ const NewBrand = () => {
                         aria-hidden="true"
                     ></i>
                 </button>
-                <h2 className="text-danger">Thương hiệu</h2>
+                <h2 className="text-danger !mb-0">Thương hiệu</h2>
                 <div className="w-[60px]"></div>
             </div>
 

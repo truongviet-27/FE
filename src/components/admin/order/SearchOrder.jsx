@@ -80,7 +80,7 @@ const SearchOrder = () => {
             .catch((error) => console.log(error));
 
         getOrderDetailByOrderId(orderId)
-            .then((resp) => setAttribute(resp.data))
+            .then((resp) => setAttribute(resp.data.content))
             .catch((error) => console.log(error));
 
         setShowFirst(true);

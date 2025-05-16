@@ -39,7 +39,7 @@ const NewAccount = () => {
                         aria-hidden="true"
                     ></i>
                 </button>
-                <h2 className="text-danger mb-0">Tài khoản</h2>
+                <h2 className="text-danger !mb-0">Tài khoản</h2>
                 <div className="w-[60px]"></div>
             </div>
             <form

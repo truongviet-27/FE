@@ -3,4 +3,12 @@ const active = {
     false: "danger",
 };
 
-export default active;
+const orderStatus = {
+    PENDING_CONFIRM: "secondary",
+    PROCESSING: "primary",
+    SHIPPING: "warning",
+    DELIVERED: "success",
+    CANCELLED: "danger",
+};
+
+export { active, orderStatus };

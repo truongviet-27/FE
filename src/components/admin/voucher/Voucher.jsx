@@ -4,7 +4,7 @@ import { getVouchers } from "../../../api/VoucherApi";
 import formatDate from "../../../utils/convertDate";
 import { toast } from "react-toastify";
 import Badge from "../badge/Badge";
-import active from "../../../enum/active";
+import { active } from "../../../enum/active";
 import { useForm } from "react-hook-form";
 
 const Voucher = () => {

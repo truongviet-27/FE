@@ -186,7 +186,7 @@ const ProductDetail = (props) => {
                         })
                         .catch((error) => {
                             setCount(1);
-                            toast.error(error.response.data.Errors);
+                            toast.error(error.response.data.message);
                         });
                 } else {
                     getAttributeById(attributeId)

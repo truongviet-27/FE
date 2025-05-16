@@ -182,7 +182,7 @@ const UserLayout = () => {
                 />
             )}
             {isAdminRoute && isLogin && <Sidebar user={user} />}
-            <div className={`${isAdminRoute ? "flex-1" : "!pt-[120px]"} `}>
+            <div className={`${isAdminRoute ? "flex-1" : "!pt-[120px] min-h-[614px]"} `}>
                 {isAdminRoute && isLogin && (
                     <TopNav user={user} userHandler={userHandler} />
                 )}

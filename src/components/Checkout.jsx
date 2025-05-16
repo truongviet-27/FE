@@ -1165,7 +1165,9 @@ const Checkout = (props) => {
                                     <span>Tổng tiền (VNĐ)</span>
                                     <strong>
                                         {amount &&
-                                            (amount + sub).toLocaleString()}
+                                            (
+                                                amount + (sub ?? 0)
+                                            ).toLocaleString()}
                                     </strong>
                                 </li>
                                 {sub && (

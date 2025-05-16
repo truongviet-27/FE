@@ -1,33 +1,27 @@
-import React, { useState, useEffect, use } from "react";
+import { useEffect, useState } from "react";
+import { Button, Form } from "react-bootstrap";
+import Alert from "react-bootstrap/Alert";
+import Modal from "react-bootstrap/Modal";
+import { useForm } from "react-hook-form";
 import { NavLink } from "react-router-dom";
+import { toast } from "react-toastify";
 import {
     getAllOrderAndPagination,
-    getOrderByOrderStatusBetweenDate,
-    getOrderByOrderStatusAndYearAndMonth,
+    getAllOrderStatus,
+    getAllOrdersByPayment,
     getOrderById,
+    getOrderByOrderStatusAndYearAndMonth,
     getOrderDetailByOrderId,
     updateCancel,
     updateProcess,
     updateShip,
     updateSuccess,
-    getAllOrderStatus,
-    getAllOrdersByPayment,
 } from "../../../api/OrderApi";
-import "../table/table.css";
-import Badge from "../badge/Badge";
-import { toast } from "react-toastify";
-import { Button, Form } from "react-bootstrap";
-import Modal from "react-bootstrap/Modal";
-import Alert from "react-bootstrap/Alert";
 import formatDate from "../../../utils/convertDate";
-
-const orderStatus = {
-    "Chờ xác nhận": "secondary",
-    "Đang xử lí": "primary",
-    "Đang vận chuyển": "warning",
-    "Đã giao": "success",
-    "Đã hủy": "danger",
-};
+import Badge from "../badge/Badge";
+import "../table/table.css";
+import { getAllShipments } from "../../../api/Shipment";
+import { orderStatus } from "../../../enum/active";
 
 const pendingStatus = {
     true: "success",
@@ -44,7 +38,7 @@ const Order = () => {
     const [showFouth, setShowFouth] = useState(false);
 
     const [shipment, setShipment] = useState(null);
-    const [code, setCode] = useState(null);
+    // const [code, setCode] = useState(null);
     const [description, setDescription] = useState(null);
     const [reason, setReason] = useState(null);
     const [shipDate, setShipDate] = useState(null);
@@ -53,14 +47,13 @@ const Order = () => {
     const [size, setSize] = useState(10);
 
     const shipmentHandler = (value) => {
-        console.log(value);
         setShipment(value);
     };
 
-    const codeHandler = (value) => {
-        console.log(value);
-        setCode(value);
-    };
+    // const codeHandler = (value) => {
+    //     console.log(value);
+    //     setCode(value);
+    // };
 
     const descriptionHandler = (value) => {
         console.log(value);
@@ -73,8 +66,23 @@ const Order = () => {
     };
 
     const shipDateHandler = (value) => {
-        console.log(value);
-        setShipDate(value);
+        const inputDate = new Date(value);
+        const today = new Date();
+
+        inputDate.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+
+        const diffInMs = inputDate - today;
+        const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+
+        if (diffInDays > 2) {
+            setShipDate(inputDate);
+        } else {
+            toast.warning(
+                "Ngày vận chuyển phải lớn hơn ngày hiện tại ít nhất 2 ngày!"
+            );
+            setShipDate("");
+        }
     };
 
     const [flagProcess, setFlagProcess] = useState(false);
@@ -83,49 +91,53 @@ const Order = () => {
         setShowFirst(false);
         setFlagProcess(false);
     };
-    const handleShowFirst = (orderId, statusId) => {
+    const handleShowFirst = (orderId, statusCode, paymentCode) => {
         getOrderById(orderId)
             .then((resp) => setTemp(resp.data.data))
             .catch((error) => console.log(error));
 
         getOrderDetailByOrderId(orderId)
-            .then((resp) => setAttribute(resp.data.data))
+            .then((resp) => setAttribute(resp.data.content))
             .catch((error) => console.log(error));
 
         setShowFirst(true);
         setObj({
-            orderId: orderId,
-            statusId: statusId,
+            orderId,
+            statusCode,
+            paymentCode,
         });
     };
 
     const handleCloseSecond = () => {
         setShowSecond(false);
         setShipment(null);
-        setCode(null);
+        // setCode(null);
         setShipDate(null);
     };
-    const handleShowSecond = (orderId, statusId) => {
+    const handleShowSecond = (orderId, statusCode, paymentCode) => {
         setShowSecond(true);
         setObj({
-            orderId: orderId,
-            statusId: statusId,
+            orderId,
+            statusCode,
+            paymentCode,
         });
     };
 
     const [flagSuccess, setFlagSuccess] = useState(false);
+
     const handleCloseThird = () => {
         setShowThird(false);
         setFlagSuccess(false);
     };
-    const handleShowThird = (orderId, statusId) => {
+    const handleShowThird = (orderId, statusCode, paymentCode) => {
         getOrderById(orderId)
             .then((resp) => setTemp(resp.data))
             .catch((error) => console.log(error));
         setShowThird(true);
         setObj({
-            orderId: orderId,
-            statusId: statusId,
+            orderId,
+            statusCode,
+            paymentCode,
         });
     };
 
@@ -134,24 +146,36 @@ const Order = () => {
         setReason(null);
         setDescription(null);
     };
-    const handleShowFouth = (orderId, statusId) => {
+    const handleShowFouth = (orderId, statusCode, paymentCode) => {
         setShowFouth(true);
         setObj({
-            orderId: orderId,
-            statusId: statusId,
+            orderId,
+            statusCode,
+            paymentCode,
         });
     };
     const [status, setStatus] = useState("ALL");
     const [orderStatuses, setOrderStatuses] = useState([]);
+    const [shipments, setShipments] = useState([]);
+
     const [obj, setObj] = useState({});
     const [total, setTotal] = useState();
     const [page, setPage] = useState(0);
     const [year, setYear] = useState("");
     const [month, setMonth] = useState("");
-    const [from, setFrom] = useState("");
-    const [to, setTo] = useState("");
     const [temp, setTemp] = useState();
     const [attribute, setAttribute] = useState([]);
+
+    const { register, handleSubmit, setValue, getValues, watch } = useForm({
+        defaultValues: {
+            status: "ALL",
+            year: "",
+            month: "",
+            from: "",
+            to: "",
+            payment: "ALL",
+        },
+    });
 
     var rows = new Array(total).fill(0).map((zero, index) => (
         <li
@@ -173,10 +197,24 @@ const Order = () => {
 
     useEffect(() => {
         onLoad();
-    }, [page, size]);
+    }, [
+        page,
+        size,
+        watch("status"),
+        watch("payment"),
+        watch("from"),
+        watch("to"),
+    ]);
 
     const onLoad = () => {
-        getAllOrderAndPagination(status, paymentMethod, page, size)
+        getAllOrderAndPagination(
+            getValues("status"),
+            getValues("payment"),
+            getValues("from"),
+            getValues("to"),
+            page,
+            size
+        )
             .then((res) => {
                 setOrders(res.data.content);
                 setTotal(res.data.totalPages);
@@ -196,38 +234,54 @@ const Order = () => {
             });
     }, []);
 
-    const updateStatusHandlerFirst = (orderId, statusId) => {
-        handleShowFirst(orderId, statusId);
+    useEffect(() => {
+        getAllShipments()
+            .then((resp) => setShipments(resp.data.content))
+            .catch((error) => {
+                console.log(error);
+                toast.error(error.response.data.message);
+            });
+    }, []);
+
+    const updateStatusHandlerFirst = (orderId, statusCode, paymentCode) => {
+        handleShowFirst(orderId, statusCode, paymentCode);
     };
 
-    const updateStatusHandlerSecond = (orderId, statusId) => {
-        handleShowSecond(orderId, statusId);
+    const updateStatusHandlerSecond = (orderId, statusCode, paymentCode) => {
+        handleShowSecond(orderId, statusCode, paymentCode);
     };
 
-    const updateStatusHandlerThird = (orderId, statusId) => {
-        handleShowThird(orderId, statusId);
+    const updateStatusHandlerThird = (orderId, statusCode, paymentCode) => {
+        handleShowThird(orderId, statusCode, paymentCode);
     };
 
-    const updateStatusHandlerFouth = (orderId, statusId) => {
-        handleShowFouth(orderId, statusId);
+    const updateStatusHandlerFouth = (orderId, statusCode, paymentCode) => {
+        handleShowFouth(orderId, statusCode, paymentCode);
     };
 
     const confirmUpdateProcess = () => {
         const data = {
             id: obj.orderId,
-            status: obj.statusId,
-            shipment: shipment,
-            payment: paymentMethod,
-            code: code,
-            description: `${reason} - ${description}`,
+            status: obj.statusCode,
+            shipment: "",
+            payment: obj.paymentCode,
+            // code: code,
+            description:
+                reason && description ? `${reason} - ${description}` : "",
             shipDate: shipDate,
         };
 
         updateProcess(data)
-            .then((resp) => {
-                setStatus(obj.statusId);
+            .then(() => {
                 setPage(0);
-                getAllOrderAndPagination(obj.statusId, paymentMethod, 0, 20)
+                getAllOrderAndPagination(
+                    getValues("status"),
+                    getValues("payment"),
+                    getValues("from"),
+                    getValues("to"),
+                    page,
+                    size
+                )
                     .then((res) => {
                         setOrders(res.data.content);
                         setTotal(res.data.totalPages);
@@ -250,18 +304,25 @@ const Order = () => {
     const confirmUpdateShip = () => {
         const data = {
             id: obj.orderId,
-            status: obj.statusId,
+            status: obj.statusCode,
             shipment: shipment,
-            code: code,
-            description: `${reason} - ${description}`,
+            // code: code,
+            description:
+                reason && description ? `${reason} - ${description}` : "",
             shipDate: shipDate,
         };
 
         updateShip(data)
-            .then((resp) => {
-                setStatus(obj.statusId);
+            .then(() => {
                 setPage(0);
-                getAllOrderAndPagination(obj.statusId, paymentMethod, 0, 20)
+                getAllOrderAndPagination(
+                    getValues("status"),
+                    getValues("payment"),
+                    getValues("from"),
+                    getValues("to"),
+                    page,
+                    size
+                )
                     .then((res) => {
                         setOrders(res.data.content);
                         setTotal(res.data.totalPages);
@@ -277,7 +338,7 @@ const Order = () => {
                 toast.error(error.response.data.message);
             });
         setShipment(null);
-        setCode(null);
+        // setCode(null);
         setShipDate(null);
         setShowSecond(false);
     };
@@ -287,7 +348,7 @@ const Order = () => {
             id: obj.orderId,
             status: obj.statusId,
             shipment: shipment,
-            code: code,
+            // code: code,
             description: `${reason} - ${description}`,
             shipDate: shipDate,
         };
@@ -319,18 +380,24 @@ const Order = () => {
     const confirmUpdateCancel = () => {
         const data = {
             id: obj.orderId,
-            status: obj.statusId,
-            shipment: shipment,
-            code: code,
+            status: obj.statusCode,
+            shipment: null,
+            // code: code,
             description: `${reason} - ${description}`,
-            shipDate: shipDate,
+            shipDate: null,
         };
 
         updateCancel(data)
-            .then((resp) => {
-                setStatus(obj.statusId);
+            .then(() => {
                 setPage(0);
-                getAllOrderAndPagination(obj.statusId, paymentMethod, 0, 20)
+                getAllOrderAndPagination(
+                    getValues("status"),
+                    getValues("payment"),
+                    getValues("from"),
+                    getValues("to"),
+                    page,
+                    size
+                )
                     .then((res) => {
                         setOrders(res.data.content);
                         setTotal(res.data.totalPages);
@@ -385,43 +452,75 @@ const Order = () => {
                 console.error("Lỗi khi tải dữ liệu:", error);
             });
     };
-    const getAllOrderByOrderStatusAndYearAndMonth = (value) => {
-        setMonth(value);
-        setFrom("");
-        setTo("");
-        getOrderByOrderStatusAndYearAndMonth(status, year, value, page, 20)
-            .then((res) => {
-                setOrders(res.data.content);
-                setTotal(res.data.totalPages);
-            })
-            .catch((error) => console.log(error.response.data.message));
-    };
+    // const getAllOrderByOrderStatusAndYearAndMonth = (value) => {
+    //     setMonth(value);
+    //     setFrom("");
+    //     setTo("");
+    //     getOrderByOrderStatusAndYearAndMonth(status, year, value, page, size)
+    //         .then((res) => {
+    //             setOrders(res.data.content);
+    //             setTotal(res.data.totalPages);
+    //         })
+    //         .catch((error) => console.log(error.response.data.message));
+    // };
+
+    useEffect(() => {
+        if (
+            (getValues("year") &&
+                getValues("status") &&
+                getValues("payment")) ||
+            (getValues("month") && getValues("status") && getValues("payment"))
+        ) {
+            getOrderByOrderStatusAndYearAndMonth(
+                getValues("status"),
+                getValues("payment"),
+                getValues("year"),
+                getValues("month"),
+                page,
+                size
+            )
+                .then((res) => {
+                    setOrders(res.data.content);
+                    setTotal(res.data.totalPages);
+                })
+                .catch((error) => toast.error(error.response.data.message));
+        }
+    }, [
+        page,
+        size,
+        watch("year"),
+        watch("month"),
+        watch("status"),
+        watch("payment"),
+    ]);
 
     const changeYearHandler = (value) => {
         setYear(value);
     };
 
-    const searchHandler = () => {
+    const searchHandler = handleSubmit((data) => {
         // if (from.length === 0 || to.length === 0) {
         //   toast.warning("Chọn ngày cần tìm kiếm.");
         // } else {
-        if (from > to) {
-            toast.warning("Chọn ngày tìm kiếm không hợp lệ.");
-        } else {
-            let a = from.split("-");
-            let strFrom = a[2] + "-" + a[1] + "-" + a[0];
-            let b = to.split("-");
-            let strTo = b[2] + "-" + b[1] + "-" + b[0];
-            console.log(strFrom + " " + strTo);
-            getOrderByOrderStatusBetweenDate(status, strFrom, strTo, page, 8)
-                .then((res) => {
-                    setOrders(res.data.content);
-                    setTotal(res.data.totalPages);
-                })
-                .catch((error) => console.log(error.response.data.message));
-        }
+        // if (from > to) {
+        //     toast.warning("Chọn ngày tìm kiếm không hợp lệ.");
+        // } else {
+        //     let a = from.split("-");
+        //     let strFrom = a[2] + "-" + a[1] + "-" + a[0];
+        //     let b = to.split("-");
+        //     let strTo = b[2] + "-" + b[1] + "-" + b[0];
+        //     console.log(strFrom + " " + strTo);
+        //     getOrderByOrderStatusBetweenDate(status, strFrom, strTo, page, 8)
+        //         .then((res) => {
+        //             setOrders(res.data.content);
+        //             setTotal(res.data.totalPages);
+        //         })
+        //         .catch((error) => console.log(error.response.data.message));
         // }
-    };
+        // }
+
+        console.log(data, "data");
+    });
 
     const flagProcessHandler = (e) => {
         const { checked } = e.target;
@@ -432,113 +531,94 @@ const Order = () => {
         const { checked } = e.target;
         setFlagSuccess(checked);
     };
+
     return (
         <>
             <div className="card flex flex-col justify-between !mx-[25px] overflow-y-hidden">
-                <div>
+                <form onSubmit={searchHandler}>
                     <div className="card__header">
                         <h3>Đơn hàng</h3>
                     </div>
-                    <div className="row">
-                        <div className="col-sm-4 mt-2">
-                            <select
-                                className="form-control"
-                                onChange={(event) =>
-                                    getAllOrderByStatus(event.target.value)
-                                }
-                            >
-                                <option value="ALL">Tất cả</option>
-                                {orderStatuses?.map((item) => (
-                                    <option key={item._id} value={item.code}>
-                                        {item.name}
-                                    </option>
-                                ))}
-                            </select>
+                    <div className="mb-5">
+                        <div className="row">
+                            <div className="col-sm-4 mt-2">
+                                <select
+                                    className="form-control"
+                                    {...register("status")}
+                                >
+                                    <option value="ALL">Tất cả</option>
+                                    {orderStatuses?.map((item) => (
+                                        <option
+                                            key={item._id}
+                                            value={item.code}
+                                        >
+                                            {item.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="col-sm-4 mt-2">
+                                <select
+                                    className="form-control"
+                                    {...register("year")}
+                                >
+                                    <option value="">Chọn năm</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025">2025</option>
+                                </select>
+                            </div>
+                            <div className="col-sm-4 mt-2">
+                                <select
+                                    className="form-control"
+                                    {...register("month")}
+                                >
+                                    <option value="">Chọn tháng</option>
+                                    {months?.map((item, index) => (
+                                        <option key={index} value={item}>
+                                            Tháng {item}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
-                        <div className="col-sm-4 mt-2">
-                            <select
-                                className="form-control"
-                                onChange={(e) =>
-                                    changeYearHandler(e.target.value)
-                                }
-                                value={year}
-                            >
-                                <option value="">Chọn năm</option>
-                                <option value="2023">2023</option>
-                                <option value="2024">2024</option>
-                                <option value="2025">2025</option>
-                            </select>
-                        </div>
-                        <div className="col-sm-4 mt-2">
-                            <select
-                                className="form-control"
-                                onChange={(e) =>
-                                    getAllOrderByOrderStatusAndYearAndMonth(
-                                        e.target.value
-                                    )
-                                }
-                                value={month}
-                            >
-                                <option value="">Chọn tháng</option>
-                                {months?.map((item, index) => (
-                                    <option key={index} value={item}>
-                                        Tháng {item}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-sm-4 mt-2">
-                            <input
-                                type="date"
-                                name=""
-                                id=""
-                                className="border w-full !rounded-[6px]"
-                                onChange={(e) => setFrom(e.target.value)}
-                                value={from}
-                            />
-                        </div>
+                        <div className="row">
+                            <div className="col-sm-4 mt-2">
+                                <input
+                                    type="date"
+                                    name=""
+                                    id=""
+                                    className="border w-full !rounded-[6px] !text-[15px]"
+                                    {...register("from")}
+                                />
+                            </div>
 
-                        <div className="col-sm-4 mt-2">
-                            <input
-                                type="date"
-                                name=""
-                                id=""
-                                className="border w-full !rounded-[6px]"
-                                onChange={(e) => setTo(e.target.value)}
-                                value={to}
-                            />
-                        </div>
-                        <div className="col-sm-4 mt-2">
-                            <select
-                                className="form-control"
-                                onChange={(event) =>
-                                    getAllOrdersByPaymentStatus(
-                                        event.target.value
-                                    )
-                                }
-                            >
-                                <option value="ALL">Tất cả</option>
-                                <option value="CODE">
-                                    Thanh toán khi giao hàng (COD)
-                                </option>
-                                <option value="BANK">
-                                    Chuyển khoản qua ngân hàng
-                                </option>
-                                <option value="VNAPY">
-                                    Chuyển khoản qua VNPay
-                                </option>
-                            </select>
-                        </div>
-
-                        <div className="flex justify-center items-center mt-4 mb-4">
-                            <button
-                                className="btn btn-primary"
-                                onClick={() => searchHandler()}
-                            >
-                                Tìm kiếm
-                            </button>
+                            <div className="col-sm-4 mt-2">
+                                <input
+                                    type="date"
+                                    name=""
+                                    id=""
+                                    className="border w-full !rounded-[6px] !text-[15px]"
+                                    {...register("to")}
+                                />
+                            </div>
+                            <div className="col-sm-4 mt-2">
+                                <select
+                                    className="form-control"
+                                    {...register("payment")}
+                                >
+                                    <option value="ALL">Tất cả</option>
+                                    <option value="COD">
+                                        Thanh toán khi giao hàng (COD)
+                                    </option>
+                                    <option value="BANK">
+                                        Chuyển khoản qua ngân hàng
+                                    </option>
+                                    <option value="VNAPY">
+                                        Chuyển khoản qua VNPay
+                                    </option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div className="card__body">
@@ -586,7 +666,7 @@ const Order = () => {
                                                         <Badge
                                                             type={
                                                                 orderStatus[
-                                                                    "Chờ xác nhận"
+                                                                    "PENDING_CONFIRM"
                                                                 ]
                                                             }
                                                             content={
@@ -602,7 +682,7 @@ const Order = () => {
                                                     <Badge
                                                         type={
                                                             orderStatus[
-                                                                "Đang xử lí"
+                                                                "PROCESSING"
                                                             ]
                                                         }
                                                         content={"Đang xử lí"}
@@ -615,7 +695,7 @@ const Order = () => {
                                                     <Badge
                                                         type={
                                                             orderStatus[
-                                                                "Đang vận chuyển"
+                                                                "SHIPPING"
                                                             ]
                                                         }
                                                         content={
@@ -630,7 +710,7 @@ const Order = () => {
                                                     <Badge
                                                         type={
                                                             orderStatus[
-                                                                "Đã giao"
+                                                                "DELIVERED"
                                                             ]
                                                         }
                                                         content={"Đã giao"}
@@ -643,7 +723,7 @@ const Order = () => {
                                                     <Badge
                                                         type={
                                                             orderStatus[
-                                                                "Đã hủy"
+                                                                "CANCELLED"
                                                             ]
                                                         }
                                                         content={"Hủy"}
@@ -671,7 +751,7 @@ const Order = () => {
                                                             scope="row"
                                                         >
                                                             <NavLink
-                                                                to={`/admin/detail-order/${item.id}`}
+                                                                to={`/admin/detail-order/${item._id}`}
                                                                 exact
                                                             >
                                                                 {index +
@@ -711,7 +791,7 @@ const Order = () => {
                                                         </td>
                                                         {
                                                             <td className="text-center align-middle">
-                                                                {paymentMethod !==
+                                                                {item.payment !==
                                                                     "VNPAY" && (
                                                                     <input
                                                                         className="form-check-input"
@@ -720,40 +800,34 @@ const Order = () => {
                                                                             index
                                                                         }
                                                                         checked={
-                                                                            item.payment ==
-                                                                            "CODE"
+                                                                            item
+                                                                                .orderStatus
+                                                                                .code ==
+                                                                            "PENDING_CONFIRM"
                                                                         }
-                                                                        value="1"
+                                                                        value="COD"
                                                                     />
                                                                 )}
                                                             </td>
                                                         }
-                                                        {/* <th>
-                                  <div className="form-check mb-4">
-                                    <input
-                                      className="form-check-input"
-                                      type="radio"
-                                      name={index}
-                                      checked={item.orderStatusId === 1}
-                                      value="1"
-                                    />
-                                  </div>
-                                </th> */}
                                                         <td className="text-center align-middle">
                                                             <input
                                                                 className="form-check-input"
                                                                 type="radio"
                                                                 name={index}
                                                                 checked={
-                                                                    item.orderStatusId ===
-                                                                    2
+                                                                    item
+                                                                        .orderStatus
+                                                                        .code ===
+                                                                    "PROCESSING"
                                                                 }
-                                                                value="2"
+                                                                value="PROCESSING"
                                                                 onChange={(e) =>
                                                                     updateStatusHandlerFirst(
                                                                         item._id,
                                                                         e.target
-                                                                            .value
+                                                                            .value,
+                                                                        item.payment
                                                                     )
                                                                 }
                                                             />
@@ -764,16 +838,29 @@ const Order = () => {
                                                                 type="radio"
                                                                 name={index}
                                                                 checked={
-                                                                    item.orderStatusId ===
-                                                                    3
+                                                                    item
+                                                                        .orderStatus
+                                                                        .code ===
+                                                                    "SHIPPING"
                                                                 }
-                                                                value="3"
+                                                                value="SHIPPING"
                                                                 onChange={(e) =>
                                                                     updateStatusHandlerSecond(
                                                                         item._id,
                                                                         e.target
-                                                                            .value
+                                                                            .value,
+                                                                        item.payment
                                                                     )
+                                                                }
+                                                                disabled={
+                                                                    item
+                                                                        .orderStatus
+                                                                        .code !==
+                                                                        "PROCESSING" &&
+                                                                    item
+                                                                        .orderStatus
+                                                                        .code !==
+                                                                        "SHIPPING"
                                                                 }
                                                             />
                                                         </td>
@@ -783,16 +870,29 @@ const Order = () => {
                                                                 type="radio"
                                                                 name={index}
                                                                 checked={
-                                                                    item.orderStatusId ===
-                                                                    4
+                                                                    item
+                                                                        .orderStatus
+                                                                        .code ===
+                                                                    "DELIVERED"
                                                                 }
-                                                                value="4"
+                                                                value="DELIVERED"
                                                                 onChange={(e) =>
                                                                     updateStatusHandlerThird(
                                                                         item._id,
                                                                         e.target
-                                                                            .value
+                                                                            .value,
+                                                                        item.payment
                                                                     )
+                                                                }
+                                                                disabled={
+                                                                    item
+                                                                        .orderStatus
+                                                                        .code !==
+                                                                        "SHIPPING" &&
+                                                                    item
+                                                                        .orderStatus
+                                                                        .code !==
+                                                                        "DELIVERED"
                                                                 }
                                                             />
                                                         </td>
@@ -802,16 +902,25 @@ const Order = () => {
                                                                 type="radio"
                                                                 name={index}
                                                                 checked={
-                                                                    item.orderStatusId ===
-                                                                    5
+                                                                    item
+                                                                        .orderStatus
+                                                                        .code ===
+                                                                    "CANCELLED"
                                                                 }
-                                                                value="5"
+                                                                value="CANCELLED"
                                                                 onChange={(e) =>
                                                                     updateStatusHandlerFouth(
                                                                         item._id,
                                                                         e.target
-                                                                            .value
+                                                                            .value,
+                                                                        item.payment
                                                                     )
+                                                                }
+                                                                disabled={
+                                                                    item
+                                                                        .orderStatus
+                                                                        .code ===
+                                                                    "DELIVERED"
                                                                 }
                                                             />
                                                         </td>
@@ -823,7 +932,7 @@ const Order = () => {
                             </div>
                         )}
                     </div>
-                </div>
+                </form>
 
                 <nav
                     aria-label="Page navigation"
@@ -883,7 +992,7 @@ const Order = () => {
                 </nav>
             </div>
             <Modal show={showFirst} onHide={handleCloseFirst}>
-                <Modal.Header closeButton>
+                <Modal.Header>
                     <Modal.Title style={{ textAlign: "center" }}>
                         Xác nhận cập nhật?
                     </Modal.Title>
@@ -894,31 +1003,82 @@ const Order = () => {
                             Gọi điện cho khách hàng xác nhận những thông tin
                         </Alert.Heading>
                         <hr />
-                        <p className="font-weight-bold">
-                            Tên khách hàng: {temp && temp.fullName}
-                        </p>
-                        <p className="font-weight-bold">
-                            Số điện thoại: {temp && temp.phone}
-                        </p>
-                        <p className="font-weight-bold">
-                            Địa chỉ nhận hàng: {temp && temp.address}
-                        </p>
-                        <p className="font-weight-bold">Sản phẩm mua:</p>
-                        {attribute?.map((item, index) => (
-                            <p key={index}>
-                                {item.attribute.name} - Size{" "}
-                                {item.attribute.size} - Số lượng {item.quantity}
-                            </p>
-                        ))}
+                        <div className="flex mb-3">
+                            <span className="font-bold min-w-[130px]">
+                                Tên khách hàng:
+                            </span>
+                            <span>{temp?.fullName}</span>
+                        </div>
+                        <div className="flex mb-3">
+                            <span className="font-bold min-w-[130px]">
+                                Email:
+                            </span>
+                            <span>{temp?.email}</span>
+                        </div>
+                        <div className="flex mb-3">
+                            <span className="font-bold min-w-[130px]">
+                                Số điện thoại:
+                            </span>
+                            <span>{temp?.phone}</span>
+                        </div>
+                        <div className="flex mb-3">
+                            <span className="font-bold min-w-[130px]">
+                                Địa chỉ nhận hàng:
+                            </span>
+                            <span>{temp?.address}</span>
+                        </div>
+                        <p className="font-bold">Sản phẩm mua:</p>
+                        <div className="flex flex-col gap-2 !ml-3">
+                            {attribute?.map((item, index) => (
+                                <div
+                                    key={item._id}
+                                    className="flex items-center gap-2 border-b border-gray-300 pb-2"
+                                >
+                                    <div className="border border-gray-400">
+                                        <img
+                                            src=""
+                                            alt="Ảnh"
+                                            className="!w-[70px] !h-[70px]"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <div className="flex gap-2">
+                                            <span className="font-bold min-w-[110px]">
+                                                Tên sản phẩm:
+                                            </span>
+                                            <span>
+                                                {item.attribute.product.name}
+                                            </span>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <span className="font-bold min-w-[110px]">
+                                                Size:
+                                            </span>
+                                            <span> {item.attribute.size}</span>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <span className="font-bold min-w-[110px]">
+                                                Số lượng:
+                                            </span>
+                                            <span>{item.quantity}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="flex mb-3 mt-3">
+                            <span className="font-bold min-w-[90px]">
+                                Tổng tiền:
+                            </span>
+                            <span>{temp?.total?.toLocaleString()} VNĐ</span>
+                        </div>
                     </Alert>
-                    <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                        <Form.Check
-                            type="checkbox"
-                            label="Đã xác nhận đơn hàng."
-                            defaultChecked={flagProcess}
-                            onChange={(e) => flagProcessHandler(e)}
-                        />
-                    </Form.Group>
+                    <Form.Check
+                        type="checkbox"
+                        label="Đã xác nhận đơn hàng."
+                        defaultChecked={flagProcess}
+                        onChange={(e) => flagProcessHandler(e)}
+                    />
                 </Modal.Body>
                 <Modal.Footer>
                     <Button
@@ -949,17 +1109,23 @@ const Order = () => {
                         <Form.Label
                             style={{ marginRight: 30, marginBottom: 10 }}
                         >
-                            Hãng vận chuyển
+                            Đơn vị vận chuyển
                         </Form.Label>
                         <Form.Select
-                            style={{ height: 40, width: 300, marginBottom: 20 }}
+                            style={{ height: 40, marginBottom: 20 }}
                             onChange={(e) => shipmentHandler(e.target.value)}
                         >
                             <option value={null}></option>
-                            <option value="ViettelPost">ViettelPost</option>
-                            <option value="J&T">J&T</option>
-                            <option value="Gojek">Gojek</option>
-                            <option value="AhaMove">AhaMove</option>
+                            {shipments.map((shipment) => {
+                                return (
+                                    <option
+                                        key={shipment._id}
+                                        value={shipment._id}
+                                    >
+                                        {shipment.name}
+                                    </option>
+                                );
+                            })}
                         </Form.Select>
                         {/* <Form>
               <Form.Label style={{ marginRight: 30, marginBottom: 10 }}>
@@ -978,7 +1144,7 @@ const Order = () => {
                                 Ngày nhận dự kiến
                             </Form.Label>
                             <Form.Control
-                                style={{ height: 40, width: 300 }}
+                                style={{ height: 40 }}
                                 type="date"
                                 onChange={(e) =>
                                     shipDateHandler(e.target.value)
@@ -1055,7 +1221,7 @@ const Order = () => {
                             Lí do hủy đơn
                         </Form.Label>
                         <Form.Select
-                            style={{ height: 40, width: 420, marginBottom: 20 }}
+                            style={{ height: 40, marginBottom: 20 }}
                             onChange={(e) => reasonHandler(e.target.value)}
                         >
                             <option value={null}></option>
