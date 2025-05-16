@@ -9,6 +9,7 @@ import {
     isEnoughCartItem,
 } from "../api/CartApi";
 import { toast } from "react-toastify";
+import { useQuery } from "react-query";
 
 const Cart = (props) => {
     const [cart, setCart] = useState([]);

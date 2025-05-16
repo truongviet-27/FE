@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import icon from "../static/images/icon_216992.png";
 import { reloadCartItem, getCartItemByAccountId } from "../api/CartApi";
 import { toast } from "react-toastify";
+import { useQuery } from "@tanstack/react-query";
 
 const OutStock = (props) => {
     const [cart, setCart] = useState([]);
