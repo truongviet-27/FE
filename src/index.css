@@ -190,3 +190,66 @@ button:hover {
     background-color: #343a40;
     color: white;
 }
+
+.custom-gallery .image-gallery-slide img {
+    object-fit: cover;
+    background-size: cover;
+    max-height: 400px;
+}
+
+.custom-gallery .image-gallery-thumbnails img {
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s linear;
+}
+
+.image-gallery-thumbnail.active,
+.image-gallery-thumbnail:focus {
+    border: none;
+}
+
+.custom-gallery button:hover {
+    background-color: transparent;
+    box-shadow: none;
+    color: inherit;
+    width: auto;
+    border: none;
+    outline: none;
+    filter: none;
+    left: inherit;
+}
+
+.image-gallery-left-nav .image-gallery-svg,
+.image-gallery-right-nav .image-gallery-svg {
+    width: 45px;
+    height: 45px;
+}
+
+.image-gallery-right-nav .image-gallery-svg:hover {
+    background-color: #bdbdbd;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-gallery-left-nav .image-gallery-svg:hover {
+    background-color: #bdbdbd;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.image-gallery-fullscreen-button:hover {
+    color: #ccc;
+}
+.image-gallery-fullscreen-button .image-gallery-svg:hover {
+    color: #ccc;
+}
+.custom-gallery .image-gallery-thumbnail:hover,
+.custom-gallery .image-gallery-thumbnail:focus {
+  transform: none !important;
+  transition: none !important;
+}

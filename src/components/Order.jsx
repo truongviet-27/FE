@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, useHistory } from "react-router-dom";
-import { getAllOrder, cancelOrder, getAllOrderStatus } from "../api/OrderApi";
+import {
+    getAllOrder,
+    cancelOrder,
+    getAllOrderStatus,
+    getOrderById,
+    getOrderDetailByOrderId,
+} from "../api/OrderApi";
 import { Button, Form } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import { toast } from "react-toastify";
@@ -11,7 +17,6 @@ const Order = (props) => {
     const [order, setOrder] = useState([]);
     const [orderStatus, setOrderStatus] = useState([]);
     const [status, setStatus] = useState("");
-    const [show, setShow] = useState(false);
     const [obj, setObj] = useState({});
     const [total, setTotal] = useState();
     const [page, setPage] = useState(0);
@@ -26,11 +31,11 @@ const Order = (props) => {
         setReason(null);
         setDescription(null);
     };
-    const handleShowFouth = (orderId, statusId) => {
+    const handleShowFouth = (orderId, statusCode) => {
         setShowFouth(true);
         setObj({
             orderId: orderId,
-            statusId: statusId,
+            statusCode: statusCode,
         });
     };
     var rows = new Array(total).fill(0).map((zero, index) => (
@@ -52,6 +57,10 @@ const Order = (props) => {
         setPage(page);
     };
 
+    const reasonHandler = (value) => {
+        setReason(value);
+    };
+
     const descriptionHandler = (value) => {
         setDescription(value);
     };
@@ -59,35 +68,35 @@ const Order = (props) => {
     const confirmUpdateCancel = () => {
         const data = {
             id: obj.orderId,
+            status: obj.statusCode,
+            shipment: null,
             description: `${reason} - ${description}`,
+            shipDate: null,
         };
 
-        cancelOrder(data)
-            .then(() => {
-                toast.success("Cập nhật thành công.");
-                setStatus(obj.statusId);
-                setPage(0);
-                getAllOrderByStatus(obj.statusId)
-                    .then((res) => {
-                        setOrder(res.data.content);
-                        setTotal(res.data.totalPages);
-                    })
-                    .catch((error) => console.log(error));
-            })
-            .catch((error) => toast.error(error.response.data.message));
+        console.log(data, "data");
+
+        // cancelOrder(data)
+        //     .then((res) => {
+        //         toast.success(res.data.message);
+        //         getAllOrder(props.user._id, "", page, size)
+        //             .then((res) => {
+        //                 setOrder(res.data.content);
+        //                 setTotal(res.data.totalPages);
+        //             })
+        //             .catch((error) => console.log(error.response.data.Errors));
+        //     })
+        //     .catch((error) => toast.error(error.response.data.message));
 
         setReason(null);
         setDescription(null);
         setShowFouth(false);
     };
 
-    const reasonHandler = (value) => {
-        setReason(value);
-    };
     useEffect(() => {
         onLoad();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page, size]);
+    }, [page, size, status]);
 
     useEffect(() => {
         getAllOrderStatus()
@@ -104,17 +113,6 @@ const Order = (props) => {
             .catch((error) => console.log(error.response.data.Errors));
     };
 
-    const getAllOrderByStatus = (value) => {
-        setPage(0);
-        setStatus(value);
-        getAllOrder(props.user.userId, value, page, size)
-            .then((res) => {
-                setOrder(res.data.content);
-                setTotal(res.data.totalPages);
-            })
-            .catch((error) => console.log(error.response.data.Errors));
-    };
-
     return (
         <>
             <div className="col-12">
@@ -122,7 +120,7 @@ const Order = (props) => {
                     <div className="mini-card !mb-0">
                         <h4 className="text-danger !mb-0"> Đơn hàng của bạn</h4>
                     </div>
-                    <div className="mb-5">
+                    <div>
                         <div className="col-12 mb-3 mt-3 mini-card">
                             <div className="form-check form-check-inline mr-5">
                                 <input
@@ -130,9 +128,10 @@ const Order = (props) => {
                                     type="radio"
                                     name="inlineRadioOptions"
                                     value=""
-                                    onChange={(event) =>
-                                        getAllOrderByStatus(event.target.value)
-                                    }
+                                    onChange={(event) => {
+                                        setStatus(event.target.value);
+                                        setPage(0);
+                                    }}
                                     checked={status == ""}
                                 />
                                 <label className="form-check-label">
@@ -149,11 +148,10 @@ const Order = (props) => {
                                         type="radio"
                                         name="inlineRadioOptions"
                                         value={item._id}
-                                        onChange={(event) =>
-                                            getAllOrderByStatus(
-                                                event.target.value
-                                            )
-                                        }
+                                        onChange={(event) => {
+                                            setStatus(event.target.value);
+                                            setPage(0);
+                                        }}
                                         checked={status == item._id}
                                     />
                                     <label
@@ -260,9 +258,12 @@ const Order = (props) => {
                                         </td>
                                         <td className="text-center align-middle font-bold">
                                             <button
-                                                className="btn btn-light !cursor-not-allowed"
+                                                className={`btn btn-light `}
                                                 onClick={() =>
-                                                    handleShowFouth(item.id, 5)
+                                                    handleShowFouth(
+                                                        item._id,
+                                                        "CANCELLED"
+                                                    )
                                                 }
                                                 disabled={[
                                                     "CANCELLED",
@@ -271,10 +272,12 @@ const Order = (props) => {
                                                     item?.orderStatus?.code
                                                 )}
                                             >
-                                                <i
-                                                    className="fa fa-ban text-danger"
-                                                    aria-hidden="true"
-                                                ></i>
+                                                {
+                                                    <i
+                                                        className="fa fa-ban text-danger"
+                                                        aria-hidden="true"
+                                                    ></i>
+                                                }
                                             </button>
                                         </td>
                                     </tr>
@@ -284,7 +287,7 @@ const Order = (props) => {
                         {/* Pagination */}
                         <nav
                             aria-label="Page navigation"
-                            className="flex items-center justify-between !mt-10"
+                            className="flex items-center justify-between !mt-10 !pb-5"
                         >
                             <div className="w-[100px]" />
 
@@ -331,6 +334,7 @@ const Order = (props) => {
                                     className="py-2 pl-2 border border-gray-100 rounded-[6px]"
                                     onChange={(e) => setSize(e.target.value)}
                                     defaultChecked={size}
+                                    value={size}
                                 >
                                     <option value={5}>5</option>
                                     <option value={10}>10</option>
@@ -343,6 +347,7 @@ const Order = (props) => {
                     </div>
                 </div>
             </div>
+
             <Modal show={showFouth} onHide={handleCloseFouth}>
                 <Modal.Header closeButton>
                     <Modal.Title style={{ textAlign: "center" }}>
@@ -367,8 +372,10 @@ const Order = (props) => {
                             <option value="Thêm bớt sản phẩm">
                                 Thêm bớt sản phẩm
                             </option>
-                            <option value="Gojek">Không còn nhu cầu</option>
-                            <option value="AhaMove">Lí do khác</option>
+                            <option value="Không còn nhu cầu">
+                                Không còn nhu cầu
+                            </option>
+                            <option value="Lí do khác">Lí do khác</option>
                         </Form.Select>
                         <Form>
                             <Form.Label

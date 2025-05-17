@@ -8,7 +8,7 @@ function RenderInput({ type, name, label, registerProps, errorMessage }) {
             <input
                 type={type}
                 id={name}
-                className="form-control form-control-lg"
+                className="form-control form-control-lg !text-[15px]"
                 {...register(name, registerProps)}
             />
             {errorMessage && (

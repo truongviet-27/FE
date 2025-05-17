@@ -158,16 +158,16 @@ const Header = (props) => {
                     <div className="d-flex align-items-center flex-1 justify-between">
                         {/* Tìm kiếm */}
                         <form
-                            className="form-inline d-flex my-2 my-lg-0 mr-3"
+                            className="form-inline d-flex my-2 my-lg-0 mr-3 border !py-1 !pl-1 !pr-3 bg-white rounded-[6px]"
                             onSubmit={submitHandler}
                         >
                             <input
-                                className="form-control mr-sm-2"
+                                className="form-control !border-none focus:!outline-none focus:!ring-0 !mr-0"
                                 type="search"
                                 aria-label="Search"
                                 name="keyword"
                             />
-                            <button type="submit">
+                            <button type="submit !bg-white">
                                 <i
                                     className="fa fa-search ml-1"
                                     aria-hidden="true"

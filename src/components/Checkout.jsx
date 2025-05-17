@@ -755,6 +755,7 @@ const Checkout = (props) => {
                 isPending: false,
                 payment: data.payment,
                 orderDetails: cart.map((item) => ({
+                    _id: item._id,
                     quantity: item.quantity,
                     originPrice: item.attribute.price,
                     sellPrice: item.lastPrice,

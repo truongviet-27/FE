@@ -1,7 +1,12 @@
 import Instance from "../axios/Instance";
 
-export const getSale = async (page, size, query, search) => {
-    const url = `/api/v1/sale/list?page=${page}&size=${size}&query=${query}&search=${search}`;
+export const getSale = async (page, size) => {
+    const url = `/api/v1/sale/list?page=${page}&size=${size}`;
+    return await Instance.get(url);
+};
+
+export const getSaleAdmin = async (page, size, query, search) => {
+    const url = `/api/v1/sale/list-admin?page=${page}&size=${size}&query=${query}&search=${search}`;
     return await Instance.get(url);
 };
 

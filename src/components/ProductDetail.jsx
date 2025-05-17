@@ -4,7 +4,10 @@ import Modal from "react-bootstrap/Modal";
 import Table from "react-bootstrap/Table";
 import { NavLink, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { getAttributeById } from "../api/AttributeApi";
+import {
+    getAllReviewAttributeByProductId,
+    getAttributeById,
+} from "../api/AttributeApi";
 import {
     getCartItemByAccountId,
     isEnoughCartItem,
@@ -16,6 +19,11 @@ import {
     relateProduct,
     toggleLikeProduct,
 } from "../api/ProductApi";
+import { Rating } from "react-simple-star-rating";
+import formatDate from "../utils/convertDate";
+
+import ImageGallery from "react-image-gallery";
+import "react-image-gallery/styles/css/image-gallery.css";
 
 const ProductDetail = (props) => {
     const { id } = useParams();
@@ -33,6 +41,10 @@ const ProductDetail = (props) => {
     const [cart, setCart] = useState([]);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
+    const [reviews, setReviews] = useState([]);
+    const [totalReview, setTotalReviews] = useState(1);
+    const [pageReview, setPageReview] = useState(0);
+    const [images, setImages] = useState([]);
 
     const [hasMore, setHasMore] = useState(true);
 
@@ -51,6 +63,8 @@ const ProductDetail = (props) => {
             console.error("Error fetching related products:", err);
         }
     };
+
+    console.log(reviews, "reviews");
 
     useEffect(() => {
         loadRelatedProducts();
@@ -76,6 +90,12 @@ const ProductDetail = (props) => {
         getProductById(id)
             .then((res) => {
                 setItem(res.data.data);
+                setImages(
+                    res.data.data.imageUrls.map((item) => ({
+                        original: item.url,
+                        thumbnail: item.url,
+                    }))
+                );
                 setAttributes(res.data.data?.attributes);
                 onModify(
                     res.data.data.attributes[0].price,
@@ -102,18 +122,11 @@ const ProductDetail = (props) => {
                     .catch((error) => console.log(error));
             })
             .catch((error) => console.log(error));
+        getAllReviewAttributeByProductId(id, page, 5).then((res) => {
+            setReviews(res.data.content);
+            setTotalReviews(res.data.totalPages);
+        });
 
-        console.log(attributes, "attributes");
-
-        // getAttribute(id, 39)
-        //     .then((res) => {
-        //         onModify(
-        //             res.data.data.price,
-        //             res.data.data.stock,
-        //             res.data.data._id
-        //         );
-        //     })
-        //     .catch((error) => console.log(error));
         setStatus(stock >= count);
 
         if (localStorage.getItem("user")) {
@@ -236,39 +249,41 @@ const ProductDetail = (props) => {
             });
     };
 
+    const onChangePageReview = (index) => {};
+
+    var rows = new Array(totalReview).fill(0).map((zero, index) => (
+        <li
+            className={pageReview === index ? "page-item active" : "page-item"}
+            key={index}
+        >
+            <button
+                className="page-link"
+                style={{ borderRadius: 50 }}
+                onClick={() => onChangePageReview(index)}
+            >
+                {index + 1}
+            </button>
+        </li>
+    ));
+
     return (
         <div>
             {item && (
                 <div className="col-12 mt-5">
-                    <div className="flex flex-col lg:flex-row border border-gray-200 rounded-2xl !p-10 !mb-10">
-                        <div className="w-full lg:w-1/3 lg:!pr-10">
-                            <div className="h-full w-full">
-                                <img
-                                    src={item?.main}
-                                    style={{
-                                        width: "600px",
-                                        height: "400px",
-                                    }}
-                                    alt=""
-                                />
-                                <div className="container row offset-3 mt-5 mb-5">
-                                    {item?.images?.map((item, index) => (
-                                        <img
-                                            key={index}
-                                            src={item}
-                                            alt={`Image ${index + 1}`}
-                                            className="img-thumbnail mr-3"
-                                            style={{
-                                                width: "200px",
-                                                height: "200px",
-                                            }}
-                                        />
-                                    ))}
-                                </div>
+                    <div className="flex flex-col lg:flex-row border border-gray-200 rounded-2xl !p-10 !mb-0 gap-12">
+                        <div className="w-full lg:w-2/5 border">
+                            <div className="!h-full !w-full !p-10">
+                                {images.length > 0 && (
+                                    <ImageGallery
+                                        items={images}
+                                        showPlayButton={false}
+                                        additionalClass="custom-gallery"
+                                    />
+                                )}
                             </div>
                         </div>
-                        <div className="w-full lg:w-2/3">
-                            <div className="text-[14px]">
+                        <div className="w-full lg:w-3/5">
+                            <div className="text-[14px] mt-0 lg:!mt-0">
                                 <div className="text-[24px] font-bold">
                                     <span>{item?.name.toUpperCase()} </span>
                                     <span className="">- {item?.code}</span>
@@ -427,6 +442,130 @@ const ProductDetail = (props) => {
                                     {item?.description}
                                 </span>
                             </div>
+                        </div>
+                    </div>
+                    {/* Đánh giá sản phẩm */}
+                    <div className="col-12 mt-5 border border-gray-200 rounded-2xl !p-10">
+                        <div className="text-center">
+                            <p className="text-[34px] !mb-2">
+                                Đánh giá sản phẩm
+                            </p>
+                        </div>
+                        <div className="!px-10">
+                            {reviews.map((review, index) => {
+                                return (
+                                    <div
+                                        key={review._id}
+                                        className="flex items-start gap-3 border-b border-gray-300 py-4"
+                                    >
+                                        <div className="border w-[60px] h-[60px]">
+                                            <img
+                                                src={review?.user?.avatar}
+                                                alt="User"
+                                            />
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <span>
+                                                {review?.user?.username}
+                                            </span>
+                                            <div className="flex">
+                                                <Rating
+                                                    initialValue={
+                                                        review?.rating
+                                                    }
+                                                    size={13}
+                                                    transition
+                                                    allowFraction
+                                                    SVGstyle={{
+                                                        display: "inline-block",
+                                                    }}
+                                                    fillColor="#f59e0b"
+                                                    emptyColor="#9ca3af"
+                                                    readonly={true}
+                                                />
+                                            </div>
+                                            <div className="flex gap-1 items-center">
+                                                <span className="text-[13px]">
+                                                    {formatDate(
+                                                        review?.createdAt,
+                                                        true
+                                                    )}
+                                                </span>
+                                                <span>|</span>
+                                                <div className="text-[13px] flex gap-1">
+                                                    <span className="font-medium">
+                                                        Phân loại hàng:
+                                                    </span>
+                                                    <span>
+                                                        {review?.product.name}
+                                                    </span>
+                                                    <span>-</span>{" "}
+                                                    <span>Size:</span>
+                                                    <span>
+                                                        {review?.attribute.size}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex flex-col gap-1 mt-4">
+                                                <span className="font-medium">
+                                                    Mô tả:
+                                                </span>
+                                                <span>
+                                                    {review?.description}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+
+                            <nav
+                                aria-label="Page navigation"
+                                className="flex items-center justify-center !mt-20"
+                            >
+                                <div className="flex-1 flex justify-center items-center">
+                                    <div className="flex pagination gap-4">
+                                        <li
+                                            className={
+                                                page === 0
+                                                    ? "page-item disabled"
+                                                    : "page-item"
+                                            }
+                                        >
+                                            <button
+                                                className="page-link"
+                                                style={{ borderRadius: 50 }}
+                                                onClick={() =>
+                                                    onChangePageReview(0)
+                                                }
+                                            >
+                                                {`<<`}
+                                            </button>
+                                        </li>
+                                        {rows}
+                                        <li
+                                            className={
+                                                pageReview === totalReview - 1
+                                                    ? "page-item disabled"
+                                                    : "page-item"
+                                            }
+                                        >
+                                            <button
+                                                className="page-link"
+                                                style={{ borderRadius: 50 }}
+                                                onClick={() =>
+                                                    onChangePageReview(
+                                                        pageReview + 1
+                                                    )
+                                                }
+                                            >
+                                                {`>>`}
+                                            </button>
+                                        </li>
+                                    </div>
+                                </div>
+                            </nav>
                         </div>
                     </div>
                     {/* Sản phẩm cùng thương hiệu */}

@@ -41,8 +41,8 @@ export const getListHot = async () => {
     return await Instance.get(url);
 };
 
-export const searchByKeyword = async (page, size, keyword) => {
-    const url = `/api/v1/product/search?page=${page}&size=${size}&search=${keyword}`;
+export const searchByKeyword = async (page, size, keyword, userId) => {
+    const url = `/api/v1/product/search?page=${page}&size=${size}&search=${keyword}&userId=${userId}`;
     return await Instance.get(url);
 };
 
@@ -62,22 +62,14 @@ export const getAllProductsByBrand = async (
     return await Instance.get(url);
 };
 
-export const createProduct = async (formData) => {
+export const createProduct = async (data) => {
     const url = `/api/v1/product/create`;
-    return await Instance.post(url, formData, {
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
-    });
+    return await Instance.post(url, data);
 };
 
-export const modifyProduct = async (formData) => {
+export const modifyProduct = async (data) => {
     const url = `/api/v1/product/modify`;
-    return await Instance.put(url, formData, {
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
-    });
+    return await Instance.put(url, data);
 };
 
 // export const modifyProduct = async (data) => {

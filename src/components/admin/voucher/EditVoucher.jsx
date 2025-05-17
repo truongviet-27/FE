@@ -51,7 +51,7 @@ const EditVoucher = () => {
                 <div className="w-[60px]"></div>
             </div>
             <form
-                className="needs-validation col-12 col-12 flex flex-col !flex-1 !justify-between"
+                className="needs-validation col-12 flex flex-col !flex-1 !justify-between"
                 onSubmit={handleSubmit(submitHandler)}
             >
                 <div className="row g-3">

@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from "react";
-import statusCards from "../../../assets/JsonData/status-card-data.json";
-import StatusCard from "../status-card/StatusCard";
+import { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
-import { Link, NavLink } from "react-router-dom";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
+import { countAccount } from "../../../api/AccountApi";
 import {
-    reportByProduct,
-    reportAmountYear,
     countOrder,
     countOrderByName,
+    reportAmountYear,
+    reportByProduct,
 } from "../../../api/OrderApi";
-import { countAccount } from "../../../api/AccountApi";
 import { countProduct } from "../../../api/ProductApi";
+import statusCards from "../../../assets/JsonData/status-card-data.json";
+import StatusCard from "../status-card/StatusCard";
 
 const Dashboard = () => {
     const [productChartOptions, setProductChartOptions] = useState({});
@@ -91,17 +90,17 @@ const Dashboard = () => {
 
         // Số lượng đơn hàng
         countOrder()
-            .then((resp) => setCountOr(resp.data))
+            .then((resp) => setCountOr(resp.data.data))
             .catch((error) => console.log(error));
 
         // Số lượng tài khoản
         countAccount()
-            .then((resp) => setCountAcc(resp.data))
+            .then((resp) => setCountAcc(resp.data.data))
             .catch((error) => console.log(error));
 
         // Số lượng sản phẩm
         countProduct()
-            .then((resp) => setCountPro(resp.data))
+            .then((resp) => setCountPro(resp.data.data))
             .catch((error) => console.log(error));
 
         // Đơn hàng theo danh mục
@@ -126,53 +125,48 @@ const Dashboard = () => {
         <div className="col-12">
             <div className="card overflow-y-scroll">
                 <h2 className="page-header">Thống kê</h2>
-                <div className="row" style={{ marginLeft: "10px" }}>
-                    <div className="col-6">
-                        <div className="card justify-between full-height overflow-hidden">
-                            <StatusCard
-                                icon={statusCards[0].icon}
-                                count={countAcc}
-                                title={`Khách hàng`}
-                                onClick={() => {
-                                    history.push("/admin/account");
-                                }}
-                            />
-                            <StatusCard
-                                icon={statusCards[1].icon}
-                                count={countPro}
-                                title={`Sản phẩm`}
-                                onClick={() => {
-                                    history.push("/admin/product");
-                                }}
-                            />
-                            <StatusCard
-                                icon={statusCards[3].icon}
-                                count={countOr}
-                                title={`Đơn hàng`}
-                                onClick={() => {
-                                    history.push("/admin/order");
-                                }}
-                            />
-                            <StatusCard
-                                icon={statusCards[2].icon}
-                                // count={total && `${total.toLocaleString()} Vnđ`}
-                                count={`10.000.000 VNĐ`}
-
-                                title={`Tổng doanh thu:`}
-                            />
-                        </div>
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 !ml-5">
+                    <div className="card justify-between full-height overflow-hidden">
+                        <StatusCard
+                            icon={statusCards[0].icon}
+                            count={countAcc}
+                            title={`Khách hàng: `}
+                            onClick={() => {
+                                history.push("/admin/account");
+                            }}
+                        />
+                        <StatusCard
+                            icon={statusCards[1].icon}
+                            count={countPro}
+                            title={`Sản phẩm: `}
+                            onClick={() => {
+                                history.push("/admin/product");
+                            }}
+                        />
+                        <StatusCard
+                            icon={statusCards[3].icon}
+                            count={countOr}
+                            title={`Đơn hàng: `}
+                            onClick={() => {
+                                history.push("/admin/order");
+                            }}
+                        />
+                        <StatusCard
+                            icon={statusCards[2].icon}
+                            // count={total && `${total.toLocaleString()} Vnđ`}
+                            count={`10.000.000 VNĐ`}
+                            title={`Tổng doanh thu: `}
+                        />
                     </div>
 
                     {/* Doanh thu theo sản phẩm */}
-                    <div className="col-6">
-                        <div className="card full-height overflow-hidden">
-                            <Chart
-                                options={productChartOptions}
-                                series={productChartSeries}
-                                type="bar"
-                                height="400"
-                            />
-                        </div>
+                    <div className="card full-height overflow-hidden">
+                        <Chart
+                            options={productChartOptions}
+                            series={productChartSeries}
+                            type="bar"
+                            height="400"
+                        />
                     </div>
 
                     {/* Doanh thu theo năm */}
@@ -192,46 +186,42 @@ const Dashboard = () => {
                             </Link>
                         </div>
                     </div> */}
-                    <div className="col-6">
-                        <div className="card full-height overflow-hidden">
-                            <Chart
-                                options={yearChartOptions}
-                                series={yearChartSeries}
-                                type="line"
-                                height="400"
-                            />
-                            <div className="mt-3">
-                                <label htmlFor="year-select">Chọn năm:</label>
-                                <select
-                                    id="year-select"
-                                    value={selectedYear}
-                                    onChange={handleYearChange}
-                                    className="form-control"
-                                >
-                                    <option value="2024">2024</option>
-                                    <option value="2025">2025</option>
-                                    {/* Thêm các năm khác nếu cần */}
-                                </select>
-                            </div>
-                            <Link
-                                to={`/admin/report-month/${selectedYear}`}
-                                className="btn btn-primary mt-3"
+                    <div className="card full-height overflow-hidden">
+                        <Chart
+                            options={yearChartOptions}
+                            series={yearChartSeries}
+                            type="line"
+                            height="400"
+                        />
+                        <div className="mt-3">
+                            <label htmlFor="year-select">Chọn năm:</label>
+                            <select
+                                id="year-select"
+                                value={selectedYear}
+                                onChange={handleYearChange}
+                                className="form-control"
                             >
-                                Xem chi tiết
-                            </Link>
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                {/* Thêm các năm khác nếu cần */}
+                            </select>
                         </div>
+                        <Link
+                            to={`/admin/report-month/${selectedYear}`}
+                            className="btn btn-primary mt-3"
+                        >
+                            Xem chi tiết
+                        </Link>
                     </div>
 
                     {/* Biểu đồ Donut: Đơn hàng theo danh mục */}
-                    <div className="col-6">
-                        <div className="card full-height overflow-hidden">
-                            <Chart
-                                options={option}
-                                series={seri}
-                                type="donut"
-                                height="400"
-                            />
-                        </div>
+                    <div className="card full-height overflow-hidden">
+                        <Chart
+                            options={option}
+                            series={seri}
+                            type="donut"
+                            height="400"
+                        />
                     </div>
                 </div>
             </div>

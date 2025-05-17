@@ -1,18 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { getOrderById, getOrderDetailByOrderId } from "../api/OrderApi";
-import { Card, Button, Modal } from "react-bootstrap";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { Alert, Button, Card, Form, Modal } from "react-bootstrap";
 import {
-    FaTruck,
-    FaMoneyCheckAlt,
     FaCheckCircle,
+    FaMoneyCheckAlt,
     FaTimesCircle,
+    FaTruck,
 } from "react-icons/fa"; // Icons
 import { toast } from "react-toastify";
-import axios from "axios";
+import { getOrderById, getOrderDetailByOrderId } from "../api/OrderApi";
 import "../index.css";
-import { blue } from "@mui/material/colors";
-import formatDateInputToUTC from "../utils/formatDateInputToUTC";
 import formatDate from "../utils/convertDate";
+
+import { Rating } from "react-simple-star-rating";
+import {
+    getReviewAttributeByOrderDetailId,
+    reviewProduct,
+} from "../api/AttributeApi";
 
 const OrderDetail = (props) => {
     const [orderDetail, setOrderDetail] = useState([]);
@@ -23,9 +27,40 @@ const OrderDetail = (props) => {
     const [showModal, setShowModal] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState("");
     const [loading, setLoading] = useState(false);
+    const [showThird, setShowThird] = useState(false);
+    const [description, setDescription] = useState(null);
+    const [attributeId, setAttributeId] = useState(null);
+    const [orderDetailId, setOrderDetailId] = useState(null);
+    const [productId, setProductId] = useState(null);
+    const [isViewReview, setIsViewReview] = useState(false);
 
     const url = new URL(window.location.href);
     const orderId = url.pathname.split("/").pop();
+
+    const [rating, setRating] = useState(0);
+
+    const handleRating = (rate) => {
+        setRating(rate);
+    };
+
+    const descriptionHandler = (value) => {
+        setDescription(value);
+    };
+
+    const handleReviewAttribute = () => {
+        reviewProduct({
+            orderDetailId,
+            attributeId,
+            rating,
+            description,
+            productId,
+        })
+            .then(() => {
+                toast.success("Cập nhật thành công.");
+                setShowThird(false);
+            })
+            .catch((error) => toast.error(error.response.data.message));
+    };
 
     const handlePayment = async (orderId, amount) => {
         try {
@@ -70,6 +105,33 @@ const OrderDetail = (props) => {
 
     const handleShowModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
+
+    const handleCloseThird = () => {
+        setShowThird(false);
+    };
+
+    const handleShowThird = (orderDetailId, attributeId, productId) => {
+        getReviewAttributeByOrderDetailId(orderDetailId)
+            .then((res) => {
+                if (res.data.data) {
+                    setRating(res.data.data.rating);
+                    setDescription(res.data.data.description);
+                    setIsViewReview(true);
+                } else {
+                    setRating(null);
+                    setDescription("");
+                    setIsViewReview(false);
+                }
+            })
+            .catch((error) => {
+                toast.error(error.response.data.message);
+            });
+        setOrderDetailId(orderDetailId);
+        setAttributeId(attributeId);
+        setProductId(productId);
+        setShowThird(true);
+    };
+
     const handlePaymentMethod = (method) => {
         setPaymentMethod(method);
         if (method === "COD") {
@@ -83,8 +145,6 @@ const OrderDetail = (props) => {
     useEffect(() => {
         onLoad();
     }, []);
-
-    console.log(total, "total");
 
     const onLoad = () => {
         getOrderById(orderId).then((resp) => {
@@ -119,7 +179,7 @@ const OrderDetail = (props) => {
                                     Chi tiết đơn hàng
                                 </span>
                             </div>
-                            <table className="table table-striped table-hover">
+                            <table className="table table-striped table-bordered table-hover">
                                 <thead className="thead-dark">
                                     <tr>
                                         <th>Tên sản phẩm</th>
@@ -128,6 +188,7 @@ const OrderDetail = (props) => {
                                         <th>Giá</th>
                                         <th>Số lượng</th>
                                         <th>Tổng</th>
+                                        {<th>Hành động</th>}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -192,6 +253,30 @@ const OrderDetail = (props) => {
                                                     item.quantity
                                                 ).toLocaleString()}
                                                 ₫
+                                            </td>
+                                            <td
+                                                style={{
+                                                    textAlign: "center",
+                                                    verticalAlign: "middle",
+                                                }}
+                                            >
+                                                {order?.orderStatus?.code ===
+                                                    "DELIVERED" && (
+                                                    <div
+                                                        className="!text-[15px] py-2 hover:text-red-600 hover:underline rounded-2xl"
+                                                        onClick={() => {
+                                                            handleShowThird(
+                                                                item._id,
+                                                                item.attribute
+                                                                    ._id,
+                                                                item.attribute
+                                                                    .product._id
+                                                            );
+                                                        }}
+                                                    >
+                                                        Đánh giá
+                                                    </div>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}
@@ -374,6 +459,63 @@ const OrderDetail = (props) => {
                         Chuyển khoản
                     </Button>
                 </Modal.Body>
+            </Modal>
+            <Modal show={showThird} onHide={handleCloseThird}>
+                <Modal.Header closeButton>
+                    <Modal.Title style={{ textAlign: "center" }}>
+                        Đánh giá sản phẩm
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Alert variant="success">
+                        <Alert.Heading>Đánh giá</Alert.Heading>
+                        <hr />
+
+                        <Form>
+                            <div className="flex justify-center">
+                                <Rating
+                                    onClick={handleRating}
+                                    initialValue={rating}
+                                    size={40}
+                                    transition
+                                    allowFraction
+                                    SVGstyle={{ display: "inline-block" }}
+                                    fillColor="#f59e0b"
+                                    emptyColor="#9ca3af"
+                                    readonly={isViewReview}
+                                />
+                            </div>
+                            <Form.Label
+                                style={{ marginRight: 30, marginBottom: 10 }}
+                            >
+                                Mô tả
+                            </Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                rows={3}
+                                onChange={(e) => {
+                                    descriptionHandler(e.target.value);
+                                }}
+                                value={description}
+                                disabled={isViewReview}
+                            />
+                        </Form>
+                    </Alert>
+                </Modal.Body>
+                {!isViewReview && (
+                    <Modal.Footer>
+                        <Button
+                            variant="danger"
+                            onClick={handleReviewAttribute}
+                            disabled={!rating || !description}
+                        >
+                            Xác nhận
+                        </Button>
+                        <Button variant="primary" onClick={handleCloseThird}>
+                            Đóng
+                        </Button>
+                    </Modal.Footer>
+                )}
             </Modal>
         </div>
     );

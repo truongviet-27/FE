@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { getSale } from "../../../api/SaleApi";
+import { getSale, getSaleAdmin } from "../../../api/SaleApi";
 import { toast } from "react-toastify";
 import Badge from "../badge/Badge";
 import { active } from "../../../enum/active";
@@ -43,7 +43,7 @@ const Sale = () => {
     }, [page, size, watch("query"), watch("search")]);
 
     const onLoad = () => {
-        getSale(page, size, getValues("query"), getValues("search"))
+        getSaleAdmin(page, size, getValues("query"), getValues("search"))
             .then((resp) => {
                 setSale(resp.data.content);
                 setTotal(resp.data.totalPages);
