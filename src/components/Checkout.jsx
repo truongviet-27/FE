@@ -41,19 +41,18 @@ const Checkout = (props) => {
         handleSubmit,
         formState: { errors },
         reset,
+        getValues,
     } = useForm();
 
     useEffect(() => {
         onLoad();
     }, [props.user]);
 
-    console.log(text, "text");
-
     const textHandler = (value) => {
         setText(value);
     };
 
-    console.log(props.user, "props.user");
+    console.log(getValues(), "getValues");
     const onLoad = () => {
         getAllProvince().then((resp) => setInfo(resp.data));
         if (props.user) {
@@ -76,6 +75,7 @@ const Checkout = (props) => {
                 name: props.user.fullName,
                 phone: props.user.phone,
                 email: props.user.email,
+                payment: "COD",
             };
             reset(flag);
         } else {
@@ -654,7 +654,6 @@ const Checkout = (props) => {
                                         {...register("payment", {
                                             required: true,
                                         })}
-                                        defaultChecked={true}
                                         onChange={(e) =>
                                             textHandler(e.target.value)
                                         }
