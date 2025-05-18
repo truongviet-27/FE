@@ -16,10 +16,7 @@ import "./topnav.css";
 const TopNav = (props) => {
     const [notifications, setNotifications] = useState([]);
     const [key, setKey] = useState("");
-    const [curr_user, setCurrUser] = useState({
-        display_name: "Tài khoản",
-        image: user_image,
-    });
+
     const history = useHistory();
 
     const renderNotificationItem = (item, index) => (
@@ -68,16 +65,12 @@ const TopNav = (props) => {
             .catch((error) => console.log(error));
     };
 
-    console.log(props.user, "user");
-
     const renderUserToggle = (user) => (
         <div className="topnav__right-user">
             <div className="topnav__right-user__image">
-                <img src={avt} alt="avt" />
+                <img src={user?.avatar} alt="avt" />
             </div>
-            <div className="topnav__right-user__name">
-                {props?.user?.fullName}
-            </div>
+            <div className="topnav__right-user__name">{user?.fullName}</div>
         </div>
     );
 
@@ -88,7 +81,7 @@ const TopNav = (props) => {
             onClick={index === 3 && signOutHandler}
         >
             <div className="notification-item">
-                <i className={item.icon}></i>
+                <i className={item.avatar}></i>
                 <span>{item.content}</span>
             </div>
         </Link>
@@ -112,19 +105,11 @@ const TopNav = (props) => {
 
     return (
         <div className="topnav border-b border-gray-300 !justify-end">
-            {/* <div className="topnav__search">
-                <input
-                    type="text"
-                    placeholder="Search here..."
-                    onChange={(e) => keyHanlder(e.target.value)}
-                />
-                <i className="bx bx-search" onClick={searchHandler}></i>
-            </div> */}
             <div className="topnav__right">
                 <div className="topnav__right-item">
                     {/* dropdown here */}
                     <Dropdown
-                        customToggle={() => renderUserToggle(curr_user)}
+                        customToggle={() => renderUserToggle(props.user)}
                         contentData={user_menu}
                         renderItems={(item, index) =>
                             renderUserMenu(item, index)

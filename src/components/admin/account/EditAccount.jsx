@@ -39,6 +39,7 @@ const EditAccount = () => {
             birthday: data.birthday,
             username: data.username,
             userId: data.userId,
+            avatar: data.avatar,
         };
         updateAccount(result)
             .then(() => {

@@ -57,16 +57,17 @@ const Order = () => {
     const [attribute, setAttribute] = useState([]);
     const [size, setSize] = useState(10);
 
-    const { register, handleSubmit, setValue, getValues, watch } = useForm({
-        defaultValues: {
-            status: "ALL",
-            year: "",
-            month: "",
-            from: "",
-            to: "",
-            payment: "ALL",
-        },
-    });
+    const { register, handleSubmit, setValue, getValues, watch, reset } =
+        useForm({
+            defaultValues: {
+                status: "ALL",
+                year: "",
+                month: "",
+                from: "",
+                to: "",
+                payment: "ALL",
+            },
+        });
 
     const shipmentHandler = (value) => {
         setShipment(value);
@@ -487,12 +488,12 @@ const Order = () => {
 
     return (
         <>
-            <div className="card flex flex-col justify-between !mx-[25px] overflow-y-hidden">
+            <div className="card flex flex-col justify-between !mx-[25px]">
                 <form onSubmit={searchHandler}>
                     <div className="card__header">
                         <h3>Đơn hàng</h3>
                     </div>
-                    <div className="mb-5">
+                    <div className="mb-4">
                         <div className="row">
                             <div className="col-sm-4 mt-2">
                                 <select
@@ -573,6 +574,17 @@ const Order = () => {
                                 </select>
                             </div>
                         </div>
+                    </div>
+
+                    <div className="flex justify-center mb-4">
+                        <button
+                            onClick={() => {
+                                reset();
+                            }}
+                            className="!rounded-[6px] !text-[14px] !py-2 bg-transparent border text-black !px-4 hover:!bg-gray-100 hover:!text-black-200"
+                        >
+                            Reset
+                        </button>
                     </div>
                     <div className="card__body">
                         {orders && (
@@ -738,11 +750,11 @@ const Order = () => {
                                                                     type={
                                                                         pendingStatus[
                                                                             item
-                                                                                .isPending
+                                                                                .isPayment
                                                                         ]
                                                                     }
                                                                     content={
-                                                                        item.isPending
+                                                                        item.isPayment
                                                                             ? "Đã thanh toán"
                                                                             : "Chưa thanh toán"
                                                                     }

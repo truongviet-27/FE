@@ -58,7 +58,7 @@ const OrderForm = () => {
             phone: data.phone,
             email: data.email,
             note: data.note,
-            isPending: data.isPending,
+            isPayment: data.isPayment,
         };
         updateOrder(result)
             .then(() => {
@@ -224,7 +224,7 @@ const OrderForm = () => {
                                 </label>
                                 <select
                                     className="form-control"
-                                    {...register("isPending", {
+                                    {...register("isPayment", {
                                         required: false,
                                     })}
                                 >

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { createAccount } from "../../../api/AccountApi";
 import { useHistory } from "react-router-dom";
@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 
 const NewAccount = () => {
     const history = useHistory();
+    const [previewUrl, setPreviewUrl] = useState(null);
 
     const {
         register,
@@ -16,7 +17,7 @@ const NewAccount = () => {
     const onSubmitHandler = (data) => {
         createAccount({
             ...data,
-            avatar: "test",
+            avatar: "",
         })
             .then(() => {
                 toast.success("Thêm tài khoản thành công.");
@@ -27,6 +28,19 @@ const NewAccount = () => {
 
     const goBack = () => {
         history.goBack();
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onloadend = () => {
+                setPreviewUrl(reader.result);
+            };
+
+            reader.readAsDataURL(file);
+        }
     };
 
     return (

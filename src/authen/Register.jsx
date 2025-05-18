@@ -15,73 +15,44 @@ const Register = () => {
         formState: { errors },
     } = methods;
     const [showPassword, setShowPassword] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState(null);
     const history = useHistory();
-    // const renderInput = (type, name, label, registerProps, errorMessage) => (
-    //     <div className="form-outline mb-4 position-relative">
-    //         <input
-    //             type={type}
-    //             id={name}
-    //             className="form-control form-control-lg"
-    //             {...register(name, registerProps)}
-    //         />
-    //         {errorMessage && (
-    //             <div className="alert alert-danger" role="alert">
-    //                 {errorMessage}
-    //             </div>
-    //         )}
-    //     </div>
-    // );
     const onSubmitHandler = (data) => {
         registerAccount({
             ...data,
-            avatar: "123",
+            avatar: previewUrl,
         })
             .then(() => {
                 toast.success("Đăng kí thành công!");
                 history.push("/sign-in");
             })
             .catch((error) => {
-                // Kiểm tra xem error có response hay không để log lỗi phù hợp
                 if (error.response) {
-                    // Nếu có response từ server
                     toast.error(
                         error.response.data.message || "Có lỗi xảy ra!"
-                    ); // Hiển thị lỗi từ server
+                    );
                 } else if (error.request) {
-                    // Nếu không có response
                     toast.error(
                         "Không thể kết nối đến server. Vui lòng thử lại sau."
                     );
                 } else {
-                    // Nếu có lỗi khác
                     toast.error("Đã xảy ra lỗi: " + error.message);
                 }
             });
     };
 
-    const renderRadioGroup = (name, options) => (
-        <div className="mb-4">
-            <h6 className="mb-2 pb-1">Giới tính:</h6>
-            {options.map((option) => (
-                <div
-                    className="form-check form-check-inline"
-                    key={option.value}
-                >
-                    <input
-                        className="form-check-input"
-                        type="radio"
-                        name={name}
-                        id={option.id}
-                        value={option.value}
-                        {...register(name, { required: true })}
-                    />
-                    <label className="form-check-label" htmlFor={option.id}>
-                        {option.label}
-                    </label>
-                </div>
-            ))}
-        </div>
-    );
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onloadend = () => {
+                setPreviewUrl(reader.result);
+            };
+
+            reader.readAsDataURL(file);
+        }
+    };
 
     return (
         <FormProvider {...methods}>
@@ -100,23 +71,55 @@ const Register = () => {
                     Đăng ký tài khoản
                 </h3>
                 <form onSubmit={handleSubmit(onSubmitHandler)}>
+                    <div className="flex flex-col items-center justify-center gap-4">
+                        {previewUrl ? (
+                            <img
+                                src={previewUrl}
+                                alt="Avatar"
+                                className="!w-30 !h-30 rounded-full object-cover border-4 border-primary shadow-md"
+                            />
+                        ) : (
+                            <div className="w-30 h-30 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm border-dashed border-2 border-gray-400">
+                                No Avatar
+                            </div>
+                        )}
+
+                        {/* Upload Button */}
+                        <label
+                            htmlFor="photo-upload"
+                            className="cursor-pointer px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition"
+                        >
+                            Chọn ảnh đại diện
+                        </label>
+
+                        <input
+                            id="photo-upload"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="hidden"
+                        />
+                    </div>
                     {/* Nhóm 1: Chứa 4 trường */}
                     <div className="form-group">
                         <div className="mb-3">
                             <label htmlFor="username" className="form-label">
                                 Username <span style={{ color: "red" }}>*</span>
                             </label>
-                            {RenderInput(
-                                "text",
-                                "username",
-                                "Username",
-                                {
+                            <RenderInput
+                                type={"text"}
+                                name={"username"}
+                                label={"Username"}
+                                registerProps={{
                                     required: true,
                                     pattern: /^\s*\S+.*/,
-                                },
-                                errors.username && "Tài khoản không hợp lệ!"
-                            )}
-                            {errors.username && (
+                                }}
+                                errorMessage={
+                                    errors?.username &&
+                                    "Tài khoản không hợp lệ!"
+                                }
+                            />
+                            {errors?.username && (
                                 <span
                                     className="text-danger"
                                     style={{ fontSize: "12px" }}
@@ -150,7 +153,7 @@ const Register = () => {
                                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                                 </span>
                             </div>
-                            {errors.password && (
+                            {errors?.password && (
                                 <span
                                     className="text-danger"
                                     style={{ fontSize: "12px" }}
@@ -163,17 +166,19 @@ const Register = () => {
                             <label htmlFor="fullName" className="form-label">
                                 Họ tên <span style={{ color: "red" }}>*</span>
                             </label>
-                            {RenderInput(
-                                "text",
-                                "fullName",
-                                "Họ tên",
-                                {
+                            <RenderInput
+                                type={"text"}
+                                name={"fullName"}
+                                label={"Họ tên"}
+                                registerProps={{
                                     required: true,
                                     pattern: /^\s*\S+.*/,
-                                },
-                                errors.fullName && "Họ tên không hợp lệ!"
-                            )}
-                            {errors.fullName && (
+                                }}
+                                errorMessage={
+                                    errors?.fullName && "Họ tên không hợp lệ!"
+                                }
+                            />
+                            {errors?.fullName && (
                                 <span
                                     className="text-danger"
                                     style={{ fontSize: "12px" }}
@@ -186,18 +191,20 @@ const Register = () => {
                             <label htmlFor="email" className="form-label">
                                 Email <span style={{ color: "red" }}>*</span>
                             </label>
-                            {RenderInput(
-                                "text",
-                                "email",
-                                "Email",
-                                {
+                            <RenderInput
+                                type={"text"}
+                                name={"email"}
+                                label={"Email"}
+                                registerProps={{
                                     required: true,
                                     pattern:
                                         /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                },
-                                errors.email && "Email không hợp lệ!"
-                            )}
-                            {errors.email && (
+                                }}
+                                errorMessage={
+                                    errors?.email && "Email không hợp lệ!"
+                                }
+                            />
+                            {errors?.email && (
                                 <span
                                     className="text-danger"
                                     style={{ fontSize: "12px" }}
@@ -215,17 +222,20 @@ const Register = () => {
                                 Số điện thoại{" "}
                                 <span style={{ color: "red" }}>*</span>
                             </label>
-                            {RenderInput(
-                                "tel",
-                                "phone",
-                                "Số điện thoại",
-                                {
+                            <RenderInput
+                                type={"tel"}
+                                name={"phone"}
+                                label={"Số điện thoại"}
+                                registerProps={{
                                     required: true,
                                     pattern: /^0[0-9]{9}$/,
-                                },
-                                errors.phone && "Số điện thoại không hợp lệ!"
-                            )}
-                            {errors.phone && (
+                                }}
+                                errorMessage={
+                                    errors?.phone &&
+                                    "Số điện thoại không hợp lệ!"
+                                }
+                            />
+                            {errors?.phone && (
                                 <span
                                     className="text-danger"
                                     style={{ fontSize: "12px" }}
@@ -239,11 +249,11 @@ const Register = () => {
                                 Ngày sinh{" "}
                                 <span style={{ color: "red" }}>*</span>
                             </label>
-                            {RenderInput(
-                                "date",
-                                "birthday",
-                                "Ngày sinh",
-                                {
+                            <RenderInput
+                                type={"date"}
+                                name={"birthday"}
+                                label={"Ngày sinh"}
+                                registerProps={{
                                     required: true,
                                     validate: (value) => {
                                         const today = new Date();
@@ -253,11 +263,13 @@ const Register = () => {
                                             "Ngày sinh không hợp lệ!"
                                         );
                                     },
-                                },
-                                errors.birthday?.message &&
+                                }}
+                                errorMessage={
+                                    errors?.birthday?.message &&
                                     "Vui lòng nhập ngày sinh!"
-                            )}
-                            {errors.birthday && (
+                                }
+                            />
+                            {errors?.birthday && (
                                 <span
                                     className="text-danger"
                                     style={{ fontSize: "12px" }}

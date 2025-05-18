@@ -6,6 +6,8 @@ import {
     FaMoneyCheckAlt,
     FaTimesCircle,
     FaTruck,
+    FaClipboardList,
+    FaCreditCard,
 } from "react-icons/fa"; // Icons
 import { toast } from "react-toastify";
 import { getOrderById, getOrderDetailByOrderId } from "../api/OrderApi";
@@ -17,6 +19,7 @@ import {
     getReviewAttributeByOrderDetailId,
     reviewProduct,
 } from "../api/AttributeApi";
+import { generatePaymentUrl } from "../api/Payment";
 
 const OrderDetail = (props) => {
     const [orderDetail, setOrderDetail] = useState([]);
@@ -134,12 +137,14 @@ const OrderDetail = (props) => {
 
     const handlePaymentMethod = (method) => {
         setPaymentMethod(method);
-        if (method === "COD") {
-            handleShipCodePayment(orderId);
-        } else {
-            handlePayment(orderId, total);
+        if (method === "VNPAY") {
+            generatePaymentUrl({ orderId })
+                .then((res) => {
+                    window.location.href = res.data.data;
+                })
+                .catch((err) => toast.error(err.message));
+            handleCloseModal();
         }
-        handleCloseModal();
     };
 
     useEffect(() => {
@@ -167,245 +172,223 @@ const OrderDetail = (props) => {
     };
 
     return (
-        <div className="container-fluid mt-4">
+        <div className="!px-10 mt-4">
             <div className="row">
                 {/* Order Information */}
                 <div className="col-lg-8">
                     <div className="mb-4">
-                        <div className="p-4">
-                            <div className="flex items-center gap-2 mb-3 text-[19px]">
-                                <FaTruck className="mr-2 text-primary" />
-                                <span className="text-primary font-bold">
-                                    Chi tiết đơn hàng
-                                </span>
-                            </div>
-                            <table className="table table-striped table-bordered table-hover">
-                                <thead className="thead-dark">
-                                    <tr>
-                                        <th>Tên sản phẩm</th>
-                                        <th>Ảnh sản phẩm </th>
-                                        <th>Size</th>
-                                        <th>Giá</th>
-                                        <th>Số lượng</th>
-                                        <th>Tổng</th>
-                                        {<th>Hành động</th>}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {orderDetail.map((item, index) => (
-                                        <tr
-                                            key={item._id}
-                                            className="table-row"
-                                        >
-                                            <td
-                                                style={{
-                                                    textAlign: "center",
-                                                    verticalAlign: "middle",
-                                                }}
-                                            >
-                                                {item.attribute.product.name}
-                                            </td>
-                                            <td
-                                                style={{
-                                                    textAlign: "center",
-                                                    verticalAlign: "middle",
-                                                }}
-                                            >
-                                                {" "}
-                                                <img
-                                                    src={item.image}
-                                                    className="w-[70px] h-[70px]"
-                                                />
-                                            </td>
-                                            <td
-                                                style={{
-                                                    textAlign: "center",
-                                                    verticalAlign: "middle",
-                                                }}
-                                            >
-                                                {item.attribute.size}
-                                            </td>
-                                            <td
-                                                style={{
-                                                    textAlign: "center",
-                                                    verticalAlign: "middle",
-                                                }}
-                                            >
-                                                {item.sellPrice.toLocaleString()}
-                                                ₫
-                                            </td>
-                                            <td
-                                                style={{
-                                                    textAlign: "center",
-                                                    verticalAlign: "middle",
-                                                }}
-                                            >
-                                                {item.quantity}
-                                            </td>
-                                            <td
-                                                style={{
-                                                    textAlign: "center",
-                                                    verticalAlign: "middle",
-                                                }}
-                                            >
-                                                {(
-                                                    item.sellPrice *
-                                                    item.quantity
-                                                ).toLocaleString()}
-                                                ₫
-                                            </td>
-                                            <td
-                                                style={{
-                                                    textAlign: "center",
-                                                    verticalAlign: "middle",
-                                                }}
-                                            >
-                                                {order?.orderStatus?.code ===
-                                                    "DELIVERED" && (
-                                                    <div
-                                                        className="!text-[15px] py-2 hover:text-red-600 hover:underline rounded-2xl"
-                                                        onClick={() => {
-                                                            handleShowThird(
-                                                                item._id,
-                                                                item.attribute
-                                                                    ._id,
-                                                                item.attribute
-                                                                    .product._id
-                                                            );
-                                                        }}
-                                                    >
-                                                        Đánh giá
-                                                    </div>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                            <div className="flex flex-col gap-3 text-right">
-                                <div className="flex gap-2 justify-end">
-                                    <span className="font-medium">
-                                        Tạm tính:
-                                    </span>{" "}
-                                    <span>{amount?.toLocaleString()}</span>{" "}
-                                    <span>đ</span>
-                                </div>
-                                {sale ? (
-                                    <div className="flex gap-2 justify-end">
-                                        <span className="font-medium">
-                                            Giảm giá: -
-                                        </span>
-                                        <span>
-                                            {sale
-                                                ? (
-                                                      (amount * sale) /
-                                                      100
-                                                  ).toLocaleString()
-                                                : 0}
-                                        </span>
-                                        <span>đ</span>
-                                    </div>
-                                ) : (
-                                    <></>
-                                )}
+                        <div className="flex items-center gap-2 mb-3 text-[19px]">
+                            <FaTruck className="mr-2 text-primary" />
+                            <span className="text-primary font-bold">
+                                Chi tiết đơn hàng
+                            </span>
+                        </div>
+                        <table className="table table-striped table-bordered table-hover">
+                            <thead className="thead-dark">
+                                <tr>
+                                    <th className="text-center align-middle">
+                                        Tên sản phẩm
+                                    </th>
+                                    <th className="text-center align-middle">
+                                        Ảnh sản phẩm{" "}
+                                    </th>
+                                    <th className="text-center align-middle">
+                                        Size
+                                    </th>
+                                    <th className="text-center align-middle">
+                                        Giá
+                                    </th>
+                                    <th className="text-center align-middle">
+                                        Số lượng
+                                    </th>
+                                    <th className="text-center align-middle">
+                                        Tổng
+                                    </th>
 
-                                <h5 className="text-danger">
-                                    Tổng cộng: {total?.toLocaleString()} đ
-                                </h5>
+                                    <th className="text-center align-middle">
+                                        Hành động
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {orderDetail.map((item, index) => (
+                                    <tr key={item._id} className="table-row">
+                                        <td className="text-center align-middle font-medium">
+                                            {item.product.name}
+                                        </td>
+                                        <td className="text-center align-middle font-medium">
+                                            {" "}
+                                            <div className="flex justify-center items-center">
+                                                <img
+                                                    src={
+                                                        item?.imageUrls[0]?.url
+                                                    }
+                                                    className="!w-[70px] !h-[70px]"
+                                                />
+                                            </div>
+                                        </td>
+                                        <td className="text-center align-middle font-medium">
+                                            {item.attribute.size}
+                                        </td>
+                                        <td className="text-center align-middle font-medium">
+                                            {item.sellPrice.toLocaleString()}₫
+                                        </td>
+                                        <td className="text-center align-middle font-medium">
+                                            {item.quantity}
+                                        </td>
+                                        <td className="text-center align-middle font-medium">
+                                            {(
+                                                item.sellPrice * item.quantity
+                                            ).toLocaleString()}
+                                            ₫
+                                        </td>
+                                        <td className="text-center align-middle font-medium">
+                                            {order?.orderStatus?.code ===
+                                                "DELIVERED" && (
+                                                <div
+                                                    className="!text-[15px] py-2 hover:text-red-600 hover:underline rounded-2xl"
+                                                    onClick={() => {
+                                                        handleShowThird(
+                                                            item._id,
+                                                            item.attribute._id,
+                                                            item.attribute
+                                                                .product._id
+                                                        );
+                                                    }}
+                                                >
+                                                    Đánh giá
+                                                </div>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        <div className="flex flex-col gap-3 text-right">
+                            <div className="flex gap-2 justify-end">
+                                <span className="font-bold">Tạm tính:</span>{" "}
+                                <span className="font-bold">
+                                    {amount?.toLocaleString()}
+                                </span>{" "}
+                                <span className="font-bold">đ</span>
                             </div>
+                            {sale ? (
+                                <div className="flex gap-3 justify-end font-bold">
+                                    <span className="font-bold">
+                                        Giảm giá: -
+                                    </span>
+                                    <span className="font-bold">
+                                        {sale
+                                            ? (
+                                                  (amount * sale) /
+                                                  100
+                                              ).toLocaleString()
+                                            : 0}
+                                    </span>
+                                    <span className="font-bold">đ</span>
+                                </div>
+                            ) : (
+                                <div className="flex gap-1 justify-end">
+                                    <span className="font-bold">
+                                        Giảm giá: 0
+                                    </span>
+                                    <span className="font-bold">đ</span>
+                                </div>
+                            )}
+
+                            <h5 className="text-danger !font-bold">
+                                Tổng cộng: {total?.toLocaleString()} đ
+                            </h5>
                         </div>
                     </div>
 
-                    <div className="row">
-                        <div className="col-md-6">
-                            <div className="mb-4">
-                                <Card.Body>
-                                    <h5 className="text-primary">
-                                        <FaMoneyCheckAlt className="mr-2" />{" "}
-                                        Trạng thái thanh toán
-                                    </h5>
-                                    <p
-                                        className={`text-${
-                                            order.isPending
-                                                ? "success"
-                                                : "danger"
-                                        }`}
-                                    >
-                                        {order.isPending ? (
-                                            <>
-                                                <FaCheckCircle className="mr-2" />{" "}
-                                                Đã thanh toán
-                                            </>
-                                        ) : (
-                                            <>
-                                                <FaTimesCircle className="mr-2" />{" "}
-                                                Chưa thanh toán
-                                                {order.payment === null && (
-                                                    <button
-                                                        className="btn btn-success"
-                                                        onClick={
-                                                            handleShowModal
-                                                        } // Show modal when clicking payment button
-                                                    >
-                                                        Thanh toán
-                                                    </button>
-                                                )}
-                                            </>
-                                        )}
-                                    </p>
-                                </Card.Body>
+                    <div className="flex flex-col justify-between md:flex-row !pt-10 border-t-1 border-gray-300">
+                        <div className="mb-4">
+                            <div>
+                                <h5 className="text-primary">
+                                    <FaMoneyCheckAlt className="mb-2" />
+                                    Trạng thái thanh toán
+                                </h5>
+                                <p
+                                    className={`text-${
+                                        order.isPayment ? "success" : "danger"
+                                    }`}
+                                >
+                                    {order.isPayment ? (
+                                        <div className="flex gap-2 items-center">
+                                            <FaCheckCircle className="mr-2" />{" "}
+                                            Đã thanh toán
+                                        </div>
+                                    ) : (
+                                        <div className="flex gap-2 items-center">
+                                            <FaTimesCircle className="mr-2" />{" "}
+                                            Chưa thanh toán
+                                            {(order.payment === "BANK" ||
+                                                order.payment === "VNPAY") && (
+                                                <button
+                                                    className="btn btn-success"
+                                                    onClick={handleShowModal}
+                                                >
+                                                    Thanh toán
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
+                                </p>
                             </div>
                         </div>
-                        <div className="col-md-6">
-                            <div className="mb-4">
-                                <div>
-                                    <h5 className="text-primary">
-                                        Trạng thái đơn hàng
-                                    </h5>
-                                    <p className="text-info">
-                                        {order?.orderStatus?.name}
-                                    </p>
-                                    <p className="text-info">
-                                        {order?.shipDate &&
-                                        order.orderStatus?.name == "SHIPPING"
-                                            ? `Ngày nhận dự kiến: ${new Date(
-                                                  order?.shipDate
-                                              ).toLocaleDateString("vi-VN", {
-                                                  day: "2-digit",
-                                                  month: "2-digit",
-                                                  year: "numeric",
-                                              })}`
-                                            : ""}
-                                    </p>
-                                    <p
-                                        className="text"
-                                        style={{ fontWeight: "bolder" }}
-                                    >
-                                        {order.description && (
-                                            <>Lí do hủy : {order.description}</>
-                                        )}
-                                    </p>
-                                </div>
+                        <div className="mb-4">
+                            <div>
+                                <h5 className="text-primary ">
+                                    <FaClipboardList className="mb-2" />
+                                    Trạng thái đơn hàng
+                                </h5>
+                                <p className="text-info">
+                                    {order?.orderStatus?.name}
+                                </p>
+                                <p className="text-info">
+                                    {order?.shipDate &&
+                                    order.orderStatus?.name == "SHIPPING"
+                                        ? `Ngày nhận dự kiến: ${new Date(
+                                              order?.shipDate
+                                          ).toLocaleDateString("vi-VN", {
+                                              day: "2-digit",
+                                              month: "2-digit",
+                                              year: "numeric",
+                                          })}`
+                                        : ""}
+                                </p>
+                                {order.reason && (
+                                    <div className="text flex gap-2">
+                                        <span className="font-bold">
+                                            Lí do hủy:
+                                        </span>
+                                        <span>{order.reason}</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <div className="mb-4">
+                            <div>
+                                <h5 className="text-primary">
+                                    <FaCreditCard className="mb-2" />
+                                    Phương thức thanh toán
+                                </h5>
+                                <p className="text-info">{order.payment}</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Delivery Method */}
-                    <div className="mb-4">
-                        <div>
-                            <h5 className="text-primary">
-                                Phương thức thanh toán
-                            </h5>
-                            <p className="text-info">{order.payment}</p>
-                        </div>
-                    </div>
                 </div>
 
                 {/* Customer Information */}
-                <div className="col-lg-4">
+                <div className="col-lg-4 border-t-1 border-gray-300 md:border-none !pt-10 md:!pt-0 !mb-10">
                     <div className="mb-4">
                         <div>
-                            <h5 className="text-danger">Thông tin mua hàng</h5>
+                            <h5 className="text-danger !mb-5">
+                                Thông tin mua hàng
+                            </h5>
                             <div className="flex items-center gap-2 mb-3">
                                 <span className="font-medium">
                                     Ngày mua hàng:
@@ -427,7 +410,7 @@ const OrderDetail = (props) => {
                         <div>
                             <h5 className="text-danger">Địa chỉ nhận hàng</h5>
                             <div className="flex items-center gap-2 mb-3">
-                                <span className="font-medium">SDT:</span>
+                                <span className="font-medium">SĐT:</span>
                                 <span>{order.phone}</span>
                             </div>
                             <div className="flex gap-2 mb-3">
@@ -436,8 +419,6 @@ const OrderDetail = (props) => {
                             </div>
                         </div>
                     </div>
-
-                    {/* Buttons for actions */}
                 </div>
             </div>
             <Modal show={showModal} onHide={handleCloseModal}>
@@ -445,18 +426,33 @@ const OrderDetail = (props) => {
                     <Modal.Title>Chọn phương thức thanh toán</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    <div className="!mb-5">
+                        <Button
+                            variant="outline-primary"
+                            className="!mr-4"
+                            onClick={() => handlePaymentMethod("BANK")}
+                        >
+                            Chuyển khoản qua ngân hàng
+                        </Button>
+                        {paymentMethod === "BANK" && (
+                            <img
+                                src={`https://img.vietqr.io/image/ICB-100870483156-compact2.png?amount=${
+                                    order.total
+                                }&accountName=${encodeURIComponent(
+                                    "NGUYEN TRUONG VIET"
+                                )}&addInfo=${encodeURIComponent(
+                                    `TK: ${order.user.username} - SĐT: ${props.user.phone}`
+                                )}`}
+                                alt="QR"
+                                className="!w-[300px] !h-[350px] border mt-1 mb-2 rounded-2xl"
+                            />
+                        )}
+                    </div>
                     <Button
-                        variant="primary"
-                        onClick={() => handlePaymentMethod("COD")}
+                        variant="outline-primary"
+                        onClick={() => handlePaymentMethod("VNPAY")}
                     >
-                        Thanh toán khi giao hàng
-                    </Button>
-                    <Button
-                        variant="secondary"
-                        style={{ backgroundColor: "blue" }}
-                        onClick={() => handlePaymentMethod("TRANSFER")}
-                    >
-                        Chuyển khoản
+                        Thanh toán qua VNPAY
                     </Button>
                 </Modal.Body>
             </Modal>

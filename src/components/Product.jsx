@@ -344,14 +344,15 @@ const Product = (props) => {
                                                 }}
                                             >
                                                 <img
-                                                    src={item?.image}
+                                                    src={
+                                                        item?.imageUrls[0]?.url
+                                                    }
                                                     alt="Product"
                                                     style={{
                                                         width: "100%",
                                                         height: "100%",
                                                         objectFit: "cover",
                                                     }}
-                                                    className="mini-card"
                                                 />
                                             </NavLink>
 

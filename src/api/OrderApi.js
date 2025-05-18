@@ -45,8 +45,8 @@ export const reportAmountYear = async () => {
     return await Instance.get(url);
 };
 
-export const reportByProduct = async (page, size) => {
-    const url = `/api/v1/order/synthesis/product?page=${page}&size=${size}`;
+export const reportByProduct = async (page, size, sort) => {
+    const url = `/api/v1/order/synthesis/product?page=${page}&size=${size}&sort=${sort}`;
     return await Instance.get(url);
 };
 

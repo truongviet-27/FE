@@ -65,7 +65,7 @@ body {
     width: 200px;
 }
 
-.form-inline button {
+/* .form-inline button {
     background-color: #ff6f61;
     color: #fff;
     border: none;
@@ -75,7 +75,7 @@ body {
     cursor: pointer;
     width: auto;
     box-sizing: border-box;
-}
+} */
 
 .form-inline button:hover {
     background-color: blue;
@@ -128,12 +128,12 @@ body {
     border-color: #ff6f61;
 }
 
-.form-inline button {
+/* .form-inline button {
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 14px;
-}
+} */
 
 .dropdown-menu {
     border-radius: 10px;
@@ -294,11 +294,11 @@ hr.light {
 .form-inline button {
     display: flex;
     align-items: center;
+    /* Bạn có thể thay đổi màu */
     justify-content: center;
     padding: 5px 10px;
     border: none;
     background-color: #007bff;
-    /* Bạn có thể thay đổi màu */
     color: white;
     border-radius: 4px;
     cursor: pointer;

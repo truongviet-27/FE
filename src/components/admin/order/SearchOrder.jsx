@@ -407,11 +407,11 @@ const SearchOrder = () => {
                                                     <Badge
                                                         type={
                                                             pendingStatus[
-                                                                orders.isPending
+                                                                orders.isPayment
                                                             ]
                                                         }
                                                         content={
-                                                            orders.isPending
+                                                            orders.isPayment
                                                                 ? "Đã thanh toán"
                                                                 : "Chưa thanh toán"
                                                         }

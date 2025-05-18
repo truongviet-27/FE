@@ -1,8 +1,9 @@
-import { React, useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
 import { getProductById } from "../../../api/ProductApi";
-import { useParams, useHistory } from "react-router-dom";
-import { getAttribute } from "../../../api/AttributeApi";
 
+import ImageGallery from "react-image-gallery";
+import "react-image-gallery/styles/css/image-gallery.css";
 const Detail = () => {
     const { id } = useParams();
     const [item, setItem] = useState();
@@ -11,6 +12,8 @@ const Detail = () => {
     const [stock, setStock] = useState();
     const [flag, setFlag] = useState();
     const history = useHistory();
+
+    const [images, setImages] = useState([]);
 
     useEffect(() => {
         onLoad();
@@ -23,6 +26,12 @@ const Detail = () => {
             .then((res) => {
                 setItem(res.data.data);
                 setAttributes(res.data.data.attributes);
+                setImages(
+                    res.data.data.imageUrls.map((item) => ({
+                        original: item.url,
+                        thumbnail: item.url,
+                    }))
+                );
                 onModify(
                     res.data.data.attributes[0].price,
                     res.data.data.attributes[0].stock,
@@ -49,7 +58,7 @@ const Detail = () => {
     };
     return (
         item && (
-            <div className="card flex flex-col !mx-[25px] overflow-y-scroll lg:!overflow-y-hidden">
+            <div className="card flex flex-col !mx-[25px] overflow-y-scroll">
                 <div className="col-12 flex items-center justify-between text-center mb-5">
                     <button style={{ width: 60 }} onClick={() => goBack()}>
                         <i
@@ -64,14 +73,15 @@ const Detail = () => {
                 <div className="flex flex-col lg:flex-row border border-gray-200 rounded-2xl !p-10 !mb-10 !mt-0">
                     <div className="w-full xl:w-2/5 lg:!pr-10">
                         <div className="h-full w-full">
-                            <img
-                                src={item?.main}
-                                style={{
-                                    width: "600px",
-                                    height: "400px",
-                                }}
-                                alt=""
-                            />
+                            <div className="!h-full !w-full">
+                                {item.imageUrls.length > 0 && (
+                                    <ImageGallery
+                                        items={images}
+                                        showPlayButton={false}
+                                        additionalClass="custom-gallery"
+                                    />
+                                )}
+                            </div>
                             <div className="container row offset-3 mt-5 mb-5">
                                 {item?.images?.map((item, index) => (
                                     <img

@@ -20,8 +20,11 @@ const EditProduct = () => {
     const [image, setImage] = useState([]);
     const [count, setCount] = useState(0);
     const [currentImages, setCurrentImages] = useState([]); // Ảnh đã có (URL từ backend)
+    const [base64Images, setBase64Images] = useState([]);
     const [newImages, setNewImages] = useState([]); // Ảnh mới upload
     const [numbers, setNumbers] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+
+    const [categoriesOld, setCategoriesOld] = useState([]);
     const {
         register,
         handleSubmit,
@@ -51,7 +54,8 @@ const EditProduct = () => {
         keyName: "key",
     });
 
-    const onFileChange = (event) => {
+    const onFileChange = async (event) => {
+        console.log("xxxxxxxxxxx");
         const files = Array.from(event.target.files);
 
         const validImages = files.filter(
@@ -66,16 +70,23 @@ const EditProduct = () => {
             );
         }
 
-        // Tạo URL tạm thời cho hình ảnh để hiển thị
-        const imagePreviews = validImages.map((file) => {
-            return {
-                file, // Giữ file để upload sau
-                preview: URL.createObjectURL(file), // URL để hiển thị trước
-            };
-        });
+        const promises = files.map((file) => convertToBase64(file));
+        const base64Results = await Promise.all(promises);
 
-        // Thêm ảnh mới vào danh sách
-        setNewImages((prev) => [...prev, ...imagePreviews]);
+        console.log(base64Results, "base64Results");
+
+        setBase64Images(base64Results);
+
+        setNewImages((prev) => [...prev, ...base64Results]);
+    };
+
+    const convertToBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
     };
 
     const handleRemoveCurrentImage = (index) => {
@@ -120,15 +131,21 @@ const EditProduct = () => {
                 setItem(res.data.data);
                 // setFlag(res.data.data.categories);
                 // setAttributes(res.data.data.attributes);
-                setCurrentImages(res.data.data.images);
+                setCurrentImages(res.data.data.imageUrls);
                 setCount(res.data.data.attributes.length);
+
+                setCategoriesOld(res.data.data.categories);
 
                 reset({
                     ...res.data.data,
+                    brand: res.data.data.brand._id,
+                    sale: res.data.data.sale._id,
                 });
             })
             .catch((error) => console.log(error));
     };
+
+    console.log(getValues(), "getValues");
     const submitHandler = (data) => {
         const numbersSize = getValues("attributes").map((item) => item.size);
 
@@ -140,13 +157,12 @@ const EditProduct = () => {
         } else {
             const newData = {
                 ...data,
-                brand: data.brand._id,
-                sale: data.sale._id,
                 categories: data.categories
                     .map((item, index) => {
                         return item && category[index];
                     })
                     .filter((item) => !!item),
+                categoriesOld: categoriesOld,
                 attributes: data.attributes.map((attribute) => {
                     return {
                         ...attribute,
@@ -155,6 +171,8 @@ const EditProduct = () => {
                         stock: +attribute.stock,
                     };
                 }),
+                images: currentImages,
+                imagesNew: newImages,
             };
 
             console.log(newData, "newData");
@@ -268,7 +286,7 @@ const EditProduct = () => {
                                     {...register("brand", { required: true })}
                                 >
                                     {brand?.map((item, index) => (
-                                        <option value={item?._id} key={index}>
+                                        <option value={item._id} key={item._id}>
                                             {item?.name}
                                         </option>
                                     ))}
@@ -283,10 +301,7 @@ const EditProduct = () => {
                                     {...register("sale", { required: true })}
                                 >
                                     {sale?.map((item, index) => (
-                                        <option
-                                            value={item?._id}
-                                            key={item._id}
-                                        >
+                                        <option value={item._id} key={item._id}>
                                             {item?.name} - {item?.discount} %
                                         </option>
                                     ))}
@@ -333,7 +348,7 @@ const EditProduct = () => {
                 ))}
               </div> */}
 
-                            <div className="mt-4 mb-5">
+                            <div className="mt-4">
                                 <label
                                     htmlFor="upload-images"
                                     style={{
@@ -356,18 +371,21 @@ const EditProduct = () => {
                                 />
                             </div>
 
-                            <div style={{ display: "flex", flexWrap: "wrap" }}>
+                            <div
+                                style={{ display: "flex", flexWrap: "wrap" }}
+                                className="!px-0"
+                            >
                                 {/* Ảnh hiện tại */}
-                                {currentImages?.map((src, index) => (
+                                {currentImages?.map((item, index) => (
                                     <div
                                         key={`current-${index}`}
                                         style={{
-                                            position: "relative",
                                             margin: "10px",
                                         }}
+                                        className="relative"
                                     >
                                         <img
-                                            src={src}
+                                            src={item.url}
                                             alt={`current-img-${index}`}
                                             style={{
                                                 width: "120px",
@@ -378,18 +396,19 @@ const EditProduct = () => {
                                                     "0 0 5px rgba(0,0,0,0.1)",
                                             }}
                                         />
-                                        <button
+                                        <div
                                             onClick={() =>
                                                 handleRemoveCurrentImage(index)
                                             }
+                                            className="absolute top-0 right-0 bg-black py-0 px-2 text-white !text-[15px] cursor-pointer"
                                         >
                                             ×
-                                        </button>
+                                        </div>
                                     </div>
                                 ))}
 
                                 {/* Ảnh mới */}
-                                {newImages?.map((src, index) => (
+                                {newImages?.map((item, index) => (
                                     <div
                                         key={`new-${index}`}
                                         style={{
@@ -398,7 +417,7 @@ const EditProduct = () => {
                                         }}
                                     >
                                         <img
-                                            src={src.preview}
+                                            src={item}
                                             alt={`new-img-${index}`}
                                             style={{
                                                 width: "120px",
@@ -409,13 +428,14 @@ const EditProduct = () => {
                                                     "0 0 5px rgba(0,0,0,0.1)",
                                             }}
                                         />
-                                        <button
+                                        <div
                                             onClick={() =>
                                                 handleRemoveNewImage(index)
                                             }
+                                            className="absolute top-0 right-0 bg-black py-0 px-2 text-white !text-[15px] cursor-pointer"
                                         >
                                             ×
-                                        </button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>

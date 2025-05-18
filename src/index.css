@@ -250,6 +250,6 @@ button:hover {
 }
 .custom-gallery .image-gallery-thumbnail:hover,
 .custom-gallery .image-gallery-thumbnail:focus {
-  transform: none !important;
-  transition: none !important;
+    transform: none !important;
+    transition: none !important;
 }

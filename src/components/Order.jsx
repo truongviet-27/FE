@@ -12,6 +12,7 @@ import Modal from "react-bootstrap/Modal";
 import { toast } from "react-toastify";
 import Alert from "react-bootstrap/Alert";
 import formatDate from "../utils/convertDate";
+import convertStatusOrder from "../utils/convertStatusOrder";
 
 const Order = (props) => {
     const [order, setOrder] = useState([]);
@@ -76,17 +77,17 @@ const Order = (props) => {
 
         console.log(data, "data");
 
-        // cancelOrder(data)
-        //     .then((res) => {
-        //         toast.success(res.data.message);
-        //         getAllOrder(props.user._id, "", page, size)
-        //             .then((res) => {
-        //                 setOrder(res.data.content);
-        //                 setTotal(res.data.totalPages);
-        //             })
-        //             .catch((error) => console.log(error.response.data.Errors));
-        //     })
-        //     .catch((error) => toast.error(error.response.data.message));
+        cancelOrder(data)
+            .then((res) => {
+                toast.success(res.data.message);
+                getAllOrder(props.user._id, "", page, size)
+                    .then((res) => {
+                        setOrder(res.data.content);
+                        setTotal(res.data.totalPages);
+                    })
+                    .catch((error) => console.log(error.response.data.Errors));
+            })
+            .catch((error) => toast.error(error.response.data.message));
 
         setReason(null);
         setDescription(null);
@@ -235,17 +236,19 @@ const Order = (props) => {
                                         </td>
                                         <td
                                             className={`text-center align-middle font-bold ${
-                                                item.isPending
+                                                item.isPayment
                                                     ? "text-success"
                                                     : "text-danger"
                                             }`}
                                         >
-                                            {item.isPending
+                                            {item.isPayment
                                                 ? "Đã thanh toán"
                                                 : "Chưa thanh toán"}
                                         </td>
                                         <td className="text-center align-middle font-bold">
-                                            {item?.orderStatus?.name}
+                                            {convertStatusOrder(
+                                                item?.orderStatus?.code
+                                            )}
                                         </td>
                                         <td className="text-center align-middle font-bold">
                                             {item?.shipment?.name}

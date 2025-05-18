@@ -9,6 +9,7 @@ import {
     isEnoughCartItem,
 } from "../api/CartApi";
 import { toast } from "react-toastify";
+import { NavLink } from "react-bootstrap";
 
 const Cart = (props) => {
     const [cart, setCart] = useState([]);
@@ -269,14 +270,21 @@ const Cart = (props) => {
                                         />
                                     </td>
                                     <td className="text-center align-middle font-bold">
-                                        <div className="flex items-center justify-center h-[80px]">
+                                        <div
+                                            className="flex items-center justify-center h-[80px]"
+                                            onClick={() => {
+                                                history.push(
+                                                    `/product-detail/${item.product._id}`
+                                                );
+                                            }}
+                                        >
                                             <img
                                                 className="img-fluid"
                                                 style={{
                                                     width: "70px",
                                                     height: "70px",
                                                 }}
-                                                src={item?.image}
+                                                src={item?.imageUrls[0]?.url}
                                                 alt=""
                                             />
                                         </div>

@@ -250,7 +250,7 @@ const Product = () => {
                                                     width: "70px",
                                                     height: "70px",
                                                 }}
-                                                src={item.image}
+                                                src={item?.imageUrls[0]?.url}
                                                 alt=""
                                             />
                                         </td>

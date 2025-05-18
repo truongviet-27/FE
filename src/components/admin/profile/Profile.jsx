@@ -16,6 +16,8 @@ const ProfileAdmin = (props) => {
         formState: { errors },
         getValues,
         reset,
+        setValue,
+        watch,
     } = methods;
 
     const onSubmitHandler = (data) => {
@@ -40,10 +42,23 @@ const ProfileAdmin = (props) => {
         }
     }, [props.user]);
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onloadend = () => {
+                setValue("avatar", reader.result);
+            };
+
+            reader.readAsDataURL(file);
+        }
+    };
+
     return (
         <FormProvider {...methods}>
             <div className="profile-container">
-                <section className="vh-100 gradient-custom">
+                <section className="gradient-custom">
                     <div className="container py-5 h-100">
                         <div className="row justify-content-center align-items-center h-100">
                             <div className="col-12 col-lg-9 col-xl-7">
@@ -60,6 +75,35 @@ const ProfileAdmin = (props) => {
                                                 onSubmitHandler
                                             )}
                                         >
+                                            <div className="flex flex-col items-center justify-center gap-4">
+                                                {watch("avatar") ? (
+                                                    <img
+                                                        src={watch("avatar")}
+                                                        alt="Avatar"
+                                                        className="!w-30 !h-30 rounded-full object-cover border-4 border-primary shadow-md"
+                                                    />
+                                                ) : (
+                                                    <div className="w-30 h-30 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm border-dashed border-2 border-gray-400">
+                                                        No Avatar
+                                                    </div>
+                                                )}
+
+                                                {/* Upload Button */}
+                                                <label
+                                                    htmlFor="photo-upload"
+                                                    className="cursor-pointer px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition"
+                                                >
+                                                    Chọn ảnh đại diện
+                                                </label>
+
+                                                <input
+                                                    id="photo-upload"
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleFileChange}
+                                                    className="hidden"
+                                                />
+                                            </div>
                                             <div className="row mb-3">
                                                 <div className="col-md-12">
                                                     <label

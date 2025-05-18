@@ -11,6 +11,7 @@ import {
 import { countProduct } from "../../../api/ProductApi";
 import statusCards from "../../../assets/JsonData/status-card-data.json";
 import StatusCard from "../status-card/StatusCard";
+import { toast } from "react-toastify";
 
 const Dashboard = () => {
     const [productChartOptions, setProductChartOptions] = useState({});
@@ -27,11 +28,20 @@ const Dashboard = () => {
 
     useEffect(() => {
         // Doanh thu theo sản phẩm
-        reportByProduct(0, 8)
+        reportByProduct(0, 10, "totalRevenue")
             .then((resp) => {
-                const productNames = resp.data.content.map((item) => item.name);
-                const revenues = resp.data.content.map((item) => item.amount);
-
+                const productNames = resp.data.content.map(
+                    (item) => item.productInfo.name
+                );
+                const revenues = resp.data.content.map(
+                    (item) => item.totalRevenue
+                );
+                const quantity = resp.data.content.map(
+                    (item) => item.totalQuantity
+                );
+                const quantityOrder = resp.data.content.map(
+                    (item) => item.orderDetailLength
+                );
                 setProductChartOptions({
                     chart: {
                         type: "bar",
@@ -40,7 +50,7 @@ const Dashboard = () => {
                         categories: productNames,
                     },
                     title: {
-                        text: "Doanh thu theo sản phẩm",
+                        text: "10 sản phẩm doanh số cao nhất",
                         align: "center",
                     },
                 });
@@ -49,6 +59,14 @@ const Dashboard = () => {
                     {
                         name: "Doanh thu",
                         data: revenues,
+                    },
+                    {
+                        name: "Số lượng",
+                        data: quantity,
+                    },
+                    {
+                        name: "Số đơn hàng",
+                        data: quantityOrder,
                     },
                 ]);
             })
@@ -88,32 +106,32 @@ const Dashboard = () => {
             })
             .catch((error) => console.log(error));
 
-        // Số lượng đơn hàng
-        countOrder()
-            .then((resp) => setCountOr(resp.data.data))
-            .catch((error) => console.log(error));
-
-        // Số lượng tài khoản
-        countAccount()
-            .then((resp) => setCountAcc(resp.data.data))
-            .catch((error) => console.log(error));
-
-        // Số lượng sản phẩm
-        countProduct()
-            .then((resp) => setCountPro(resp.data.data))
-            .catch((error) => console.log(error));
-
         // Đơn hàng theo danh mục
         countOrderByName()
             .then((resp) => {
-                const x = resp.data.map((item) => item.name);
+                const x = resp.data.content.map((item) => item.name);
                 setOption({
                     labels: x,
                 });
                 const y = resp.data.map((item) => item.count);
                 setSeri(y);
             })
-            .catch((error) => console.log(error));
+            .catch((error) => toast.error(error.message));
+
+        // Số lượng đơn hàng
+        countOrder()
+            .then((resp) => setCountOr(resp.data.data))
+            .catch((error) => toast.error(error.message));
+
+        // Số lượng tài khoản
+        countAccount()
+            .then((resp) => setCountAcc(resp.data.data))
+            .catch((error) => toast.error(error.message));
+
+        // Số lượng sản phẩm
+        countProduct()
+            .then((resp) => setCountPro(resp.data.data))
+            .catch((error) => toast.error(error.message));
     }, []);
     const [selectedYear, setSelectedYear] = useState("2024");
 
@@ -164,28 +182,16 @@ const Dashboard = () => {
                         <Chart
                             options={productChartOptions}
                             series={productChartSeries}
-                            type="bar"
+                            type="line"
                             height="400"
                         />
+                        <Link
+                            to={`/admin/report-product`}
+                            className="btn btn-primary mt-3 !flex justify-center"
+                        >
+                            Xem chi tiết
+                        </Link>
                     </div>
-
-                    {/* Doanh thu theo năm */}
-                    {/* <div className="col-6">
-                        <div className="card full-height">
-                            <Chart
-                                options={yearChartOptions}
-                                series={yearChartSeries}
-                                type="line"
-                                height="400"
-                            />
-                            <Link
-                                to="/admin/report-month/2024"
-                                className="btn btn-primary mt-3"
-                            >
-                                Xem chi tiết
-                            </Link>
-                        </div>
-                    </div> */}
                     <div className="card full-height overflow-hidden">
                         <Chart
                             options={yearChartOptions}

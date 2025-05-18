@@ -97,40 +97,74 @@ const WishList = () => {
                         <table className="table table-striped table-bordered table-hover">
                             <thead className="thead-dark">
                                 <tr>
-                                    <th scope="col">STT</th>
-                                    <th scope="col">Tên sản phẩm</th>
-                                    <th scope="col">Mã sản phẩm</th>
-                                    <th scope="col">Thương hiệu</th>
-                                    <th scope="col">Hình ảnh</th>
+                                    <th
+                                        scope="col"
+                                        className="text-center align-middle"
+                                    >
+                                        STT
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="text-center align-middle"
+                                    >
+                                        Tên sản phẩm
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="text-center align-middle"
+                                    >
+                                        Mã sản phẩm
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="text-center align-middle"
+                                    >
+                                        Thương hiệu
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="text-center align-middle"
+                                    >
+                                        Hình ảnh
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {products?.map((item, index) => (
                                     <tr key={item._id}>
-                                        <th scope="row">
+                                        <td
+                                            scope="row"
+                                            className="text-center align-middle font-bold"
+                                        >
                                             <NavLink
                                                 to={`/product-detail/${item._id}`}
                                                 exact
                                             >
                                                 {index + 1 + page * size}
                                             </NavLink>
-                                        </th>
-                                        <th>{item.name}</th>
-                                        <th>{item.code}</th>
-                                        <th>{item?.brand?.name}</th>
-                                        <th>
+                                        </td>
+                                        <td className="text-center align-middle font-bold">
+                                            {item.name}
+                                        </td>
+                                        <td className="text-center align-middle font-bold">
+                                            {item.code}
+                                        </td>
+                                        <td className="text-center align-middle font-bold">
+                                            {item?.brand?.name}
+                                        </td>
+                                        <td className="text-center align-middle font-bold">
                                             <div className="flex justify-center">
                                                 <img
                                                     className="img-fluid"
                                                     style={{
-                                                        width: "50px",
-                                                        height: "50px",
+                                                        width: "70px",
+                                                        height: "70px",
                                                     }}
-                                                    src={item?.image}
+                                                    src={item?.imageUrls[0]?.url}
                                                     alt=""
                                                 />
                                             </div>
-                                        </th>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>

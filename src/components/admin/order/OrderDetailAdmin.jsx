@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 import Alert from "react-bootstrap/Alert";
+import {
+    FaCheckCircle,
+    FaClipboardList,
+    FaCreditCard,
+    FaMoneyCheckAlt,
+    FaTimesCircle,
+} from "react-icons/fa"; // Icons
 import { useHistory, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
@@ -11,8 +18,10 @@ import {
     updateShip,
     updateSuccess,
 } from "../../../api/OrderApi";
-import formatDate from "../../../utils/convertDate";
 import { getAllShipments } from "../../../api/Shipment";
+import formatDate from "../../../utils/convertDate";
+import convertStatusOrder from "../../../utils/convertStatusOrder";
+import convertStatusColor from "../../../utils/convertStatusColor";
 
 const OrderDetail = () => {
     const history = useHistory();
@@ -260,7 +269,7 @@ const OrderDetail = () => {
                 <div className="w-[60px]"></div>
             </div>
             <div className="col-12 welcome">
-                <div className="col-12 row mb-5">
+                <div className="col-12 row mb-4">
                     <div className="col-6 text ">
                         <p
                             className="display-4 text-primary !font-bold"
@@ -298,7 +307,7 @@ const OrderDetail = () => {
                         </div>
                     </div>
                 </div>
-                <div className="col-12 mb-5">
+                <div className="col-12 !mb-0 border-t-1 border-gray-300 pt-4">
                     <p
                         className="display-4 text-primary !font-bold"
                         style={{ fontSize: "24px" }}
@@ -323,7 +332,7 @@ const OrderDetail = () => {
                                         scope="row"
                                         className="text-center align-middle font-bold"
                                     >
-                                        {item?.attribute?.product?.name}
+                                        {item?.product?.name}
                                     </td>
                                     <td className="text-center align-middle font-bold">
                                         <div className="flex items-center justify-center h-[80px]">
@@ -333,7 +342,7 @@ const OrderDetail = () => {
                                                     width: "70px",
                                                     height: "70px",
                                                 }}
-                                                src={item?.image}
+                                                src={item?.imageUrls[0]?.url}
                                                 alt=""
                                             />
                                         </div>
@@ -357,7 +366,7 @@ const OrderDetail = () => {
                             ))}
                         </tbody>
                     </table>
-                    <div className="flex flex-col items-end !mt-4 !mb-14 text-[18px]">
+                    <div className="flex flex-col items-end !mt-4 !mb-4 text-[18px]">
                         <p style={{ fontWeight: "bolder" }}>
                             Tạm tính:{" "}
                             {(
@@ -366,7 +375,7 @@ const OrderDetail = () => {
                             )?.toLocaleString()}{" "}
                             đ
                         </p>
-                        {
+                        {order?.voucher?.discount ? (
                             <p style={{ fontWeight: "bolder" }}>
                                 Giảm giá: -{" "}
                                 {(
@@ -375,15 +384,16 @@ const OrderDetail = () => {
                                 )?.toLocaleString()}{" "}
                                 đ
                             </p>
-                        }
-                        <p
-                            className="text-danger"
-                            style={{ fontWeight: "bolder" }}
-                        >
+                        ) : (
+                            <p style={{ fontWeight: "bolder" }}>
+                                Giảm giá: 0 đ
+                            </p>
+                        )}
+                        <h5 className="text-danger !font-bold">
                             Tổng cộng: {order?.total?.toLocaleString()} đ
-                        </p>
+                        </h5>
                     </div>
-                    <div className="flex mb-5 justify-between">
+                    {/* <div className="flex mb-5 justify-between">
                         <div className="">
                             <p
                                 className="display-4 text-primary !font-bold"
@@ -395,7 +405,7 @@ const OrderDetail = () => {
                                 className="text-danger"
                                 style={{ fontWeight: "bolder" }}
                             >
-                                {order?.isPending
+                                {order?.isPayment
                                     ? "Đã thanh toán"
                                     : "Chưa thanh toán"}
                             </p>
@@ -417,10 +427,85 @@ const OrderDetail = () => {
                                 className="text"
                                 style={{ fontWeight: "bolder" }}
                             >
-                                {order?.description && (
-                                    <>Lí do hủy : {order.description}</>
+                                {order?.reason && (
+                                    <>Lí do hủy : {order?.reason}</>
                                 )}
                             </p>
+                        </div>
+                    </div> */}
+                    <div className="flex flex-col justify-between md:flex-row !pt-10 mb-5 border-t-1 border-b-1 border-gray-300">
+                        <div className="mb-4">
+                            <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <FaMoneyCheckAlt className="mb-2 text-primary text-[22px]" />
+                                    <h5 className="text-primary !mb-1">
+                                        Trạng thái thanh toán
+                                    </h5>
+                                </div>
+                                <p
+                                    className={`text-${
+                                        order.isPayment ? "success" : "danger"
+                                    }`}
+                                >
+                                    {order.isPayment ? (
+                                        <div className="flex gap-2 items-center font-bold">
+                                            <FaCheckCircle className="mr-2" />{" "}
+                                            Đã thanh toán
+                                        </div>
+                                    ) : (
+                                        <div className="flex gap-2 items-center font-bold">
+                                            <FaTimesCircle className="mr-2" />{" "}
+                                            Chưa thanh toán
+                                        </div>
+                                    )}
+                                </p>
+                            </div>
+                        </div>
+                        <div className="mb-4">
+                            <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <FaClipboardList className="mb-2 text-primary text-[22px]" />
+                                    <h5 className="text-primary !mb-1">
+                                        Trạng thái đơn hàng
+                                    </h5>
+                                </div>
+                                <p className="text-info">
+                                    {convertStatusColor(
+                                        order?.orderStatus?.code
+                                    )}
+                                </p>
+                                <p className="text-info">
+                                    {order?.shipDate &&
+                                    order.orderStatus?.name == "SHIPPING"
+                                        ? `Ngày nhận dự kiến: ${new Date(
+                                              order?.shipDate
+                                          ).toLocaleDateString("vi-VN", {
+                                              day: "2-digit",
+                                              month: "2-digit",
+                                              year: "numeric",
+                                          })}`
+                                        : ""}
+                                </p>
+                                {order.reason && (
+                                    <div className="text flex gap-2">
+                                        <span className="font-bold">
+                                            Lí do hủy:
+                                        </span>
+                                        <span>{order.reason}</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <div className="mb-4">
+                            <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <FaCreditCard className="mb-2 text-primary text-[22px]" />
+                                    <h5 className="text-primary !mb-1">
+                                        Phương thức thanh toán
+                                    </h5>
+                                </div>
+                                <p className="font-bold">{order.payment}</p>
+                            </div>
                         </div>
                     </div>
                     <div>
@@ -469,20 +554,19 @@ const OrderDetail = () => {
                                             Xác nhận đã giao hàng
                                         </button>
                                     )}
-                                    {order?.orderStatus?.code !==
-                                        "DELIVERED" && (
-                                        <button
-                                            className="btn btn-danger mx-2"
-                                            onClick={() => {
-                                                handleShowFouth(
-                                                    id,
-                                                    "CANCELLED"
-                                                );
-                                            }}
-                                        >
-                                            Hủy đơn hàng
-                                        </button>
-                                    )}
+                                    {order?.orderStatus?.code !== "DELIVERED" && !order.isPayment && (
+                                            <button
+                                                className="btn btn-danger mx-2"
+                                                onClick={() => {
+                                                    handleShowFouth(
+                                                        id,
+                                                        "CANCELLED"
+                                                    );
+                                                }}
+                                            >
+                                                Hủy đơn hàng
+                                            </button>
+                                        )}
                                 </div>
                             )}
                     </div>
@@ -545,21 +629,22 @@ const OrderDetail = () => {
                                             <span className="font-bold min-w-[110px]">
                                                 Tên sản phẩm:
                                             </span>
-                                            <span>
-                                                {item.attribute.product.name}
-                                            </span>
+                                            <span>{item?.product?.name}</span>
                                         </div>
                                         <div className="flex gap-2">
                                             <span className="font-bold min-w-[110px]">
                                                 Size:
                                             </span>
-                                            <span> {item.attribute.size}</span>
+                                            <span>
+                                                {" "}
+                                                {item?.attribute?.size}
+                                            </span>
                                         </div>
                                         <div className="flex gap-2">
                                             <span className="font-bold min-w-[110px]">
                                                 Số lượng:
                                             </span>
-                                            <span>{item.quantity}</span>
+                                            <span>{item?.quantity}</span>
                                         </div>
                                     </div>
                                 </div>
