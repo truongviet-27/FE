@@ -168,7 +168,7 @@ const Checkout = (props) => {
                 .then((res) => {
                     generatePaymentUrl({ orderId: res.data.data._id })
                         .then(() => {
-                            toast.success("Đặt hàng thành công");
+                            console.log("Redirect trang thanh toán");
                         })
                         .catch((err) => toast.error(err.message));
                 })
@@ -206,7 +206,7 @@ const Checkout = (props) => {
                 .then((res) => {
                     generatePaymentUrl({ orderId: res.data.data._id })
                         .then(() => {
-                            toast.success("Đặt hàng thành công");
+                            console.log("Redirect trang thanh toán");
                         })
                         .catch((err) => toast.error(err.message));
                 })

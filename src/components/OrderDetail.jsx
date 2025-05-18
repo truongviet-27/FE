@@ -139,8 +139,8 @@ const OrderDetail = (props) => {
         setPaymentMethod(method);
         if (method === "VNPAY") {
             generatePaymentUrl({ orderId })
-                .then((res) => {
-                    window.location.href = res.data.data;
+                .then(() => {
+                    console.log("Redirect trang thanh toán");
                 })
                 .catch((err) => toast.error(err.message));
             handleCloseModal();
