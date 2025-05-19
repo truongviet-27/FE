@@ -107,6 +107,12 @@ const WishList = () => {
                                         scope="col"
                                         className="text-center align-middle"
                                     >
+                                        Hình ảnh
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="text-center align-middle"
+                                    >
                                         Tên sản phẩm
                                     </th>
                                     <th
@@ -120,12 +126,6 @@ const WishList = () => {
                                         className="text-center align-middle"
                                     >
                                         Thương hiệu
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="text-center align-middle"
-                                    >
-                                        Hình ảnh
                                     </th>
                                 </tr>
                             </thead>
@@ -144,15 +144,6 @@ const WishList = () => {
                                             </NavLink>
                                         </td>
                                         <td className="text-center align-middle font-bold">
-                                            {item.name}
-                                        </td>
-                                        <td className="text-center align-middle font-bold">
-                                            {item.code}
-                                        </td>
-                                        <td className="text-center align-middle font-bold">
-                                            {item?.brand?.name}
-                                        </td>
-                                        <td className="text-center align-middle font-bold">
                                             <div className="flex justify-center">
                                                 <img
                                                     className="img-fluid"
@@ -160,10 +151,21 @@ const WishList = () => {
                                                         width: "70px",
                                                         height: "70px",
                                                     }}
-                                                    src={item?.imageUrls[0]?.url}
+                                                    src={
+                                                        item?.imageUrls[0]?.url
+                                                    }
                                                     alt=""
                                                 />
                                             </div>
+                                        </td>
+                                        <td className="text-center align-middle font-bold">
+                                            {item.name}
+                                        </td>
+                                        <td className="text-center align-middle font-bold">
+                                            {item.code}
+                                        </td>
+                                        <td className="text-center align-middle font-bold">
+                                            {item?.brand?.name}
                                         </td>
                                     </tr>
                                 ))}

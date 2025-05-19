@@ -26,6 +26,7 @@ import { orderStatus } from "../../../enum/active";
 const pendingStatus = {
     true: "success",
     false: "danger",
+    null: "warning",
 };
 
 const months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
@@ -114,7 +115,7 @@ const Order = () => {
         setShowFirst(false);
         setFlagProcess(false);
     };
-    const handleShowFirst = (orderId, statusCode, paymentCode) => {
+    const handleShowFirst = (orderId, statusCode, paymentCode, isPending) => {
         getOrderById(orderId)
             .then((resp) => setTemp(resp.data.data))
             .catch((error) => console.log(error));
@@ -128,6 +129,7 @@ const Order = () => {
             orderId,
             statusCode,
             paymentCode,
+            isPending,
         });
     };
 
@@ -137,22 +139,24 @@ const Order = () => {
         // setCode(null);
         setShipDate(null);
     };
-    const handleShowSecond = (orderId, statusCode, paymentCode) => {
+    const handleShowSecond = (orderId, statusCode, paymentCode, isPending) => {
         setShowSecond(true);
         setObj({
             orderId,
             statusCode,
             paymentCode,
+            isPending,
         });
     };
 
     const [flagSuccess, setFlagSuccess] = useState(false);
+    const [flagModalFouth, setFlagModalFouth] = useState(false);
 
     const handleCloseThird = () => {
         setShowThird(false);
         setFlagSuccess(false);
     };
-    const handleShowThird = (orderId, statusCode, paymentCode) => {
+    const handleShowThird = (orderId, statusCode, paymentCode, isPending) => {
         getOrderById(orderId)
             .then((resp) => setTemp(resp.data.data))
             .catch((error) => console.log(error));
@@ -161,6 +165,7 @@ const Order = () => {
             orderId,
             statusCode,
             paymentCode,
+            isPending,
         });
     };
 
@@ -169,12 +174,13 @@ const Order = () => {
         setReason(null);
         setDescription(null);
     };
-    const handleShowFouth = (orderId, statusCode, paymentCode) => {
+    const handleShowFouth = (orderId, statusCode, paymentCode, isPending) => {
         setShowFouth(true);
         setObj({
             orderId,
             statusCode,
             paymentCode,
+            isPending,
         });
     };
 
@@ -244,20 +250,40 @@ const Order = () => {
             });
     }, []);
 
-    const updateStatusHandlerFirst = (orderId, statusCode, paymentCode) => {
-        handleShowFirst(orderId, statusCode, paymentCode);
+    const updateStatusHandlerFirst = (
+        orderId,
+        statusCode,
+        paymentCode,
+        isPending
+    ) => {
+        handleShowFirst(orderId, statusCode, paymentCode, isPending);
     };
 
-    const updateStatusHandlerSecond = (orderId, statusCode, paymentCode) => {
-        handleShowSecond(orderId, statusCode, paymentCode);
+    const updateStatusHandlerSecond = (
+        orderId,
+        statusCode,
+        paymentCode,
+        isPending
+    ) => {
+        handleShowSecond(orderId, statusCode, paymentCode, isPending);
     };
 
-    const updateStatusHandlerThird = (orderId, statusCode, paymentCode) => {
-        handleShowThird(orderId, statusCode, paymentCode);
+    const updateStatusHandlerThird = (
+        orderId,
+        statusCode,
+        paymentCode,
+        isPending
+    ) => {
+        handleShowThird(orderId, statusCode, paymentCode, isPending);
     };
 
-    const updateStatusHandlerFouth = (orderId, statusCode, paymentCode) => {
-        handleShowFouth(orderId, statusCode, paymentCode);
+    const updateStatusHandlerFouth = (
+        orderId,
+        statusCode,
+        paymentCode,
+        isPending
+    ) => {
+        handleShowFouth(orderId, statusCode, paymentCode, isPending);
     };
 
     const confirmUpdateProcess = () => {
@@ -486,6 +512,11 @@ const Order = () => {
         setFlagSuccess(checked);
     };
 
+    const flagModalFouthHanler = (e) => {
+        const { checked } = e.target;
+        setFlagModalFouth(checked);
+    };
+
     return (
         <>
             <div className="card flex flex-col justify-between !mx-[25px]">
@@ -568,7 +599,7 @@ const Order = () => {
                                     <option value="BANK">
                                         Chuyển khoản qua ngân hàng
                                     </option>
-                                    <option value="VNAPY">
+                                    <option value="VNPAY">
                                         Chuyển khoản qua VNPay
                                     </option>
                                 </select>
@@ -756,7 +787,10 @@ const Order = () => {
                                                                     content={
                                                                         item.isPayment
                                                                             ? "Đã thanh toán"
-                                                                            : "Chưa thanh toán"
+                                                                            : item.isPayment ===
+                                                                              false
+                                                                            ? "Chưa thanh toán"
+                                                                            : "Hoàn tiền"
                                                                     }
                                                                 />
                                                             </td>
@@ -809,7 +843,8 @@ const Order = () => {
                                                                             e
                                                                                 .target
                                                                                 .value,
-                                                                            item.payment
+                                                                            item.payment,
+                                                                            item.isPending
                                                                         )
                                                                     }
                                                                     disabled={
@@ -838,7 +873,8 @@ const Order = () => {
                                                                             e
                                                                                 .target
                                                                                 .value,
-                                                                            item.payment
+                                                                            item.payment,
+                                                                            item.isPending
                                                                         )
                                                                     }
                                                                     disabled={
@@ -875,7 +911,8 @@ const Order = () => {
                                                                             e
                                                                                 .target
                                                                                 .value,
-                                                                            item.payment
+                                                                            item.payment,
+                                                                            item.isPending
                                                                         )
                                                                     }
                                                                     disabled={
@@ -912,7 +949,8 @@ const Order = () => {
                                                                             e
                                                                                 .target
                                                                                 .value,
-                                                                            item.payment
+                                                                            item.payment,
+                                                                            item.isPending
                                                                         )
                                                                     }
                                                                     disabled={
@@ -1190,7 +1228,7 @@ const Order = () => {
                         <Form.Check
                             type="checkbox"
                             label="Xác nhận đã nhận tiền."
-                            defaultChecked={flagProcess}
+                            defaultChecked={flagSuccess}
                             onChange={(e) => flagSuccessHandler(e)}
                         />
                     </Form.Group>
@@ -1217,7 +1255,18 @@ const Order = () => {
                 </Modal.Header>
                 <Modal.Body>
                     <Alert variant="danger">
-                        <Alert.Heading>Hủy đơn hàng</Alert.Heading>
+                        <div className="flex gap-2 items-center">
+                            <Alert.Heading>Hủy đơn hàng</Alert.Heading>
+                            {obj.isPending ? (
+                                <Alert.Heading style={{ marginBottom: 5 }}>
+                                    (Đã thanh toán)
+                                </Alert.Heading>
+                            ) : (
+                                <Alert.Heading style={{ marginBottom: 5 }}>
+                                    (Chưa thanh toán)
+                                </Alert.Heading>
+                            )}
+                        </div>
                         <hr />
                         <Form.Label
                             style={{ marginRight: 30, marginBottom: 10 }}
@@ -1252,13 +1301,44 @@ const Order = () => {
                                 }
                             />
                         </Form>
+                        {obj.isPending && (
+                            <Form.Group
+                                className="mb-3 mt-4"
+                                controlId="formBasicCheckbox"
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Form.Check
+                                        type="checkbox"
+                                        defaultChecked={flagModalFouth}
+                                        onChange={(e) =>
+                                            flagModalFouthHanler(e)
+                                        }
+                                        style={{
+                                            marginTop: 0,
+                                        }}
+                                    />
+                                    <Form.Label
+                                        style={{
+                                            marginRight: 0,
+                                            marginBottom: 0,
+                                        }}
+                                    >
+                                        Xác nhận hoàn tiền
+                                    </Form.Label>
+                                </div>
+                            </Form.Group>
+                        )}
                     </Alert>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button
                         variant="danger"
                         onClick={confirmUpdateCancel}
-                        disabled={!reason || !description}
+                        disabled={
+                            !reason ||
+                            !description ||
+                            (!flagModalFouth && obj.isPending)
+                        }
                     >
                         Xác nhận
                     </Button>

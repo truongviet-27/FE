@@ -75,8 +75,8 @@ const Dashboard = () => {
         // Doanh thu theo năm
         reportAmountYear()
             .then((resp) => {
-                const years = resp.data.map((item) => item.year);
-                const revenues = resp.data.map((item) => item.total);
+                const years = resp.data.data.map((item) => item.year);
+                const revenues = resp.data.data.map((item) => item.totalAmount);
 
                 setYearChartOptions({
                     chart: {
@@ -98,8 +98,8 @@ const Dashboard = () => {
                     },
                 ]);
 
-                const totalRevenue = resp.data.reduce(
-                    (sum, item) => sum + item.total,
+                const totalRevenue = resp.data.data.reduce(
+                    (sum, item) => sum + item.totalAmount,
                     0
                 );
                 setTotal(totalRevenue);
@@ -143,7 +143,7 @@ const Dashboard = () => {
         <div className="col-12">
             <div className="card overflow-y-scroll">
                 <h2 className="page-header">Thống kê</h2>
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 !ml-5">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 !ml-5 !mb-5">
                     <div className="card justify-between full-height overflow-hidden">
                         <StatusCard
                             icon={statusCards[0].icon}
@@ -171,8 +171,7 @@ const Dashboard = () => {
                         />
                         <StatusCard
                             icon={statusCards[2].icon}
-                            // count={total && `${total.toLocaleString()} Vnđ`}
-                            count={`10.000.000 VNĐ`}
+                            count={total && `${total.toLocaleString()} Vnđ`}
                             title={`Tổng doanh thu: `}
                         />
                     </div>

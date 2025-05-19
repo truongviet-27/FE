@@ -1,16 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { NavLink, useHistory } from "react-router-dom";
-import {
-    getAllOrder,
-    cancelOrder,
-    getAllOrderStatus,
-    getOrderById,
-    getOrderDetailByOrderId,
-} from "../api/OrderApi";
+import { useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap";
-import Modal from "react-bootstrap/Modal";
-import { toast } from "react-toastify";
 import Alert from "react-bootstrap/Alert";
+import Modal from "react-bootstrap/Modal";
+import { NavLink, useHistory } from "react-router-dom";
+import { toast } from "react-toastify";
+import { cancelOrder, getAllOrder, getAllOrderStatus } from "../api/OrderApi";
 import formatDate from "../utils/convertDate";
 import convertStatusOrder from "../utils/convertStatusOrder";
 
@@ -27,6 +21,8 @@ const Order = (props) => {
     const [reason, setReason] = useState(null);
     const history = useHistory();
 
+    const [flagModalFouth, setFlagModalFouth] = useState(false);
+
     const handleCloseFouth = () => {
         setShowFouth(false);
         setReason(null);
@@ -39,6 +35,12 @@ const Order = (props) => {
             statusCode: statusCode,
         });
     };
+
+    const flagModalFouthHanler = (e) => {
+        const { checked } = e.target;
+        setFlagModalFouth(checked);
+    };
+
     var rows = new Array(total).fill(0).map((zero, index) => (
         <li
             className={page === index ? "page-item active" : "page-item"}
@@ -238,12 +240,16 @@ const Order = (props) => {
                                             className={`text-center align-middle font-bold ${
                                                 item.isPayment
                                                     ? "text-success"
-                                                    : "text-danger"
+                                                    : item.isPayment === false
+                                                    ? "text-danger"
+                                                    : "text-black"
                                             }`}
                                         >
                                             {item.isPayment
                                                 ? "Đã thanh toán"
-                                                : "Chưa thanh toán"}
+                                                : item.isPayment === false
+                                                ? "Chưa thanh toán"
+                                                : "Hoàn tiền"}
                                         </td>
                                         <td className="text-center align-middle font-bold">
                                             {convertStatusOrder(
@@ -394,13 +400,44 @@ const Order = (props) => {
                                 }
                             />
                         </Form>
+                        {obj.isPending && (
+                            <Form.Group
+                                className="mb-3 mt-4"
+                                controlId="formBasicCheckbox"
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Form.Check
+                                        type="checkbox"
+                                        defaultChecked={flagModalFouth}
+                                        onChange={(e) =>
+                                            flagModalFouthHanler(e)
+                                        }
+                                        style={{
+                                            marginTop: 0,
+                                        }}
+                                    />
+                                    <Form.Label
+                                        style={{
+                                            marginRight: 0,
+                                            marginBottom: 0,
+                                        }}
+                                    >
+                                        Xác nhận đã nhận tiền
+                                    </Form.Label>
+                                </div>
+                            </Form.Group>
+                        )}
                     </Alert>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button
                         variant="danger"
                         onClick={confirmUpdateCancel}
-                        disabled={!reason || !description}
+                        disabled={
+                            !reason ||
+                            !description ||
+                            (!flagModalFouth && obj.isPending)
+                        }
                     >
                         Xác nhận
                     </Button>

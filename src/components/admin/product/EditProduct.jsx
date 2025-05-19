@@ -13,8 +13,6 @@ const EditProduct = () => {
     const [sale, setSale] = useState([]);
     const [category, setCategory] = useState([]);
     const [item, setItem] = useState();
-    // const [attributes, setAttributes] = useState([]);
-    // const [flag, setFlag] = useState([]);
     const { id } = useParams();
     const history = useHistory();
     const [image, setImage] = useState([]);
@@ -166,6 +164,7 @@ const EditProduct = () => {
                 attributes: data.attributes.map((attribute) => {
                     return {
                         ...attribute,
+                        originPrice: +attribute.originPrice,
                         size: +attribute.size,
                         price: +attribute.price,
                         stock: +attribute.stock,
@@ -332,21 +331,6 @@ const EditProduct = () => {
                                     ))}
                                 </div>
                             </div>
-                            {/* <div className="col-12 mt-5 mb-5">
-                <label className="form-label mb-3">Loại sản phẩm</label> <br />
-                {cate && cate.map((i) => (
-                  <div className="col-2 form-check form-check-inline mr-5" key={i.id}>
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      value={i.id}
-                      defaultChecked={flag.includes(i.id)}  // Kiểm tra xem id của category này có trong flag không
-                      {...register("category", { required: true })}
-                    />
-                    <label className="form-check-label">{i.name}</label>
-                  </div>
-                ))}
-              </div> */}
 
                             <div className="mt-4">
                                 <label
@@ -491,24 +475,37 @@ const EditProduct = () => {
                                         className="border border-gray-200 py-4 px-2 rounded-2xl !mt-4 form-row"
                                     >
                                         <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">Size</label>
+                                            <label className="mb-2">
+                                                Giá nhập (Vnđ)
+                                            </label>
                                             <input
                                                 type="number"
                                                 className="form-control"
                                                 {...register(
-                                                    `attributes.${index}.size`,
+                                                    `attributes.${index}.originPrice`,
                                                     {
-                                                        // required: true,
-                                                        min: 36,
-                                                        max: 45,
+                                                        required:
+                                                            "Trường này không được để trống",
+                                                        min: {
+                                                            value: 1,
+                                                            message:
+                                                                "Giá sản phẩm phải lớn hơn 0",
+                                                        },
                                                     }
                                                 )}
                                             />
-                                            {errors.attribute && (
-                                                <p className="text-danger mt-2">
-                                                    Size giày trong khoảng 36-45
-                                                </p>
-                                            )}
+                                            {Object.keys(errors).length > 0 &&
+                                                errors.attributes[index]
+                                                    .originPrice && (
+                                                    <p className="text-danger mt-2">
+                                                        {
+                                                            errors.attributes[
+                                                                index
+                                                            ].originPrice
+                                                                .message
+                                                        }
+                                                    </p>
+                                                )}
                                         </div>
                                         <div className="form-group col-md-12 mb-3">
                                             <label className="mb-2">
@@ -520,16 +517,63 @@ const EditProduct = () => {
                                                 {...register(
                                                     `attributes.${index}.price`,
                                                     {
-                                                        required: true,
-                                                        min: 1,
+                                                        required:
+                                                            "Trường này không được để trống",
+                                                        min: {
+                                                            value: 1,
+                                                            message:
+                                                                "Giá sản phẩm phải lớn hơn 0",
+                                                        },
                                                     }
                                                 )}
                                             />
-                                            {errors.price1 && (
-                                                <p className="text-danger mt-2">
-                                                    Giá sản phẩm lớn hơn 0
-                                                </p>
-                                            )}
+                                            {Object.keys(errors).length > 0 &&
+                                                errors.attributes[index]
+                                                    .price && (
+                                                    <p className="text-danger mt-2">
+                                                        {
+                                                            errors.attributes[
+                                                                index
+                                                            ].price.message
+                                                        }
+                                                    </p>
+                                                )}
+                                        </div>
+
+                                        <div className="form-group col-md-12 mb-3">
+                                            <label className="mb-2">Size</label>
+                                            <input
+                                                type="number"
+                                                className="form-control"
+                                                {...register(
+                                                    `attributes.${index}.size`,
+                                                    {
+                                                        required:
+                                                            "Trường này không được để trống",
+                                                        min: {
+                                                            value: 36,
+                                                            message:
+                                                                "Size phải lớn hơn hoặc bằng 36",
+                                                        },
+                                                        max: {
+                                                            value: 45,
+                                                            message:
+                                                                "Size phải nhỏ hơn hoặc bằng 45",
+                                                        },
+                                                    }
+                                                )}
+                                            />
+                                            {Object.keys(errors).length > 0 &&
+                                                errors.attributes[index]
+                                                    .size && (
+                                                    <p className="text-danger mt-2">
+                                                        {
+                                                            errors.attributes[
+                                                                index
+                                                            ].size.message
+                                                        }
+                                                    </p>
+                                                )}
                                         </div>
                                         <div className="form-group col-md-12">
                                             <label className="mb-2">
@@ -541,16 +585,27 @@ const EditProduct = () => {
                                                 {...register(
                                                     `attributes.${index}.stock`,
                                                     {
-                                                        required: true,
-                                                        min: 1,
+                                                        required:
+                                                            "Trường này không được để trống",
+                                                        min: {
+                                                            value: 1,
+                                                            message:
+                                                                "Số lượng phải lớn hơn hoặc bằng 1",
+                                                        },
                                                     }
                                                 )}
                                             />
-                                            {errors.quantity1 && (
-                                                <p className="text-danger mt-2">
-                                                    Số lượng sản phẩm lớn hơn 1
-                                                </p>
-                                            )}
+                                            {Object.keys(errors).length > 0 &&
+                                                errors.attributes[index]
+                                                    .stock && (
+                                                    <p className="text-danger mt-2">
+                                                        {
+                                                            errors.attributes[
+                                                                index
+                                                            ].stock.message
+                                                        }
+                                                    </p>
+                                                )}
                                         </div>
                                     </div>
                                 );

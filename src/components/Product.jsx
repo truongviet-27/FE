@@ -10,6 +10,7 @@ import { NavLink } from "react-router-dom";
 import { Collapse } from "antd";
 import "./sidebar/sidebar.css";
 import { toast } from "react-toastify";
+import { Rating } from "react-simple-star-rating";
 
 const { Panel } = Collapse;
 const prices = [
@@ -328,7 +329,7 @@ const Product = (props) => {
                                             </div>
                                             <div className="position-absolute right-6 text-[#EE4D2D] bg-[#FEEEEA] flex items-center px-2 py-1 text-[14px] font-medium">
                                                 <span className="ml-1">
-                                                    Đã bán 12
+                                                    Đã bán {item?.sumOrder ?? 0}
                                                 </span>
                                             </div>
 
@@ -390,7 +391,7 @@ const Product = (props) => {
                                                         </div>
                                                     </div>
 
-                                                    <div className="flex gap-3 mb-1 items-center pr-4 py-2 rounded-2xl text-[#EE4D2D]">
+                                                    <div className="flex gap-3 mb-1 items-center pr-4 pt-1 rounded-2xl text-[#EE4D2D]">
                                                         <div className="flex gap-2">
                                                             <span className="font-medium text-[16px]">
                                                                 {(
@@ -446,27 +447,22 @@ const Product = (props) => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <p className="text-warning d-flex align-items-center mb-3">
-                                                    <i
-                                                        className="fa fa-star"
-                                                        aria-hidden="true"
-                                                    ></i>
-                                                    <i
-                                                        className="fa fa-star"
-                                                        aria-hidden="true"
-                                                    ></i>
-                                                    <i
-                                                        className="fa fa-star"
-                                                        aria-hidden="true"
-                                                    ></i>
-                                                    <i
-                                                        className="fa fa-star"
-                                                        aria-hidden="true"
-                                                    ></i>
-                                                    <i
-                                                        className="fa fa-star"
-                                                        aria-hidden="true"
-                                                    ></i>
+                                                <p className="text-warning d-flex align-items-center mb-2">
+                                                    <Rating
+                                                        initialValue={
+                                                            item.rating ?? 5
+                                                        }
+                                                        size={16}
+                                                        transition
+                                                        allowFraction={true}
+                                                        SVGstyle={{
+                                                            display:
+                                                                "inline-block",
+                                                        }}
+                                                        fillColor="#f59e0b"
+                                                        emptyColor="#9ca3af"
+                                                        readonly={true}
+                                                    />
                                                 </p>
                                                 <div className="mb-0">
                                                     <span>{item?.name}</span>

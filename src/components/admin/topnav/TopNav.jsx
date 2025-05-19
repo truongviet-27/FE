@@ -42,27 +42,27 @@ const TopNav = (props) => {
     );
 
     const loadData = async () => {
-        await loadNotification()
-            .then((resp) => setNotifications(resp.data))
-            .catch((error) => console.log(error));
+        // await loadNotification()
+        //     .then((resp) => setNotifications(resp.data))
+        //     .catch((error) => console.log(error));
 
-        await pushNotification()
-            .then((resp) => {
-                resp.data.map((item) =>
-                    item.type == 1
-                        ? toast.info(item.content)
-                        : toast.warning(item.content)
-                );
-            })
-            .catch((error) => console.log(error));
+        // await pushNotification()
+        //     .then((resp) => {
+        //         resp.data.map((item) =>
+        //             item.type == 1
+        //                 ? toast.info(item.content)
+        //                 : toast.warning(item.content)
+        //         );
+        //     })
+        //     .catch((error) => console.log(error));
     };
     useEffect(() => {
         window.setInterval(loadData, 10000);
     }, []);
     const readHandler = (id) => {
-        readNotification(id)
-            .then(() => console.log(id))
-            .catch((error) => console.log(error));
+        // readNotification(id)
+        //     .then(() => console.log(id))
+        //     .catch((error) => console.log(error));
     };
 
     const renderUserToggle = (user) => (
@@ -104,7 +104,7 @@ const TopNav = (props) => {
     };
 
     return (
-        <div className="topnav border-b border-gray-300 !justify-end">
+        <div className="topnav border-b border-gray-300 !justify-end !h-[80px]">
             <div className="topnav__right">
                 <div className="topnav__right-item">
                     {/* dropdown here */}

@@ -114,6 +114,7 @@ const OrderDetail = (props) => {
     };
 
     const handleShowThird = (orderDetailId, attributeId, productId) => {
+        console.log("xxxxxxxxxxxxx");
         getReviewAttributeByOrderDetailId(orderDetailId)
             .then((res) => {
                 if (res.data.data) {
@@ -139,8 +140,8 @@ const OrderDetail = (props) => {
         setPaymentMethod(method);
         if (method === "VNPAY") {
             generatePaymentUrl({ orderId })
-                .then(() => {
-                    console.log("Redirect trang thanh toán");
+                .then((res) => {
+                    window.location.href = res.data.data;
                 })
                 .catch((err) => toast.error(err.message));
             handleCloseModal();
@@ -251,8 +252,7 @@ const OrderDetail = (props) => {
                                                         handleShowThird(
                                                             item._id,
                                                             item.attribute._id,
-                                                            item.attribute
-                                                                .product._id
+                                                            item.product._id
                                                         );
                                                     }}
                                                 >
@@ -474,7 +474,7 @@ const OrderDetail = (props) => {
                                     initialValue={rating}
                                     size={40}
                                     transition
-                                    allowFraction
+                                    allowFraction={false}
                                     SVGstyle={{ display: "inline-block" }}
                                     fillColor="#f59e0b"
                                     emptyColor="#9ca3af"

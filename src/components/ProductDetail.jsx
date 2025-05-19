@@ -288,16 +288,35 @@ const ProductDetail = (props) => {
                                     <span>{item?.name.toUpperCase()} </span>
                                     <span className="">- {item?.code}</span>
                                 </div>
-
-                                <div className="mt-4">
+                                <div className="mt-2">
+                                    <Rating
+                                        initialValue={item.rating ?? 5}
+                                        size={20}
+                                        transition
+                                        allowFraction={true}
+                                        SVGstyle={{ display: "inline-block" }}
+                                        fillColor="#f59e0b"
+                                        emptyColor="#9ca3af"
+                                        readonly={true}
+                                    />
+                                </div>
+                                <div className="mt-3">
                                     <span className="font-medium">
                                         Mã SP: {item?.code}
                                     </span>
                                 </div>
                                 <div className="flex gap-10 mt-4">
-                                    <span className="font-medium">
-                                        Đã bán: {12} sản phẩm
-                                    </span>
+                                    <div className="flex gap-1 font-medium">
+                                        <span> Đã bán:</span>
+                                        <span>
+                                            {
+                                                item.attributes.find(
+                                                    (item) => item._id === flag
+                                                ).sumOrder
+                                            }
+                                        </span>
+                                        <span>sản phẩm</span>
+                                    </div>
                                     <span className="font-medium">
                                         Lượt xem: {item?.view} lượt
                                     </span>
@@ -456,9 +475,9 @@ const ProductDetail = (props) => {
                                 return (
                                     <div
                                         key={review._id}
-                                        className="flex items-start gap-3 border-b border-gray-300 py-4"
+                                        className="flex items-start gap-3 border-b border-gray-200 py-4"
                                     >
-                                        <div className="border w-[60px] h-[60px]">
+                                        <div className="border !border-gray-400 w-[60px] h-[60px] rounded-[50%] overflow-hidden">
                                             <img
                                                 src={review?.user?.avatar}
                                                 alt="User"
@@ -507,7 +526,7 @@ const ProductDetail = (props) => {
                                                 </div>
                                             </div>
 
-                                            <div className="flex flex-col gap-1 mt-4">
+                                            <div className="flex flex-col gap-1 mt-2">
                                                 <span className="font-medium">
                                                     Mô tả:
                                                 </span>

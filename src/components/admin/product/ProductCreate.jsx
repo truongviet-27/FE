@@ -12,11 +12,8 @@ import { createProduct } from "../../../api/ProductApi";
 const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 const ProductForm = () => {
-    const [count, setCount] = useState(1);
     const [brand, setBrand] = useState([]);
     const [sale, setSale] = useState([]);
-    const [category, setCategory] = useState([]);
-    const [images, setImages] = useState([]);
     const [base64Images, setBase64Images] = useState([]);
 
     const history = useHistory();
@@ -66,53 +63,6 @@ const ProductForm = () => {
             .catch((error) => console.log(error));
     }, []);
 
-    // const onFileChange = (event) => {
-    //     const files = Array.from(event.target.files);
-    //     console.log(files, "imagesxx");
-
-    //     const links = files.map((item) => item.name);
-    //     let flag = false;
-    //     for (let name of links) {
-    //         if (!name.includes(".jpg") && !name.includes(".png")) {
-    //             toast.warning("File ảnh không hợp lệ.");
-    //             setImages([]);
-    //             flag = true;
-    //             break;
-    //         }
-    //     }
-
-    //     if (!flag) {
-    //         const toBase64 = (file) =>
-    //             new Promise((resolve, reject) => {
-    //                 const reader = new FileReader();
-    //                 reader.readAsDataURL(file);
-    //                 reader.onload = () => resolve(reader.result);
-    //                 reader.onerror = (error) => reject(error);
-    //             });
-
-    //         Promise.all(files.map((file) => toBase64(file)))
-    //             .then((base64Images) => {
-    //                 if (
-    //                     Array.isArray(base64Images) &&
-    //                     base64Images.every(Boolean)
-    //                 ) {
-    //                     // setImages(base64Images);
-    //                     console.log(base64Images, "base64Images");
-    //                 } else {
-    //                     console.error(
-    //                         "Invalid base64Images result",
-    //                         base64Images
-    //                     );
-    //                     toast.error("Lỗi: dữ liệu ảnh không hợp lệ.");
-    //                 }
-    //             })
-    //             .catch((error) => {
-    //                 console.error("Error converting to base64:", error);
-    //                 toast.error("Lỗi khi xử lý file ảnh.");
-    //             });
-    //     }
-    // };
-
     const handleFileChange = async (event) => {
         const files = Array.from(event.target.files);
 
@@ -151,8 +101,9 @@ const ProductForm = () => {
                     attributes: data.attributes.map((attribute) => {
                         return {
                             ...attribute,
-                            size: +attribute.size,
+                            originPrice: +attribute.originPrice,
                             price: +attribute.price,
+                            size: +attribute.size,
                             stock: +attribute.stock,
                         };
                     }),
@@ -453,12 +404,77 @@ const ProductForm = () => {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-5 gap-4">
-                            {fieldsAttribute.map((item, index) => {
+                            {fieldsAttribute?.map((item, index) => {
                                 return (
                                     <div
                                         key={item.key}
                                         className="border border-gray-200 py-4 px-2 rounded-2xl !mt-4 form-row"
                                     >
+                                        <div className="form-group col-md-12 mb-3">
+                                            <label className="mb-2">
+                                                Giá nhập (VNĐ)
+                                            </label>
+                                            <input
+                                                type="number"
+                                                className="form-control"
+                                                {...register(
+                                                    `attributes.${index}.originPrice`,
+                                                    {
+                                                        required:
+                                                            "Trường này không được để trống",
+                                                        min: {
+                                                            value: 1,
+                                                            message:
+                                                                "Giá sản phẩm phải lớn hơn 0",
+                                                        },
+                                                    }
+                                                )}
+                                            />
+                                            {Object.keys(errors).length > 0 &&
+                                                errors?.attributes[index]
+                                                    ?.originPrice && (
+                                                    <p className="text-danger mt-2">
+                                                        {
+                                                            errors?.attributes[
+                                                                index
+                                                            ]?.originPrice
+                                                                ?.message
+                                                        }
+                                                    </p>
+                                                )}
+                                        </div>
+                                        <div className="form-group col-md-12 mb-3">
+                                            <label className="mb-2">
+                                                Giá (VNĐ)
+                                            </label>
+                                            <input
+                                                type="number"
+                                                className="form-control"
+                                                {...register(
+                                                    `attributes.${index}.price`,
+                                                    {
+                                                        required:
+                                                            "Trường này không được để trống",
+                                                        min: {
+                                                            value: 1,
+                                                            message:
+                                                                "Giá sản phẩm phải lớn hơn 0",
+                                                        },
+                                                    }
+                                                )}
+                                            />
+                                            {Object.keys(errors).length > 0 &&
+                                                errors?.attributes[index]
+                                                    ?.price && (
+                                                    <p className="text-danger mt-2">
+                                                        {
+                                                            errors?.attributes[
+                                                                index
+                                                            ]?.price?.message
+                                                        }
+                                                    </p>
+                                                )}
+                                        </div>
                                         <div className="form-group col-md-12 mb-3">
                                             <label className="mb-2">Size</label>
                                             <input
@@ -466,10 +482,20 @@ const ProductForm = () => {
                                                 className="form-control"
                                                 {...register(
                                                     `attributes.${index}.size`,
+
                                                     {
-                                                        required: true,
-                                                        min: 36,
-                                                        max: 45,
+                                                        required:
+                                                            "Trường này không được để trống",
+                                                        min: {
+                                                            value: 36,
+                                                            message:
+                                                                "Size phải lớn hơn hoặc bằng 36",
+                                                        },
+                                                        max: {
+                                                            value: 45,
+                                                            message:
+                                                                "Size phải nhỏ hơn hoặc bằng 45",
+                                                        },
                                                         validate: (value) =>
                                                             getValues(
                                                                 "attributes"
@@ -485,34 +511,19 @@ const ProductForm = () => {
                                                     }
                                                 )}
                                             />
-                                            {errors?.attributes?.message && (
-                                                <p className="text-danger mt-2">
-                                                    {/* {errors.attributes.message} */}
-                                                    Size giày trong khoảng 36-45
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="form-group col-md-12 mb-3">
-                                            <label className="mb-2">
-                                                Giá(Vnđ)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                {...register(
-                                                    `attributes.${index}.price`,
-                                                    {
-                                                        required: true,
-                                                        min: 1,
-                                                    }
+                                            {Object.keys(errors).length > 0 &&
+                                                errors?.attributes[index]
+                                                    ?.size && (
+                                                    <p className="text-danger mt-2">
+                                                        {
+                                                            errors?.attributes[
+                                                                index
+                                                            ]?.size?.message
+                                                        }
+                                                    </p>
                                                 )}
-                                            />
-                                            {errors.price1 && (
-                                                <p className="text-danger mt-2">
-                                                    Giá sản phẩm lớn hơn 0
-                                                </p>
-                                            )}
                                         </div>
+
                                         <div className="form-group col-md-12">
                                             <label className="mb-2">
                                                 Số lượng
@@ -523,16 +534,27 @@ const ProductForm = () => {
                                                 {...register(
                                                     `attributes.${index}.stock`,
                                                     {
-                                                        required: true,
-                                                        min: 1,
+                                                        required:
+                                                            "Trường này không được để trống",
+                                                        min: {
+                                                            value: 1,
+                                                            message:
+                                                                "Số lượng phải lớn hơn hoặc bằng 1",
+                                                        },
                                                     }
                                                 )}
                                             />
-                                            {errors.quantity1 && (
-                                                <p className="text-danger mt-2">
-                                                    Số lượng sản phẩm lớn hơn 1
-                                                </p>
-                                            )}
+                                            {Object.keys(errors).length > 0 &&
+                                                errors?.attributes[index]
+                                                    ?.stock && (
+                                                    <p className="text-danger mt-2">
+                                                        {
+                                                            errors?.attributes[
+                                                                index
+                                                            ]?.stock?.message
+                                                        }
+                                                    </p>
+                                                )}
                                         </div>
                                     </div>
                                 );

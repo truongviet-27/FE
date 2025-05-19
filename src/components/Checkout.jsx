@@ -205,8 +205,8 @@ const Checkout = (props) => {
             createOrder(order)
                 .then((res) => {
                     generatePaymentUrl({ orderId: res.data.data._id })
-                        .then(() => {
-                            console.log("Redirect trang thanh toán");
+                        .then((res) => {
+                            window.location.href = res.data.data;
                         })
                         .catch((err) => toast.error(err.message));
                 })
