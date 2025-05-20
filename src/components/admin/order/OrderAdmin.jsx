@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 import {
     getAllOrderAndPagination,
     getAllOrderStatus,
-    getAllOrdersByPayment,
     getOrderById,
     getOrderByOrderStatusAndYearAndMonth,
     getOrderDetailByOrderId,
@@ -17,11 +16,12 @@ import {
     updateShip,
     updateSuccess,
 } from "../../../api/OrderApi";
+import { getAllShipments } from "../../../api/Shipment";
+import { orderStatus } from "../../../enum/active";
 import formatDate from "../../../utils/convertDate";
 import Badge from "../badge/Badge";
 import "../table/table.css";
-import { getAllShipments } from "../../../api/Shipment";
-import { orderStatus } from "../../../enum/active";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 const pendingStatus = {
     true: "success",
@@ -57,6 +57,8 @@ const Order = () => {
     const [temp, setTemp] = useState();
     const [attribute, setAttribute] = useState([]);
     const [size, setSize] = useState(10);
+
+    const history = useHistory();
 
     const { register, handleSubmit, setValue, getValues, watch, reset } =
         useForm({
@@ -207,6 +209,8 @@ const Order = () => {
     }, [
         page,
         size,
+        watch("year"),
+        watch("month"),
         watch("status"),
         watch("payment"),
         watch("from"),
@@ -214,22 +218,43 @@ const Order = () => {
     ]);
 
     const onLoad = () => {
-        getAllOrderAndPagination(
-            getValues("status"),
-            getValues("payment"),
-            getValues("from"),
-            getValues("to"),
-            page,
-            size
-        )
-            .then((res) => {
-                setOrders(res.data.content);
-                setTotal(res.data.totalPages);
-            })
-            .catch((error) => {
-                console.log(error);
-                toast.error(error.response.data.message);
-            });
+        if (
+            (getValues("year") &&
+                getValues("status") &&
+                getValues("payment")) ||
+            (getValues("month") && getValues("status") && getValues("payment"))
+        ) {
+            getOrderByOrderStatusAndYearAndMonth(
+                getValues("status"),
+                getValues("payment"),
+                getValues("year"),
+                getValues("month"),
+                page,
+                size
+            )
+                .then((res) => {
+                    setOrders(res.data.content);
+                    setTotal(res.data.totalPages);
+                })
+                .catch((error) => toast.error(error.response.data.message));
+        } else {
+            getAllOrderAndPagination(
+                getValues("status"),
+                getValues("payment"),
+                getValues("from"),
+                getValues("to"),
+                page,
+                size
+            )
+                .then((res) => {
+                    setOrders(res.data.content);
+                    setTotal(res.data.totalPages);
+                })
+                .catch((error) => {
+                    console.log(error);
+                    toast.error(error.response.data.message);
+                });
+        }
     };
 
     useEffect(() => {
@@ -445,26 +470,28 @@ const Order = () => {
     };
 
     useEffect(() => {
-        if (
-            (getValues("year") &&
-                getValues("status") &&
-                getValues("payment")) ||
-            (getValues("month") && getValues("status") && getValues("payment"))
-        ) {
-            getOrderByOrderStatusAndYearAndMonth(
-                getValues("status"),
-                getValues("payment"),
-                getValues("year"),
-                getValues("month"),
-                page,
-                size
-            )
-                .then((res) => {
-                    setOrders(res.data.content);
-                    setTotal(res.data.totalPages);
-                })
-                .catch((error) => toast.error(error.response.data.message));
-        }
+        // if (
+        //     (getValues("year") &&
+        //         getValues("status") &&
+        //         getValues("payment")) ||
+        //     (getValues("month") && getValues("status") && getValues("payment"))
+        // ) {
+        //     getOrderByOrderStatusAndYearAndMonth(
+        //         getValues("status"),
+        //         getValues("payment"),
+        //         getValues("year"),
+        //         getValues("month"),
+        //         page,
+        //         size
+        //     )
+        //         .then((res) => {
+        //             setOrders(res.data.content);
+        //             setTotal(res.data.totalPages);
+        //         })
+        //         .catch((error) => toast.error(error.response.data.message));
+        // } else {
+        //     onLoad();
+        // }
     }, [
         page,
         size,
@@ -546,6 +573,11 @@ const Order = () => {
                                 <select
                                     className="form-control"
                                     {...register("year")}
+                                    onChange={(e) => {
+                                        setValue("year", e.target.value);
+                                        setValue("from", "");
+                                        setValue("to", "");
+                                    }}
                                 >
                                     <option value="">Chọn năm</option>
                                     <option value="2023">2023</option>
@@ -557,6 +589,11 @@ const Order = () => {
                                 <select
                                     className="form-control"
                                     {...register("month")}
+                                    onChange={(e) => {
+                                        setValue("month", e.target.value);
+                                        setValue("from", "");
+                                        setValue("to", "");
+                                    }}
                                 >
                                     <option value="">Chọn tháng</option>
                                     {months?.map((item, index) => (
@@ -575,6 +612,11 @@ const Order = () => {
                                     id=""
                                     className="border w-full !rounded-[6px] !text-[15px]"
                                     {...register("from")}
+                                    onChange={(e) => {
+                                        setValue("from", e.target.value);
+                                        setValue("year", "");
+                                        setValue("month", "");
+                                    }}
                                 />
                             </div>
 
@@ -585,6 +627,11 @@ const Order = () => {
                                     id=""
                                     className="border w-full !rounded-[6px] !text-[15px]"
                                     {...register("to")}
+                                    onChange={(e) => {
+                                        setValue("to", e.target.value);
+                                        setValue("year", "");
+                                        setValue("month", "");
+                                    }}
                                 />
                             </div>
                             <div className="col-sm-4 mt-2">
@@ -728,244 +775,218 @@ const Order = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {orders
-                                                // .filter((order) => {
-                                                //   // Lọc theo phương thức thanh toán "CHUYỂN KHOẢN QUA VNPAY"
-                                                //   if (paymentMethod === "CHUYỂN KHOẢN QUA VNPAY") {
-                                                //     return (
-                                                //       ["Đang xử lí", "Đang vận chuyển", "Đã giao", "Đã hủy"].includes(
-                                                //         order.orderStatusName
-                                                //       )
-                                                //     );
-                                                //   }
-                                                //   return true; // Hiển thị tất cả trạng thái nếu không chọn VNPAY
-                                                // })
-                                                ?.map((item, index) => {
-                                                    const currentIndex =
-                                                        orderStatuses?.findIndex(
-                                                            (s) =>
-                                                                s.code ===
-                                                                item
-                                                                    ?.orderStatus
-                                                                    ?.code
-                                                        );
-                                                    return (
-                                                        <tr key={item._id}>
-                                                            <td
-                                                                className="text-center align-middle font-bold"
-                                                                scope="row"
-                                                            >
-                                                                <NavLink
-                                                                    to={`/admin/detail-order/${item._id}`}
-                                                                    exact
-                                                                >
-                                                                    {index +
-                                                                        1 +
-                                                                        page *
-                                                                            size}
-                                                                </NavLink>
-                                                            </td>
-                                                            <td className="text-center align-middle">
-                                                                {formatDate(
-                                                                    item.createdAt,
-                                                                    true
+                                            {orders?.map((item, index) => {
+                                                const currentIndex =
+                                                    orderStatuses?.findIndex(
+                                                        (s) =>
+                                                            s.code ===
+                                                            item?.orderStatus
+                                                                ?.code
+                                                    );
+                                                return (
+                                                    <tr key={item._id}>
+                                                        <td
+                                                            className="text-center align-middle font-medium hover:!text-blue-600"
+                                                            scope="row"
+                                                            onClick={() => {
+                                                                history.push(
+                                                                    `/admin/detail-order/${item._id}`
+                                                                );
+                                                            }}
+                                                        >
+                                                            {index +
+                                                                1 +
+                                                                page * size}
+                                                        </td>
+                                                        <td className="text-center align-middle font-medium">
+                                                            {formatDate(
+                                                                item.createdAt,
+                                                                true
+                                                            )}
+                                                        </td>
+                                                        <td className="text-center align-middle font-medium">
+                                                            {item.payment
+                                                                ? item.payment
+                                                                : "Chưa chọn phương thức thanh toán"}
+                                                        </td>
+                                                        <td className="text-center align-middle font-medium">
+                                                            <Badge
+                                                                type={
+                                                                    pendingStatus[
+                                                                        item
+                                                                            .isPayment
+                                                                    ]
+                                                                }
+                                                                content={
+                                                                    item.isPayment
+                                                                        ? "Đã thanh toán"
+                                                                        : item.isPayment ===
+                                                                          false
+                                                                        ? "Chưa thanh toán"
+                                                                        : "Hoàn tiền"
+                                                                }
+                                                            />
+                                                        </td>
+                                                        <td className="text-center align-middle font-medium">
+                                                            {item.total.toLocaleString()}{" "}
+                                                            ₫
+                                                        </td>
+                                                        {
+                                                            <td className="text-center align-middle font-medium">
+                                                                {item.payment !==
+                                                                    "VNPAY" && (
+                                                                    <input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        name={
+                                                                            index
+                                                                        }
+                                                                        checked={
+                                                                            item
+                                                                                .orderStatus
+                                                                                .code ==
+                                                                            "PENDING_CONFIRM"
+                                                                        }
+                                                                        value="COD"
+                                                                        disabled={
+                                                                            0 <
+                                                                            currentIndex
+                                                                        }
+                                                                    />
                                                                 )}
                                                             </td>
-                                                            <td className="text-center align-middle">
-                                                                {item.payment
-                                                                    ? item.payment
-                                                                    : "Chưa chọn phương thức thanh toán"}
-                                                            </td>
-                                                            <td className="text-center align-middle">
-                                                                <Badge
-                                                                    type={
-                                                                        pendingStatus[
-                                                                            item
-                                                                                .isPayment
-                                                                        ]
-                                                                    }
-                                                                    content={
-                                                                        item.isPayment
-                                                                            ? "Đã thanh toán"
-                                                                            : item.isPayment ===
-                                                                              false
-                                                                            ? "Chưa thanh toán"
-                                                                            : "Hoàn tiền"
-                                                                    }
-                                                                />
-                                                            </td>
-                                                            <td className="text-center align-middle">
-                                                                {item.total.toLocaleString()}{" "}
-                                                                ₫
-                                                            </td>
-                                                            {
-                                                                <td className="text-center align-middle">
-                                                                    {item.payment !==
-                                                                        "VNPAY" && (
-                                                                        <input
-                                                                            className="form-check-input"
-                                                                            type="radio"
-                                                                            name={
-                                                                                index
-                                                                            }
-                                                                            checked={
-                                                                                item
-                                                                                    .orderStatus
-                                                                                    .code ==
-                                                                                "PENDING_CONFIRM"
-                                                                            }
-                                                                            value="COD"
-                                                                            disabled={
-                                                                                0 <
-                                                                                currentIndex
-                                                                            }
-                                                                        />
-                                                                    )}
-                                                                </td>
-                                                            }
-                                                            <td className="text-center align-middle">
-                                                                <input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    name={index}
-                                                                    checked={
+                                                        }
+                                                        <td className="text-center align-middle font-medium">
+                                                            <input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                name={index}
+                                                                checked={
+                                                                    item
+                                                                        .orderStatus
+                                                                        .code ===
+                                                                    "PROCESSING"
+                                                                }
+                                                                value="PROCESSING"
+                                                                onChange={(e) =>
+                                                                    updateStatusHandlerFirst(
+                                                                        item._id,
+                                                                        e.target
+                                                                            .value,
+                                                                        item.payment,
+                                                                        item.isPending
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    1 <
+                                                                    currentIndex
+                                                                }
+                                                            />
+                                                        </td>
+                                                        <td className="text-center align-middle font-medium">
+                                                            <input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                name={index}
+                                                                checked={
+                                                                    item
+                                                                        .orderStatus
+                                                                        .code ===
+                                                                    "SHIPPING"
+                                                                }
+                                                                value="SHIPPING"
+                                                                onChange={(e) =>
+                                                                    updateStatusHandlerSecond(
+                                                                        item._id,
+                                                                        e.target
+                                                                            .value,
+                                                                        item.payment,
+                                                                        item.isPending
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    (item
+                                                                        .orderStatus
+                                                                        .code !==
+                                                                        "PROCESSING" &&
                                                                         item
                                                                             .orderStatus
-                                                                            .code ===
-                                                                        "PROCESSING"
-                                                                    }
-                                                                    value="PROCESSING"
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        updateStatusHandlerFirst(
-                                                                            item._id,
-                                                                            e
-                                                                                .target
-                                                                                .value,
-                                                                            item.payment,
-                                                                            item.isPending
-                                                                        )
-                                                                    }
-                                                                    disabled={
-                                                                        1 <
+                                                                            .code !==
+                                                                            "SHIPPING") ||
+                                                                    2 <
                                                                         currentIndex
-                                                                    }
-                                                                />
-                                                            </td>
-                                                            <td className="text-center align-middle">
-                                                                <input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    name={index}
-                                                                    checked={
+                                                                }
+                                                            />
+                                                        </td>
+                                                        <td className="text-center align-middle font-medium">
+                                                            <input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                name={index}
+                                                                checked={
+                                                                    item
+                                                                        .orderStatus
+                                                                        .code ===
+                                                                    "DELIVERED"
+                                                                }
+                                                                value="DELIVERED"
+                                                                onChange={(e) =>
+                                                                    updateStatusHandlerThird(
+                                                                        item._id,
+                                                                        e.target
+                                                                            .value,
+                                                                        item.payment,
+                                                                        item.isPending
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    (item
+                                                                        .orderStatus
+                                                                        .code !==
+                                                                        "SHIPPING" &&
                                                                         item
-                                                                            .orderStatus
-                                                                            .code ===
-                                                                        "SHIPPING"
-                                                                    }
-                                                                    value="SHIPPING"
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        updateStatusHandlerSecond(
-                                                                            item._id,
-                                                                            e
-                                                                                .target
-                                                                                .value,
-                                                                            item.payment,
-                                                                            item.isPending
-                                                                        )
-                                                                    }
-                                                                    disabled={
-                                                                        (item
                                                                             .orderStatus
                                                                             .code !==
-                                                                            "PROCESSING" &&
-                                                                            item
-                                                                                .orderStatus
-                                                                                .code !==
-                                                                                "SHIPPING") ||
-                                                                        2 <
-                                                                            currentIndex
-                                                                    }
-                                                                />
-                                                            </td>
-                                                            <td className="text-center align-middle">
-                                                                <input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    name={index}
-                                                                    checked={
-                                                                        item
-                                                                            .orderStatus
-                                                                            .code ===
-                                                                        "DELIVERED"
-                                                                    }
-                                                                    value="DELIVERED"
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        updateStatusHandlerThird(
-                                                                            item._id,
-                                                                            e
-                                                                                .target
-                                                                                .value,
-                                                                            item.payment,
-                                                                            item.isPending
-                                                                        )
-                                                                    }
-                                                                    disabled={
-                                                                        (item
-                                                                            .orderStatus
-                                                                            .code !==
-                                                                            "SHIPPING" &&
-                                                                            item
-                                                                                .orderStatus
-                                                                                .code !==
-                                                                                "DELIVERED") ||
-                                                                        3 <
-                                                                            currentIndex
-                                                                    }
-                                                                />
-                                                            </td>
-                                                            <td className="text-center align-middle">
-                                                                <input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    name={index}
-                                                                    checked={
-                                                                        item
-                                                                            .orderStatus
-                                                                            .code ===
-                                                                        "CANCELLED"
-                                                                    }
-                                                                    value="CANCELLED"
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        updateStatusHandlerFouth(
-                                                                            item._id,
-                                                                            e
-                                                                                .target
-                                                                                .value,
-                                                                            item.payment,
-                                                                            item.isPending
-                                                                        )
-                                                                    }
-                                                                    disabled={
-                                                                        item
-                                                                            .orderStatus
-                                                                            .code ===
-                                                                            "DELIVERED" ||
-                                                                        4 <
-                                                                            currentIndex
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                })}
+                                                                            "DELIVERED") ||
+                                                                    3 <
+                                                                        currentIndex
+                                                                }
+                                                            />
+                                                        </td>
+                                                        <td className="text-center align-middle font-medium">
+                                                            <input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                name={index}
+                                                                checked={
+                                                                    item
+                                                                        .orderStatus
+                                                                        .code ===
+                                                                    "CANCELLED"
+                                                                }
+                                                                value="CANCELLED"
+                                                                onChange={(e) =>
+                                                                    updateStatusHandlerFouth(
+                                                                        item._id,
+                                                                        e.target
+                                                                            .value,
+                                                                        item.payment,
+                                                                        item.isPending
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    item
+                                                                        .orderStatus
+                                                                        .code ===
+                                                                        "DELIVERED" ||
+                                                                    4 <
+                                                                        currentIndex
+                                                                }
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
                                         </tbody>
                                     </table>
                                 </div>
@@ -1068,17 +1089,17 @@ const Order = () => {
                             <span>{temp?.address}</span>
                         </div>
                         <p className="font-bold">Sản phẩm mua:</p>
-                        <div className="flex flex-col gap-2 !ml-3">
+                        <div className="flex flex-col gap-2">
                             {attribute?.map((item, index) => (
                                 <div
                                     key={item._id}
-                                    className="flex items-center gap-2 border-b border-gray-300 pb-2"
+                                    className="flex items-center gap-4 border-b border-gray-300 pb-2"
                                 >
                                     <div className="border border-gray-400">
                                         <img
-                                            src=""
+                                            src={item?.imageUrls[0]?.url}
                                             alt="Ảnh"
-                                            className="!w-[70px] !h-[70px]"
+                                            className="!w-[70px] !h-[70px] rounded-[6px]"
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1">
@@ -1086,9 +1107,7 @@ const Order = () => {
                                             <span className="font-bold min-w-[110px]">
                                                 Tên sản phẩm:
                                             </span>
-                                            <span>
-                                                {item.attribute.product.name}
-                                            </span>
+                                            <span>{item.product.name}</span>
                                         </div>
                                         <div className="flex gap-2">
                                             <span className="font-bold min-w-[110px]">

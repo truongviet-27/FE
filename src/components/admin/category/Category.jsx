@@ -139,21 +139,21 @@ const Category = () => {
                         {category?.map((item, index) => (
                             <tr key={index}>
                                 <td
-                                    className="text-center align-middle font-bold"
+                                    className="text-center align-middle font-medium"
                                     scope="row"
                                 >
                                     {index + 1 + page * size}
                                 </td>
-                                <td className="text-center align-middle">
+                                <td className="text-center align-middle font-medium">
                                     {item.name}
                                 </td>
-                                <td className="text-center align-middle">
+                                <td className="text-center align-middle font-medium">
                                     {item.description}
                                 </td>
-                                <td className="text-center align-middle">
+                                <td className="text-center align-middle font-medium">
                                     {formatDate(item.createdAt)}
                                 </td>
-                                <td className="text-center align-middle">
+                                <td className="text-center align-middle font-medium">
                                     <Badge
                                         type={active[item.isActive]}
                                         content={
@@ -163,7 +163,7 @@ const Category = () => {
                                         }
                                     />
                                 </td>
-                                <td className="text-center align-middle">
+                                <td className="text-center align-middle font-medium">
                                     <NavLink
                                         to={`/admin/category/category-detail/${item._id}`}
                                         exact

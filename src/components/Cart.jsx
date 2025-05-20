@@ -289,7 +289,14 @@ const Cart = (props) => {
                                             />
                                         </div>
                                     </td>
-                                    <td className="text-center align-middle font-bold">
+                                    <td
+                                        className="text-center align-middle font-bold hover:!text-blue-600"
+                                        onClick={() => {
+                                            history.push(
+                                                `/product-detail/${item.product._id}`
+                                            );
+                                        }}
+                                    >
                                         {item?.product?.name}
                                     </td>
                                     <td className="text-center align-middle font-bold">

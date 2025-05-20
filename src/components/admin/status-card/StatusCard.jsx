@@ -3,8 +3,9 @@ import "./status-card.css";
 const StatusCard = (props) => {
     return (
         <div
-            className="status-card !pr-10 lg:!pr-20 2xl:!pr-30 lg:!pl-10  flex justify-between"
+            className="status-card !pr-10 lg:!pr-20 2xl:!pr-20 lg:!pl-10  flex justify-between"
             onClick={props.onClick}
+            onBlur={props.onBlur}
             style={{ cursor: "pointer" }}
         >
             <div className="status-card__icon">

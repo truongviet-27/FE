@@ -144,24 +144,24 @@ const Voucher = () => {
                         {voucher?.map((item, index) => (
                             <tr key={index}>
                                 <td
-                                    className="text-center align-middle font-bold"
+                                    className="text-center align-middle font-medium"
                                     scope="row"
                                 >
                                     {index + 1 + page * size}
                                 </td>
-                                <td className="text-center align-middle">
+                                <td className="text-center align-middle font-medium">
                                     {item.code}
                                 </td>
-                                <td className="text-center align-middle">
+                                <td className="text-center align-middle font-medium">
                                     {item.discount}
                                 </td>
-                                <td className="text-center align-middle">
+                                <td className="text-center align-middle font-medium">
                                     {item.count}
                                 </td>
-                                <td className="text-center align-middle">
+                                <td className="text-center align-middle font-medium">
                                     {formatDate(item.expireDate, true)}
                                 </td>
-                                <td className="text-center align-middle">
+                                <td className="text-center align-middle font-medium">
                                     <Badge
                                         type={active[item.isActive]}
                                         content={
@@ -171,7 +171,7 @@ const Voucher = () => {
                                         }
                                     />
                                 </td>
-                                <td className="text-center align-middle">
+                                <td className="text-center align-middle font-medium">
                                     <NavLink
                                         to={`/admin/voucher/voucher-detail/${item._id}`}
                                         exact

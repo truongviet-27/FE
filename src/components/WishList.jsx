@@ -6,6 +6,7 @@ import { getAllProductWishList } from "../api/ProductApi";
 import { NavLink } from "react-router-dom";
 import { getBrands } from "../api/BrandApi";
 import { toast } from "react-toastify";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 const WishList = () => {
     const [products, setProducts] = useState([]);
@@ -15,6 +16,8 @@ const WishList = () => {
     const handleClose = () => setShow(false);
     const [brand, setBrand] = useState([]);
     const [size, setSize] = useState(10);
+
+    const history = useHistory();
 
     useEffect(() => {
         onLoad();
@@ -134,16 +137,23 @@ const WishList = () => {
                                     <tr key={item._id}>
                                         <td
                                             scope="row"
-                                            className="text-center align-middle font-bold"
+                                            className="text-center align-middle font-bold hover:!text-blue-600"
+                                            onClick={() => {
+                                                history.push(
+                                                    `/product-detail/${item._id}`
+                                                );
+                                            }}
                                         >
-                                            <NavLink
-                                                to={`/product-detail/${item._id}`}
-                                                exact
-                                            >
-                                                {index + 1 + page * size}
-                                            </NavLink>
+                                            {index + 1 + page * size}
                                         </td>
-                                        <td className="text-center align-middle font-bold">
+                                        <td
+                                            className="text-center align-middle font-bold"
+                                            onClick={() => {
+                                                history.push(
+                                                    `/product-detail/${item._id}`
+                                                );
+                                            }}
+                                        >
                                             <div className="flex justify-center">
                                                 <img
                                                     className="img-fluid"
@@ -158,7 +168,14 @@ const WishList = () => {
                                                 />
                                             </div>
                                         </td>
-                                        <td className="text-center align-middle font-bold">
+                                        <td
+                                            className="text-center align-middle font-bold hover:!text-blue-600"
+                                            onClick={() => {
+                                                history.push(
+                                                    `/product-detail/${item._id}`
+                                                );
+                                            }}
+                                        >
                                             {item.name}
                                         </td>
                                         <td className="text-center align-middle font-bold">

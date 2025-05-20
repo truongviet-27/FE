@@ -249,39 +249,39 @@ const Account = () => {
                             {account?.map((item, index) => (
                                 <tr key={index}>
                                     <td
-                                        className="text-center align-middle font-bold"
+                                        className="text-center align-middle font-medium"
                                         scope="row"
                                     >
                                         {index + 1 + page * size}
                                     </td>
                                     <td
-                                        className="text-center align-middle"
+                                        className="text-center align-middle font-medium"
                                         scope="row"
                                     >
                                         {item.username}
                                     </td>
                                     <td
-                                        className="text-center align-middle"
+                                        className="text-center align-middle font-medium"
                                         style={{ width: "200px" }}
                                     >
                                         {item?.userDetail.fullName}
                                     </td>
-                                    <td className="text-center align-middle">
+                                    <td className="text-center align-middle font-medium">
                                         {item?.userDetail?.gender}
                                     </td>
-                                    <td className="text-center align-middle">
+                                    <td className="text-center align-middle font-medium">
                                         {item?.userDetail?.phone}
                                     </td>
-                                    <td className="text-center align-middle">
+                                    <td className="text-center align-middle font-medium">
                                         {item?.email}
                                     </td>
-                                    <td className="text-center align-middle">
+                                    <td className="text-center align-middle font-medium">
                                         <Badge
                                             type={roleName[item.role]}
                                             content={item.role}
                                         />
                                     </td>
-                                    <td className="text-center align-middle">
+                                    <td className="text-center align-middle font-medium">
                                         <Badge
                                             type={active[item.isActive]}
                                             content={
@@ -291,7 +291,7 @@ const Account = () => {
                                             }
                                         />
                                     </td>
-                                    <td className="text-center align-middle">
+                                    <td className="text-center align-middle font-medium">
                                         <NavLink
                                             to={`/admin/account/account-detail/${item._id}`}
                                             exact

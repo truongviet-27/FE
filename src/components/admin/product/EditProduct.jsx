@@ -494,15 +494,15 @@ const EditProduct = () => {
                                                     }
                                                 )}
                                             />
-                                            {Object.keys(errors).length > 0 &&
-                                                errors.attributes[index]
-                                                    .originPrice && (
+                                            {Object.keys(errors)?.length > 0 &&
+                                                errors?.attributes[index]
+                                                    ?.originPrice && (
                                                     <p className="text-danger mt-2">
                                                         {
-                                                            errors.attributes[
+                                                            errors?.attributes[
                                                                 index
-                                                            ].originPrice
-                                                                .message
+                                                            ]?.originPrice
+                                                                ?.message
                                                         }
                                                     </p>
                                                 )}
@@ -527,14 +527,14 @@ const EditProduct = () => {
                                                     }
                                                 )}
                                             />
-                                            {Object.keys(errors).length > 0 &&
-                                                errors.attributes[index]
-                                                    .price && (
+                                            {Object.keys(errors)?.length > 0 &&
+                                                errors?.attributes[index]
+                                                    ?.price && (
                                                     <p className="text-danger mt-2">
                                                         {
-                                                            errors.attributes[
+                                                            errors?.attributes[
                                                                 index
-                                                            ].price.message
+                                                            ]?.price?.message
                                                         }
                                                     </p>
                                                 )}
@@ -563,14 +563,14 @@ const EditProduct = () => {
                                                     }
                                                 )}
                                             />
-                                            {Object.keys(errors).length > 0 &&
-                                                errors.attributes[index]
-                                                    .size && (
+                                            {Object.keys(errors)?.length > 0 &&
+                                                errors?.attributes[index]
+                                                    ?.size && (
                                                     <p className="text-danger mt-2">
                                                         {
-                                                            errors.attributes[
+                                                            errors?.attributes[
                                                                 index
-                                                            ].size.message
+                                                            ]?.size?.message
                                                         }
                                                     </p>
                                                 )}
@@ -595,14 +595,14 @@ const EditProduct = () => {
                                                     }
                                                 )}
                                             />
-                                            {Object.keys(errors).length > 0 &&
-                                                errors.attributes[index]
-                                                    .stock && (
+                                            {Object.keys(errors)?.length > 0 &&
+                                                errors?.attributes[index]
+                                                    ?.stock && (
                                                     <p className="text-danger mt-2">
                                                         {
-                                                            errors.attributes[
+                                                            errors?.attributes[
                                                                 index
-                                                            ].stock.message
+                                                            ]?.stock?.message
                                                         }
                                                     </p>
                                                 )}

@@ -259,7 +259,7 @@ const Product = (props) => {
                                     {categories?.map((item, index) => (
                                         <button
                                             className={`!text-[14px] !px-4 text-black ${
-                                                categoryIds.includes(item?._id)
+                                                categoryIds?.includes(item?._id)
                                                     ? `!bg-neutral-300`
                                                     : ``
                                             }`}
@@ -346,6 +346,7 @@ const Product = (props) => {
                                             >
                                                 <img
                                                     src={
+                                                        item?.imageUrls &&
                                                         item?.imageUrls[0]?.url
                                                     }
                                                     alt="Product"
@@ -365,7 +366,7 @@ const Product = (props) => {
                                                                 {Math.min(
                                                                     ...item.attributes.map(
                                                                         (a) =>
-                                                                            a.price ??
+                                                                            a?.price ??
                                                                             0
                                                                     )
                                                                 ).toLocaleString()}{" "}
@@ -380,7 +381,7 @@ const Product = (props) => {
                                                                 {Math.max(
                                                                     ...item.attributes.map(
                                                                         (a) =>
-                                                                            a.price ??
+                                                                            a?.price ??
                                                                             0
                                                                     )
                                                                 ).toLocaleString()}{" "}
@@ -400,7 +401,7 @@ const Product = (props) => {
                                                                             (
                                                                                 a
                                                                             ) =>
-                                                                                a.price ??
+                                                                                a?.price ??
                                                                                 0
                                                                         )
                                                                     ) *
@@ -422,7 +423,7 @@ const Product = (props) => {
                                                                             (
                                                                                 a
                                                                             ) =>
-                                                                                a.price ??
+                                                                                a?.price ??
                                                                                 0
                                                                         )
                                                                     ) *
@@ -494,7 +495,7 @@ const Product = (props) => {
                                                                     item
                                                                         ?.likeQuantity
                                                                         ?.length
-                                                                }{" "}
+                                                                }
                                                             </span>
                                                         </div>
                                                     </div>

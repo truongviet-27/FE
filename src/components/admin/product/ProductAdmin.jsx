@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import Badge from "../badge/Badge";
 import { active } from "../../../enum/active";
 import { useForm } from "react-hook-form";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 const Product = () => {
     const [products, setProducts] = useState([]);
@@ -17,6 +18,8 @@ const Product = () => {
     const handleClose = () => setShow(false);
     const [brands, setBrands] = useState([]);
     const [size, setSize] = useState(10);
+
+    const history = useHistory();
 
     const { register, handleSubmit, getValues, setValue, watch } = useForm({
         defaultValues: {
@@ -224,26 +227,33 @@ const Product = () => {
                                 {products?.map((item, index) => (
                                     <tr key={index}>
                                         <td
-                                            className="text-center align-middle font-bold"
+                                            className="text-center align-middle font-medium hover:!text-blue-600"
                                             scope="row"
+                                            onClick={() => {
+                                                history.push(
+                                                    `/admin/product/product-view/${item._id}`
+                                                );
+                                            }}
                                         >
-                                            <NavLink
-                                                to={`/admin/product/product-view/${item._id}`}
-                                                exact
-                                            >
-                                                {index + 1 + page * size}
-                                            </NavLink>
+                                            {index + 1 + page * size}
                                         </td>
-                                        <td className="text-center align-middle">
+                                        <td
+                                            className="text-center align-middle font-medium hover:!text-blue-600"
+                                            onClick={() => {
+                                                history.push(
+                                                    `/admin/product/product-view/${item._id}`
+                                                );
+                                            }}
+                                        >
                                             {item.name}
                                         </td>
-                                        <td className="text-center align-middle">
+                                        <td className="text-center align-middle font-medium">
                                             {item.code}
                                         </td>
-                                        <td className="text-center align-middle">
+                                        <td className="text-center align-middle font-medium">
                                             {item?.brand?.name}
                                         </td>
-                                        <td className="text-center align-middle flex items-center justify-center h-[80px] border-0">
+                                        <td className="text-center align-middle font-medium flex items-center justify-center h-[80px] border-0">
                                             <img
                                                 className="img-fluid"
                                                 style={{
@@ -255,7 +265,7 @@ const Product = () => {
                                             />
                                         </td>
                                         {/* <th>{formatCurrency(item.price)}</th> */}
-                                        <td className="text-center align-middle">
+                                        <td className="text-center align-middle font-medium">
                                             <Badge
                                                 type={active[item.isActive]}
                                                 content={
@@ -265,7 +275,7 @@ const Product = () => {
                                                 }
                                             />
                                         </td>
-                                        <td className="text-center align-middle">
+                                        <td className="text-center align-middle font-medium">
                                             <NavLink
                                                 to={`/admin/product/product-detail/${item._id}`}
                                                 exact

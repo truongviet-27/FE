@@ -223,15 +223,15 @@ const Order = (props) => {
                                 {order?.map((item, index) => (
                                     <tr key={index}>
                                         <td
-                                            className="text-center align-middle font-bold"
+                                            className="text-center align-middle font-bold hover:!text-blue-600"
                                             scope="row"
+                                            onClick={() => {
+                                                history.push(
+                                                    `/order/detail/${item._id}`
+                                                );
+                                            }}
                                         >
-                                            <NavLink
-                                                to={`/order/detail/${item._id}`}
-                                                exact
-                                            >
-                                                {item.code}
-                                            </NavLink>
+                                            {item.code}
                                         </td>
                                         <td className="text-center align-middle font-bold">
                                             {formatDate(item.createdAt, true)}

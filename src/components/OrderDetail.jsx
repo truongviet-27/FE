@@ -20,6 +20,8 @@ import {
     reviewProduct,
 } from "../api/AttributeApi";
 import { generatePaymentUrl } from "../api/Payment";
+import convertStatusColor from "../utils/convertStatusColor";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 const OrderDetail = (props) => {
     const [orderDetail, setOrderDetail] = useState([]);
@@ -36,6 +38,8 @@ const OrderDetail = (props) => {
     const [orderDetailId, setOrderDetailId] = useState(null);
     const [productId, setProductId] = useState(null);
     const [isViewReview, setIsViewReview] = useState(false);
+
+    const history = useHistory();
 
     const url = new URL(window.location.href);
     const orderId = url.pathname.split("/").pop();
@@ -191,7 +195,7 @@ const OrderDetail = (props) => {
                                         Tên sản phẩm
                                     </th>
                                     <th className="text-center align-middle">
-                                        Ảnh sản phẩm{" "}
+                                        Ảnh sản phẩm
                                     </th>
                                     <th className="text-center align-middle">
                                         Size
@@ -214,17 +218,28 @@ const OrderDetail = (props) => {
                             <tbody>
                                 {orderDetail.map((item, index) => (
                                     <tr key={item._id} className="table-row">
-                                        <td className="text-center align-middle font-medium">
+                                        <td
+                                            className="text-center align-middle font-medium hover:!text-blue-600"
+                                            onClick={() => {
+                                                history.push(
+                                                    `/product-detail/${item.product._id}`
+                                                );
+                                            }}
+                                        >
                                             {item.product.name}
                                         </td>
                                         <td className="text-center align-middle font-medium">
-                                            {" "}
                                             <div className="flex justify-center items-center">
                                                 <img
                                                     src={
                                                         item?.imageUrls[0]?.url
                                                     }
                                                     className="!w-[70px] !h-[70px]"
+                                                    onClick={() => {
+                                                        history.push(
+                                                            `/product-detail/${item.product._id}`
+                                                        );
+                                                    }}
                                                 />
                                             </div>
                                         </td>
@@ -305,22 +320,27 @@ const OrderDetail = (props) => {
                     <div className="flex flex-col justify-between md:flex-row !pt-10 border-t-1 border-gray-300">
                         <div className="mb-4">
                             <div>
-                                <h5 className="text-primary">
-                                    <FaMoneyCheckAlt className="mb-2" />
-                                    Trạng thái thanh toán
-                                </h5>
+                                <div className="text-primary flex items-center gap-2">
+                                    <FaMoneyCheckAlt
+                                        className="mb-2"
+                                        size={25}
+                                    />
+                                    <h5 className="text-primary">
+                                        Trạng thái thanh toán
+                                    </h5>
+                                </div>
                                 <p
                                     className={`text-${
                                         order.isPayment ? "success" : "danger"
-                                    }`}
+                                    } !ml-8 mt-1`}
                                 >
                                     {order.isPayment ? (
-                                        <div className="flex gap-2 items-center">
+                                        <div className="flex gap-2 items-center font-bold">
                                             <FaCheckCircle className="mr-2" />{" "}
                                             Đã thanh toán
                                         </div>
-                                    ) : (
-                                        <div className="flex gap-2 items-center">
+                                    ) : order.isPayment === false ? (
+                                        <div className="flex gap-2 items-center font-bold">
                                             <FaTimesCircle className="mr-2" />{" "}
                                             Chưa thanh toán
                                             {(order.payment === "BANK" ||
@@ -333,48 +353,66 @@ const OrderDetail = (props) => {
                                                 </button>
                                             )}
                                         </div>
+                                    ) : (
+                                        <div className="flex gap-2 items-center font-bold">
+                                            <FaTimesCircle className="mr-2" />
+                                            Hoàn tiền
+                                        </div>
                                     )}
                                 </p>
                             </div>
                         </div>
                         <div className="mb-4">
                             <div>
-                                <h5 className="text-primary ">
-                                    <FaClipboardList className="mb-2" />
-                                    Trạng thái đơn hàng
-                                </h5>
-                                <p className="text-info">
-                                    {order?.orderStatus?.name}
-                                </p>
-                                <p className="text-info">
-                                    {order?.shipDate &&
-                                    order.orderStatus?.name == "SHIPPING"
-                                        ? `Ngày nhận dự kiến: ${new Date(
-                                              order?.shipDate
-                                          ).toLocaleDateString("vi-VN", {
-                                              day: "2-digit",
-                                              month: "2-digit",
-                                              year: "numeric",
-                                          })}`
-                                        : ""}
-                                </p>
-                                {order.reason && (
-                                    <div className="text flex gap-2">
-                                        <span className="font-bold">
-                                            Lí do hủy:
-                                        </span>
-                                        <span>{order.reason}</span>
-                                    </div>
-                                )}
+                                <div className="text-primary flex gap-2 items-center font-bold">
+                                    <FaClipboardList
+                                        className="mb-2"
+                                        size={25}
+                                    />
+                                    <h5 className="text-primary ">
+                                        Trạng thái đơn hàng
+                                    </h5>
+                                </div>
+                                <div className="flex flex-col !ml-8">
+                                    <p className="text-danger font-bold">
+                                        {convertStatusColor(
+                                            order?.orderStatus?.code
+                                        )}
+                                    </p>
+                                    <p className="font-bold">
+                                        {order?.shipDate &&
+                                        order.orderStatus?.code == "SHIPPING"
+                                            ? `Ngày nhận dự kiến: ${new Date(
+                                                  order?.shipDate
+                                              ).toLocaleDateString("vi-VN", {
+                                                  day: "2-digit",
+                                                  month: "2-digit",
+                                                  year: "numeric",
+                                              })}`
+                                            : ""}
+                                    </p>
+                                    {order.reason && (
+                                        <div className="text flex gap-2">
+                                            <span className="font-bold">
+                                                Lí do hủy:
+                                            </span>
+                                            <span>{order.reason}</span>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                         <div className="mb-4">
                             <div>
-                                <h5 className="text-primary">
-                                    <FaCreditCard className="mb-2" />
-                                    Phương thức thanh toán
-                                </h5>
-                                <p className="text-info">{order.payment}</p>
+                                <div className="text-primary flex gap-2 items-center font-bold">
+                                    <FaCreditCard className="mb-2" size={25} />
+                                    <h5 className="text-primary">
+                                        Phương thức thanh toán
+                                    </h5>
+                                </div>
+                                <p className="font-bold !ml-8 mt-1">
+                                    {order.payment}
+                                </p>
                             </div>
                         </div>
                     </div>

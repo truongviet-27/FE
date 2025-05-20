@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
 import { Link, useHistory } from "react-router-dom";
+import { toast } from "react-toastify";
 import { countAccount } from "../../../api/AccountApi";
 import {
+    amountYear,
     countOrder,
     countOrderByName,
     reportAmountYear,
@@ -11,19 +13,31 @@ import {
 import { countProduct } from "../../../api/ProductApi";
 import statusCards from "../../../assets/JsonData/status-card-data.json";
 import StatusCard from "../status-card/StatusCard";
-import { toast } from "react-toastify";
 
 const Dashboard = () => {
     const [productChartOptions, setProductChartOptions] = useState({});
     const [productChartSeries, setProductChartSeries] = useState([]);
     const [yearChartOptions, setYearChartOptions] = useState({});
     const [yearChartSeries, setYearChartSeries] = useState([]);
-    const [countOr, setCountOr] = useState();
+    const [countOr, setCountOr] = useState({});
     const [total, setTotal] = useState();
     const [countAcc, setCountAcc] = useState();
     const [countPro, setCountPro] = useState();
-    const [seri, setSeri] = useState([]);
-    const [option, setOption] = useState({});
+    const [seriesChartDonut, setSeriesChartDonut] = useState([]);
+    const [chartDonutOption, setChartDonutOption] = useState({});
+    const [selectedYear, setSelectedYear] = useState("2024");
+
+    const [isOpenOrder, setIsOpenOrder] = useState(false);
+
+    const togglePopoverOrder = () => setIsOpenOrder(!isOpenOrder);
+
+    const [isOpenTotal, setIsOpenTotal] = useState(false);
+
+    const togglePopoverTotal = () => setIsOpenTotal(!isOpenTotal);
+
+    const [actualRevenue, setActualRevenue] = useState();
+    const [initialRevenue, setInitialRevenue] = useState();
+
     const history = useHistory();
 
     useEffect(() => {
@@ -109,19 +123,36 @@ const Dashboard = () => {
         // Đơn hàng theo danh mục
         countOrderByName()
             .then((resp) => {
-                const x = resp.data.content.map((item) => item.name);
-                setOption({
-                    labels: x,
+                const categoryName = resp.data.content.map(
+                    (item) => item.categoryName
+                );
+                setChartDonutOption({
+                    labels: categoryName,
                 });
-                const y = resp.data.map((item) => item.count);
-                setSeri(y);
+                const total = resp.data.content.map(
+                    (item) => item.totalRevenue
+                );
+
+                setSeriesChartDonut(total);
             })
             .catch((error) => toast.error(error.message));
 
-        // Số lượng đơn hàng
-        countOrder()
-            .then((resp) => setCountOr(resp.data.data))
-            .catch((error) => toast.error(error.message));
+        amountYear().then((resp) => {
+            let actual = resp.data.data.isPaymentTrue.reduce((acc, curr) => {
+                return acc + curr.totalAmount;
+            }, 0);
+
+            let initial = resp.data.data.isPaymentFalseNotDelivered.reduce(
+                (acc, curr) => {
+                    return acc + curr.totalAmount;
+                },
+                0
+            );
+            setActualRevenue(actual);
+            setInitialRevenue(initial);
+            setTotal(actual + initial);
+        });
+        // .catch((error) => toast.error(error.message));
 
         // Số lượng tài khoản
         countAccount()
@@ -132,8 +163,12 @@ const Dashboard = () => {
         countProduct()
             .then((resp) => setCountPro(resp.data.data))
             .catch((error) => toast.error(error.message));
+
+        // Số lượng đơn hàng
+        countOrder()
+            .then((resp) => setCountOr(resp.data.data))
+            .catch((error) => toast.error(error.message));
     }, []);
-    const [selectedYear, setSelectedYear] = useState("2024");
 
     const handleYearChange = (event) => {
         setSelectedYear(event.target.value);
@@ -145,6 +180,124 @@ const Dashboard = () => {
                 <h2 className="page-header">Thống kê</h2>
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 !ml-5 !mb-5">
                     <div className="card justify-between full-height overflow-hidden">
+                        <div className="relative">
+                            <div>
+                                <StatusCard
+                                    icon={statusCards[2].icon}
+                                    count={`${
+                                        total && (total ?? 0).toLocaleString()
+                                    } VNĐ`}
+                                    title={`Tổng doanh thu: `}
+                                    onClick={() => {
+                                        togglePopoverTotal();
+                                    }}
+                                    onBlur={() => {
+                                        console.log("xxxxxxxxxxxxxxxxx");
+                                        setIsOpenTotal(false);
+                                    }}
+                                />
+                            </div>
+                            {isOpenTotal && (
+                                <div
+                                    style={{
+                                        position: "absolute",
+                                        right: 0,
+                                        top: "70%",
+                                        padding: "10px 25px",
+                                        backgroundColor: "#fff",
+                                        boxShadow:
+                                            "0 2px 10px rgba(0,0,0,0.15)",
+                                        borderRadius: 6,
+                                        zIndex: 999,
+                                        animation: "fadeIn 0.3s ease",
+                                        userSelect: "none",
+                                    }}
+                                >
+                                    <div
+                                        className="cursor-pointer"
+                                        onClick={() => {}}
+                                    >
+                                        <div className="flex justify-between gap-4 font-medium mt-2 hover:text-gray-400 active:text-gray-700">
+                                            <span>Doanh thu khởi tạo :</span>
+                                            <div className="flex gap-2">
+                                                <span>
+                                                    {initialRevenue.toLocaleString()}
+                                                </span>
+                                                <span>VNĐ</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex justify-between gap-4 font-medium mt-2 hover:text-gray-400 active:text-gray-700">
+                                            <span>Doanh thu thực tế :</span>
+                                            <div className="flex gap-2">
+                                                <span>
+                                                    {actualRevenue.toLocaleString()}
+                                                </span>
+                                                <span>VNĐ</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="relative">
+                            <StatusCard
+                                icon={statusCards[3].icon}
+                                count={countOr.total}
+                                title="Đơn hàng"
+                                onClick={() => {
+                                    togglePopoverOrder();
+                                }}
+                            />
+
+                            {isOpenOrder && (
+                                <div
+                                    style={{
+                                        position: "absolute",
+                                        right: 0,
+                                        top: "70%",
+                                        padding: "10px 25px",
+                                        backgroundColor: "#fff",
+                                        boxShadow:
+                                            "0 2px 10px rgba(0,0,0,0.15)",
+                                        borderRadius: 6,
+                                        zIndex: 999,
+                                        animation: "fadeIn 0.3s ease",
+                                        userSelect: "none",
+                                    }}
+                                >
+                                    <div
+                                        className="cursor-pointer"
+                                        onClick={() => {
+                                            history.push("/admin/order");
+                                        }}
+                                    >
+                                        <div className="flex justify-between gap-4 font-medium mt-2 hover:text-gray-400 active:text-gray-700">
+                                            <span>Chờ xác nhận :</span>
+                                            <span>
+                                                {countOr.pendingConfirm}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between gap-4 font-medium mt-2 hover:text-gray-400 active:text-gray-700">
+                                            <span>Đang xử lí :</span>
+                                            <span>{countOr.processing}</span>
+                                        </div>
+                                        <div className="flex justify-between gap-4 font-medium mt-2 hover:text-gray-400 active:text-gray-700">
+                                            <span>Đang vận chuyển :</span>
+                                            <span>{countOr.shipping}</span>
+                                        </div>
+                                        <div className="flex justify-between gap-4 font-medium mt-2 hover:text-gray-400 active:text-gray-700">
+                                            <span>Đã giao :</span>
+                                            <span>{countOr.delivered}</span>
+                                        </div>
+                                        <div className="flex justify-between gap-4 font-medium mt-2 hover:text-gray-400 active:text-gray-700">
+                                            <span>Hủy :</span>
+                                            <span>{countOr.cancelled}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                         <StatusCard
                             icon={statusCards[0].icon}
                             count={countAcc}
@@ -160,19 +313,6 @@ const Dashboard = () => {
                             onClick={() => {
                                 history.push("/admin/product");
                             }}
-                        />
-                        <StatusCard
-                            icon={statusCards[3].icon}
-                            count={countOr}
-                            title={`Đơn hàng: `}
-                            onClick={() => {
-                                history.push("/admin/order");
-                            }}
-                        />
-                        <StatusCard
-                            icon={statusCards[2].icon}
-                            count={total && `${total.toLocaleString()} Vnđ`}
-                            title={`Tổng doanh thu: `}
                         />
                     </div>
 
@@ -195,7 +335,7 @@ const Dashboard = () => {
                         <Chart
                             options={yearChartOptions}
                             series={yearChartSeries}
-                            type="line"
+                            type="area"
                             height="400"
                         />
                         <div className="mt-3">
@@ -206,6 +346,7 @@ const Dashboard = () => {
                                 onChange={handleYearChange}
                                 className="form-control"
                             >
+                                <option value="2023">2024</option>
                                 <option value="2024">2024</option>
                                 <option value="2025">2025</option>
                                 {/* Thêm các năm khác nếu cần */}
@@ -222,8 +363,8 @@ const Dashboard = () => {
                     {/* Biểu đồ Donut: Đơn hàng theo danh mục */}
                     <div className="card full-height overflow-hidden">
                         <Chart
-                            options={option}
-                            series={seri}
+                            options={chartDonutOption}
+                            series={seriesChartDonut}
                             type="donut"
                             height="400"
                         />

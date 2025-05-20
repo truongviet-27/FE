@@ -45,6 +45,11 @@ export const reportAmountYear = async () => {
     return await Instance.get(url);
 };
 
+export const amountYear = async () => {
+    const url = `/api/v1/order/synthesis/amount-year`;
+    return await Instance.get(url);
+};
+
 export const reportByProduct = async (page, size, sort) => {
     const url = `/api/v1/order/synthesis/product?page=${page}&size=${size}&sort=${sort}`;
     return await Instance.get(url);
@@ -59,6 +64,11 @@ export const getOrderByOrderStatusAndYearAndMonth = async (
     size
 ) => {
     const url = `/api/v1/order/synthesis/order-by-year-month?status=${status}&payment=${payment}&year=${year}&month=${month}&page=${page}&size=${size}`;
+    return await Instance.get(url);
+};
+
+export const getOrderByOrderYearAndMonth = async (year, month, page, size) => {
+    const url = `/api/v1/order/synthesis/order-year-month?year=${year}&month=${month}&page=${page}&size=${size}`;
     return await Instance.get(url);
 };
 
