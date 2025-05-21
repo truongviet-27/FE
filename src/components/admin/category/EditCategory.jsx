@@ -31,7 +31,7 @@ const EditCategory = () => {
         updateCategory(result)
             .then(() => {
                 toast.success("Cập nhật loại sản phẩm thành công.");
-                history.push("/admin/categories");
+                history.push("/admin/category");
             })
             .catch((error) => toast.error(error.response.data.Errors));
     };

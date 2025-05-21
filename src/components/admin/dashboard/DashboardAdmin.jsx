@@ -13,6 +13,7 @@ import {
 import { countProduct } from "../../../api/ProductApi";
 import statusCards from "../../../assets/JsonData/status-card-data.json";
 import StatusCard from "../status-card/StatusCard";
+import ReactApexChart from "react-apexcharts";
 
 const Dashboard = () => {
     const [productChartOptions, setProductChartOptions] = useState({});
@@ -25,7 +26,7 @@ const Dashboard = () => {
     const [countPro, setCountPro] = useState();
     const [seriesChartDonut, setSeriesChartDonut] = useState([]);
     const [chartDonutOption, setChartDonutOption] = useState({});
-    const [selectedYear, setSelectedYear] = useState("2024");
+    const [selectedYear, setSelectedYear] = useState("2025");
 
     const [isOpenOrder, setIsOpenOrder] = useState(false);
 
@@ -41,6 +42,106 @@ const Dashboard = () => {
     const history = useHistory();
 
     useEffect(() => {
+        // Đơn hàng theo danh mục
+        countOrderByName()
+            .then((resp) => {
+                const categoryName = resp.data.content.map(
+                    (item) => item.categoryName
+                );
+                setChartDonutOption({
+                    labels: categoryName,
+                });
+
+                // setChartDonutOption({
+                //     annotations: {
+                //         points: [
+                //             {
+                //                 x: "Bananas",
+                //                 seriesIndex: 0,
+                //                 label: {
+                //                     borderColor: "#775DD0",
+                //                     offsetY: 0,
+                //                     style: {
+                //                         color: "#fff",
+                //                         background: "#775DD0",
+                //                     },
+                //                     text: "Bananas are good",
+                //                 },
+                //             },
+                //         ],
+                //     },
+                //     chart: {
+                //         height: 350,
+                //         type: "bar",
+                //     },
+                //     plotOptions: {
+                //         bar: {
+                //             borderRadius: 10,
+                //             columnWidth: "50%",
+                //         },
+                //     },
+                //     dataLabels: {
+                //         enabled: false,
+                //     },
+                //     stroke: {
+                //         width: 0,
+                //     },
+                //     grid: {
+                //         row: {
+                //             colors: ["#fff", "#f2f2f2"],
+                //         },
+                //     },
+                //     xaxis: {
+                //         labels: {
+                //             rotate: -45,
+                //         },
+                //         categories: [
+                //             "Apples",
+                //             "Oranges",
+                //             "Strawberries",
+                //             "Pineapples",
+                //             "Mangoes",
+                //             "Bananas",
+                //             "Blackberries",
+                //             "Pears",
+                //             "Watermelons",
+                //             "Cherries",
+                //             "Pomegranates",
+                //             "Tangerines",
+                //             "Papayas",
+                //         ],
+                //         tickPlacement: "on",
+                //     },
+                //     yaxis: {
+                //         title: {
+                //             text: "Servings",
+                //         },
+                //     },
+                //     fill: {
+                //         type: "gradient",
+                //         gradient: {
+                //             shade: "light",
+                //             type: "horizontal",
+                //             shadeIntensity: 0.25,
+                //             gradientToColors: undefined,
+                //             inverseColors: true,
+                //             opacityFrom: 0.85,
+                //             opacityTo: 0.85,
+                //             stops: [50, 0, 100],
+                //         },
+                //     },
+                // });
+                const total = resp.data.content.map(
+                    (item) => item.totalRevenue
+                );
+
+                setSeriesChartDonut(total);
+                // setSeriesChartDonut({
+                //     name: "Servings",
+                //     data: [44, 55, 41, 67, 22, 43, 21, 33, 45, 31, 87, 65, 35],
+                // });
+            })
+            .catch((error) => toast.error(error.message));
         // Doanh thu theo sản phẩm
         reportByProduct(0, 10, "totalRevenue")
             .then((resp) => {
@@ -119,23 +220,6 @@ const Dashboard = () => {
                 setTotal(totalRevenue);
             })
             .catch((error) => console.log(error));
-
-        // Đơn hàng theo danh mục
-        countOrderByName()
-            .then((resp) => {
-                const categoryName = resp.data.content.map(
-                    (item) => item.categoryName
-                );
-                setChartDonutOption({
-                    labels: categoryName,
-                });
-                const total = resp.data.content.map(
-                    (item) => item.totalRevenue
-                );
-
-                setSeriesChartDonut(total);
-            })
-            .catch((error) => toast.error(error.message));
 
         amountYear().then((resp) => {
             let actual = resp.data.data.isPaymentTrue.reduce((acc, curr) => {
@@ -317,7 +401,7 @@ const Dashboard = () => {
                     </div>
 
                     {/* Doanh thu theo sản phẩm */}
-                    <div className="card full-height overflow-hidden">
+                    <div className="card flex-col justify-between full-height overflow-hidden">
                         <Chart
                             options={productChartOptions}
                             series={productChartSeries}
@@ -331,7 +415,7 @@ const Dashboard = () => {
                             Xem chi tiết
                         </Link>
                     </div>
-                    <div className="card full-height overflow-hidden">
+                    <div className="card flex-col justify-between full-height overflow-hidden">
                         <Chart
                             options={yearChartOptions}
                             series={yearChartSeries}
@@ -346,10 +430,9 @@ const Dashboard = () => {
                                 onChange={handleYearChange}
                                 className="form-control"
                             >
-                                <option value="2023">2024</option>
+                                <option value="2023">2023</option>
                                 <option value="2024">2024</option>
                                 <option value="2025">2025</option>
-                                {/* Thêm các năm khác nếu cần */}
                             </select>
                         </div>
                         <Link
@@ -366,7 +449,7 @@ const Dashboard = () => {
                             options={chartDonutOption}
                             series={seriesChartDonut}
                             type="donut"
-                            height="400"
+                            height={"400"}
                         />
                     </div>
                 </div>

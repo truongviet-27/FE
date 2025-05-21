@@ -11,18 +11,23 @@ const NewCategory = () => {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm();
+    } = useForm({
+        defaultValues: {
+            name: "",
+            description: "",
+            isActive: true,
+        },
+    });
 
     const submitHandler = (data) => {
         const result = {
             ...data,
-            createdAt: null,
         };
         console.log(result);
         createCategory(result)
             .then(() => {
                 toast.success("Thêm mới loại sản phẩm thành công.");
-                history.push("/admin/categories");
+                history.push("/admin/category");
             })
             .catch((error) => toast.error(error.response.data.Errors));
     };
@@ -91,8 +96,8 @@ const NewCategory = () => {
                                 required: false,
                             })}
                         >
-                            <option value="false">Không hoạt động</option>
-                            <option value="true">Hoạt động</option>
+                            <option value={false}>Không hoạt động</option>
+                            <option value={true}>Hoạt động</option>
                         </select>
                     </div>
                 </div>

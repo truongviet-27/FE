@@ -358,7 +358,6 @@ const Order = () => {
             id: obj.orderId,
             status: obj.statusCode,
             shipment: shipment,
-            // code: code,
             description:
                 reason && description ? `${reason} - ${description}` : "",
             shipDate: shipDate,
@@ -675,6 +674,12 @@ const Order = () => {
                                                     scope="col"
                                                     className="text-center align-middle"
                                                 >
+                                                    STT
+                                                </th>
+                                                <th
+                                                    scope="col"
+                                                    className="text-center align-middle"
+                                                >
                                                     Mã đơn hàng
                                                 </th>
                                                 <th
@@ -785,6 +790,11 @@ const Order = () => {
                                                     );
                                                 return (
                                                     <tr key={item._id}>
+                                                        <td className="text-center align-middle font-medium">
+                                                            {index +
+                                                                1 +
+                                                                page * size}
+                                                        </td>
                                                         <td
                                                             className="text-center align-middle font-medium hover:!text-blue-600"
                                                             scope="row"
@@ -794,9 +804,7 @@ const Order = () => {
                                                                 );
                                                             }}
                                                         >
-                                                            {index +
-                                                                1 +
-                                                                page * size}
+                                                            {item.code}
                                                         </td>
                                                         <td className="text-center align-middle font-medium">
                                                             {formatDate(

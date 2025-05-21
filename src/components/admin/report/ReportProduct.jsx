@@ -63,8 +63,8 @@ const ReportProduct = () => {
                     }}
                 >
                     <option value={"totalRevenue"}>Doanh thu</option>
-                    <option value={"orderDetailLength"}>Số lượng đơn</option>
                     <option value={"totalQuantity"}>Số lượng bán</option>
+                    <option value={"orderDetailLength"}>Số lượng đơn</option>
                 </select>
             </div>
             <div className="card__body min-h-[450px]">

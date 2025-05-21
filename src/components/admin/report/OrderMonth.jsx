@@ -1,18 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { getOrderByOrderStatusAndYearAndMonth } from "../../../api/OrderApi";
+import {
+    getOrderByOrderStatusAndYearAndMonth,
+    getOrderByOrderYearAndMonth,
+} from "../../../api/OrderApi";
 import { NavLink, useHistory, useParams } from "react-router-dom";
+import truncateWords from "../../../utils/truncateWord";
+import formatDate from "../../../utils/convertDate";
 
 const OrderMonth = (props) => {
-    const { id } = useParams();
+    const { month } = useParams();
     const history = useHistory();
 
     const [order, setOrder] = useState([]);
     const [page, setPage] = useState(0);
+    const [size, setSize] = useState(10);
+
     const [total, setTotal] = useState();
 
     var rows = new Array(total).fill(0).map((zero, index) => (
         <li
-            className={page === index + 1 ? "page-item active" : "page-item"}
+            className={page === index ? "page-item active" : "page-item"}
             key={index}
         >
             <button
@@ -26,13 +33,13 @@ const OrderMonth = (props) => {
     ));
 
     useEffect(() => {
-        getOrderByOrderStatusAndYearAndMonth(3, props.year, id, page, 8)
+        getOrderByOrderYearAndMonth(props.year, month, page, size)
             .then((resp) => {
                 setOrder(resp.data.content);
                 setTotal(resp.data.totalPages);
             })
             .catch((error) => console.log(error));
-    }, [page]);
+    }, [page, size]);
 
     const onChangePage = (page) => {
         setPage(page);
@@ -57,30 +64,76 @@ const OrderMonth = (props) => {
                     <table className="table table-striped table-bordered table-hover">
                         <thead className="thead-dark">
                             <tr>
-                                <th scope="col">Mã đơn hàng</th>
-                                <th scope="col">Tên khách hàng</th>
-                                <th scope="col">Số điện thoại</th>
-                                <th scope="col">Địa chỉ</th>
-                                <th scope="col">Ngày tạo</th>
-                                <th scope="col">Tổng tiền</th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Mã đơn hàng
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Tên khách hàng
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Số điện thoại
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Địa chỉ
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Ngày tạo
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Tổng tiền
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             {order?.map((item, index) => (
                                 <tr key={index}>
-                                    <th scope="row">
-                                        <NavLink
-                                            to={`/detail-order/${item.id}`}
-                                            exact
-                                        >
-                                            #OD{item.id}
-                                        </NavLink>
-                                    </th>
-                                    <td>{item.fullname}</td>
-                                    <td>{item.phone}</td>
-                                    <td>{item.address}</td>
-                                    <td>{item.createdAt}</td>
-                                    <td>{item.total}</td>
+                                    <td
+                                        scope="row"
+                                        className="text-center align-middle font-medium hover:!text-blue-600"
+                                        onClick={() => {
+                                            history.push(
+                                                `/admin/detail-order/${item.id}`
+                                            );
+                                        }}
+                                    >
+                                        {item.code}
+                                    </td>
+                                    <td className="text-center align-middle font-medium">
+                                        {item.fullName}
+                                    </td>
+                                    <td className="text-center align-middle font-medium">
+                                        {item.phone}
+                                    </td>
+                                    <td
+                                        className="text-center align-middle font-medium"
+                                        title={item.address}
+                                    >
+                                        {truncateWords(item.address)}
+                                    </td>
+                                    <td className="text-center align-middle font-medium">
+                                        {formatDate(item.createdAt, true)}
+                                    </td>
+                                    <td className="text-center align-middle font-medium">
+                                        {item.total.toLocaleString()} VNĐ
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>

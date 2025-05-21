@@ -32,11 +32,17 @@ const EditProduct = () => {
         control,
         setValue,
         watch,
-    } = useForm();
+    } = useForm({
+        defaultValues: {
+            isActive: true,
+            categories: [],
+            attributes: [],
+        },
+    });
 
     console.log(errors, "erros");
 
-    const { fields: fieldsCategoryId } = useFieldArray({
+    const { fields: fieldsCategory } = useFieldArray({
         name: "categories",
         control,
         keyName: "key",
@@ -138,6 +144,7 @@ const EditProduct = () => {
                     ...res.data.data,
                     brand: res.data.data.brand._id,
                     sale: res.data.data.sale._id,
+                    categories: res.data.data.categories,
                 });
             })
             .catch((error) => console.log(error));
@@ -155,6 +162,8 @@ const EditProduct = () => {
         } else {
             const newData = {
                 ...data,
+                brand: data.brand._id,
+                sale: data.sale._id,
                 categories: data.categories
                     .map((item, index) => {
                         return item && category[index];
@@ -284,6 +293,9 @@ const EditProduct = () => {
                                     className="form-control"
                                     {...register("brand", { required: true })}
                                 >
+                                    <option value="">
+                                        -- Chọn thương hiệu --
+                                    </option>
                                     {brand?.map((item, index) => (
                                         <option value={item._id} key={item._id}>
                                             {item?.name}
@@ -299,9 +311,12 @@ const EditProduct = () => {
                                     className="form-control"
                                     {...register("sale", { required: true })}
                                 >
-                                    {sale?.map((item, index) => (
-                                        <option value={item._id} key={item._id}>
-                                            {item?.name} - {item?.discount} %
+                                    <option value="">
+                                        -- Chọn khuyến mãi --
+                                    </option>
+                                    {sale?.map((item) => (
+                                        <option key={item._id} value={item._id}>
+                                            {item.name} - {item.discount}%
                                         </option>
                                     ))}
                                 </select>
@@ -309,7 +324,7 @@ const EditProduct = () => {
                             <div className="col-12 mt-4">
                                 <label className="form-label mb-3">
                                     Loại sản phẩm
-                                </label>{" "}
+                                </label>
                                 <br />
                                 <div className="flex items-center gap-4 flex-wrap">
                                     {category?.map((item, index) => (
@@ -323,6 +338,13 @@ const EditProduct = () => {
                                                 {...register(
                                                     `categories.${index}`
                                                 )}
+                                                value={
+                                                    !!fieldsCategory.find(
+                                                        (category) =>
+                                                            category?._id ===
+                                                            item?._id
+                                                    )
+                                                }
                                             />
                                             <label className="form-check-label">
                                                 {item?.name}
@@ -431,8 +453,8 @@ const EditProduct = () => {
                                         required: false,
                                     })}
                                 >
-                                    <option value="false">Dừng bán</option>
-                                    <option value="true">Đang bán</option>
+                                    <option value={false}>Dừng bán</option>
+                                    <option value={true}>Đang bán</option>
                                 </select>
                             </div>
                         </div>

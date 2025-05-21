@@ -350,7 +350,7 @@ const UserLayout = () => {
                         <Route path={`/admin/report-month/:year`} exact>
                             <ReportMonth yearHandler={yearHandler} />
                         </Route>
-                        <Route path={`/admin/order-month/:id`} exact>
+                        <Route path={`/admin/order-month/:month`} exact>
                             <OrderMonth year={year} />
                         </Route>
                         <Route path={`/admin/product/product-view/:id`} exact>

@@ -188,6 +188,12 @@ const Product = () => {
                                         scope="col"
                                         className="text-center align-middle"
                                     >
+                                        Hình ảnh
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="text-center align-middle"
+                                    >
                                         Tên sản phẩm
                                     </th>
                                     <th
@@ -200,13 +206,19 @@ const Product = () => {
                                         scope="col"
                                         className="text-center align-middle"
                                     >
-                                        Thương hiệu
+                                        Tồn kho
                                     </th>
                                     <th
                                         scope="col"
                                         className="text-center align-middle"
                                     >
-                                        Hình ảnh
+                                        Số lượng nhập
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="text-center align-middle"
+                                    >
+                                        Thương hiệu
                                     </th>
 
                                     <th
@@ -237,6 +249,17 @@ const Product = () => {
                                         >
                                             {index + 1 + page * size}
                                         </td>
+                                        <td className="text-center align-middle font-medium flex items-center justify-center h-[80px] border-0 ">
+                                            <img
+                                                className="img-fluid rounded-[6px] !overflow-hidden"
+                                                style={{
+                                                    width: "70px",
+                                                    height: "70px",
+                                                }}
+                                                src={item?.imageUrls[0]?.url}
+                                                alt=""
+                                            />
+                                        </td>
                                         <td
                                             className="text-center align-middle font-medium hover:!text-blue-600"
                                             onClick={() => {
@@ -251,19 +274,15 @@ const Product = () => {
                                             {item.code}
                                         </td>
                                         <td className="text-center align-middle font-medium">
+                                            {item?.totalStock}
+                                        </td>
+                                        <td className="text-center align-middle font-medium">
+                                            {item?.totalCache}
+                                        </td>
+                                        <td className="text-center align-middle font-medium">
                                             {item?.brand?.name}
                                         </td>
-                                        <td className="text-center align-middle font-medium flex items-center justify-center h-[80px] border-0">
-                                            <img
-                                                className="img-fluid"
-                                                style={{
-                                                    width: "70px",
-                                                    height: "70px",
-                                                }}
-                                                src={item?.imageUrls[0]?.url}
-                                                alt=""
-                                            />
-                                        </td>
+
                                         {/* <th>{formatCurrency(item.price)}</th> */}
                                         <td className="text-center align-middle font-medium">
                                             <Badge
