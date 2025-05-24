@@ -664,7 +664,7 @@ const SearchOrder = () => {
                         <hr />
                         <p className="font-weight-bold">
                             Tổng tiền đơn hàng:{" "}
-                            {temp && temp.total.toLocaleString()} đ
+                            {temp && temp.total.toLocaleString("vi-VN")} đ
                         </p>
                     </Alert>
                     <Form.Group className="mb-3" controlId="formBasicCheckbox">

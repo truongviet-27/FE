@@ -16,6 +16,12 @@ const convertStatusColor = (text) => {
     if (text === "CANCELLED") {
         return <span className={`text-[#fb0b12] font-bold`}>Hủy</span>;
     }
+    if (text === "RETURN") {
+        return <span className={`text-[#fb0b12] font-bold`}>Trả hàng</span>;
+    }
+    if (text === "REFUND") {
+        return <span className={`text-[#fb0b12] font-bold`}>Hoàn tiền</span>;
+    }
 };
 
 export default convertStatusColor;

@@ -1,27 +1,31 @@
-import axios from "axios";
+// import Modal from "antd/es/modal/Modal";
 import { useEffect, useState } from "react";
-import { Alert, Button, Card, Form, Modal } from "react-bootstrap";
+import { Alert, Button, Modal, Form } from "react-bootstrap";
 import {
     FaCheckCircle,
+    FaClipboardList,
+    FaCreditCard,
     FaMoneyCheckAlt,
     FaTimesCircle,
     FaTruck,
-    FaClipboardList,
-    FaCreditCard,
 } from "react-icons/fa"; // Icons
 import { toast } from "react-toastify";
-import { getOrderById, getOrderDetailByOrderId } from "../api/OrderApi";
+import {
+    getOrderById,
+    getOrderDetailByOrderId,
+    updateOrderReturn,
+} from "../api/OrderApi";
 import "../index.css";
 import formatDate from "../utils/convertDate";
 
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { Rating } from "react-simple-star-rating";
 import {
     getReviewAttributeByOrderDetailId,
     reviewProduct,
 } from "../api/AttributeApi";
 import { generatePaymentUrl } from "../api/Payment";
-import convertStatusColor from "../utils/convertStatusColor";
-import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import convertStatusOrder from "../utils/convertStatusOrder";
 
 const OrderDetail = (props) => {
     const [orderDetail, setOrderDetail] = useState([]);
@@ -38,6 +42,7 @@ const OrderDetail = (props) => {
     const [orderDetailId, setOrderDetailId] = useState(null);
     const [productId, setProductId] = useState(null);
     const [isViewReview, setIsViewReview] = useState(false);
+    const [orderStatusReturn, setOrderStatusReturn] = useState(false);
 
     const history = useHistory();
 
@@ -67,47 +72,6 @@ const OrderDetail = (props) => {
                 setShowThird(false);
             })
             .catch((error) => toast.error(error.response.data.message));
-    };
-
-    const handlePayment = async (orderId, amount) => {
-        try {
-            const response = await fetch(
-                `http://localhost:8086/api/v1/payment/vn-pay?amount=${amount}&orderId=${orderId}`,
-                {
-                    method: "GET",
-                }
-            );
-            const result = await response.json();
-            if (response.ok) {
-                // toast.success('Thành công! Đơn hàng sẽ được chuẩn bị');
-                window.location.href = result.data.paymentUrl;
-            } else {
-                toast.error(result.message || "Thanh toán thất bại.");
-            }
-        } catch (error) {
-            toast.error("Có lỗi xảy ra khi thanh toán.");
-        }
-    };
-
-    const handleShipCodePayment = async (orderId) => {
-        setLoading(true);
-
-        try {
-            const response = await axios.put(
-                `http://localhost:8086/api/v1/payment/ship-code?orderId=${orderId}`
-            );
-            // Hiển thị thông báo thành công
-            if (response.status === 200) {
-                toast.success("Thành công! Đơn hàng chờ xác nhận");
-                window.location.reload();
-            } else {
-                toast.error("Thất bại, kiểm tra lại");
-            }
-        } catch (error) {
-            toast.error("Failed to update payment method");
-        } finally {
-            setLoading(false);
-        }
     };
 
     const handleShowModal = () => setShowModal(true);
@@ -176,6 +140,39 @@ const OrderDetail = (props) => {
         });
     };
 
+    const handleShowModalReturn = () => {
+        console.log("xxxxxxxxxxxxxx");
+        setOrderStatusReturn(true);
+    };
+    const handleCloseModalReturn = () => {
+        setOrderStatusReturn(false);
+    };
+
+    const handleOrderReturn = async () => {
+        const data = {
+            orderId: order._id,
+            status: "RETURN",
+        };
+        updateOrderReturn(data)
+            .then((res) => {
+                toast.success(res.data.message);
+                setOrderStatusReturn(false);
+                getOrderById(orderId).then((resp) => {
+                    setOrder(resp.data.data);
+                    setSale(
+                        resp.data.data?.voucher?.discount
+                            ? resp.data.data?.voucher?.discount
+                            : 0
+                    );
+                    setTotal(resp.data.data?.total);
+                });
+            })
+            .catch((error) => {
+                console.log(error, "error");
+                toast.error(error.response.data.message);
+            });
+    };
+
     return (
         <div className="!px-10 mt-4">
             <div className="row">
@@ -211,7 +208,7 @@ const OrderDetail = (props) => {
                                     </th>
 
                                     <th className="text-center align-middle">
-                                        Hành động
+                                        Đánh giá
                                     </th>
                                 </tr>
                             </thead>
@@ -247,7 +244,10 @@ const OrderDetail = (props) => {
                                             {item.attribute.size}
                                         </td>
                                         <td className="text-center align-middle font-medium">
-                                            {item.sellPrice.toLocaleString()}₫
+                                            {item.sellPrice.toLocaleString(
+                                                "vi-VN"
+                                            )}
+                                            ₫
                                         </td>
                                         <td className="text-center align-middle font-medium">
                                             {item.quantity}
@@ -255,7 +255,7 @@ const OrderDetail = (props) => {
                                         <td className="text-center align-middle font-medium">
                                             {(
                                                 item.sellPrice * item.quantity
-                                            ).toLocaleString()}
+                                            ).toLocaleString("vi-VN")}
                                             ₫
                                         </td>
                                         <td className="text-center align-middle font-medium">
@@ -283,7 +283,7 @@ const OrderDetail = (props) => {
                             <div className="flex gap-2 justify-end">
                                 <span className="font-bold">Tạm tính:</span>{" "}
                                 <span className="font-bold">
-                                    {amount?.toLocaleString()}
+                                    {amount?.toLocaleString("vi-VN")}
                                 </span>{" "}
                                 <span className="font-bold">đ</span>
                             </div>
@@ -297,7 +297,7 @@ const OrderDetail = (props) => {
                                             ? (
                                                   (amount * sale) /
                                                   100
-                                              ).toLocaleString()
+                                              ).toLocaleString("vi-VN")
                                             : 0}
                                     </span>
                                     <span className="font-bold">đ</span>
@@ -312,7 +312,7 @@ const OrderDetail = (props) => {
                             )}
 
                             <h5 className="text-danger !font-bold">
-                                Tổng cộng: {total?.toLocaleString()} đ
+                                Tổng cộng: {total?.toLocaleString("vi-VN")} đ
                             </h5>
                         </div>
                     </div>
@@ -375,7 +375,7 @@ const OrderDetail = (props) => {
                                 </div>
                                 <div className="flex flex-col !ml-8">
                                     <p className="text-danger font-bold">
-                                        {convertStatusColor(
+                                        {convertStatusOrder(
                                             order?.orderStatus?.code
                                         )}
                                     </p>
@@ -457,10 +457,21 @@ const OrderDetail = (props) => {
                             </div>
                         </div>
                     </div>
+
+                    {order?.orderStatus?.code === "DELIVERED" && (
+                        <div>
+                            <button
+                                className="!bg-red-500 border !border-red-600 text-white !rounded-[10px] !py-1 !px-4 !text-[15px]"
+                                onClick={handleShowModalReturn}
+                            >
+                                Trả hàng
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
             <Modal show={showModal} onHide={handleCloseModal}>
-                <Modal.Header closeButton>
+                <Modal.Header>
                     <Modal.Title>Chọn phương thức thanh toán</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
@@ -495,7 +506,7 @@ const OrderDetail = (props) => {
                 </Modal.Body>
             </Modal>
             <Modal show={showThird} onHide={handleCloseThird}>
-                <Modal.Header closeButton>
+                <Modal.Header>
                     <Modal.Title style={{ textAlign: "center" }}>
                         Đánh giá sản phẩm
                     </Modal.Title>
@@ -538,6 +549,9 @@ const OrderDetail = (props) => {
                 </Modal.Body>
                 {!isViewReview && (
                     <Modal.Footer>
+                        <Button variant="primary" onClick={handleCloseThird}>
+                            Đóng
+                        </Button>
                         <Button
                             variant="danger"
                             onClick={handleReviewAttribute}
@@ -545,11 +559,27 @@ const OrderDetail = (props) => {
                         >
                             Xác nhận
                         </Button>
-                        <Button variant="primary" onClick={handleCloseThird}>
-                            Đóng
-                        </Button>
                     </Modal.Footer>
                 )}
+            </Modal>
+
+            <Modal show={orderStatusReturn} onHide={handleCloseModalReturn}>
+                <Modal.Header>
+                    <Modal.Title style={{ textAlign: "center" }}>
+                        Xác nhận hoàn trả
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>Bạn có chắc chắn muốn hoàn trả đơn hàng này không?</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="primary" onClick={handleCloseModalReturn}>
+                        Đóng
+                    </Button>
+                    <Button variant="danger" onClick={handleOrderReturn}>
+                        Xác nhận
+                    </Button>
+                </Modal.Footer>
             </Modal>
         </div>
     );

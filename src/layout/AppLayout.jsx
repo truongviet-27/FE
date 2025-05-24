@@ -128,12 +128,15 @@ const UserLayout = () => {
     };
 
     const addHandler = (data) => {
-        const res = cartItem.find((item) => item.id === data.id);
+        const res = cartItem.some(
+            (item) => item.attribute._id === data.attribute._id
+        );
+
         if (res) {
             setCartItem(
                 cartItem.map((item) =>
-                    item.id === data.id
-                        ? { ...res, quantity: res.quantity + data.quantity }
+                    item.attribute._id === data.attribute._id
+                        ? { ...item, quantity: item.quantity + data.quantity }
                         : item
                 )
             );
@@ -237,6 +240,7 @@ const UserLayout = () => {
                             <ProductDetail
                                 user={user}
                                 addHandler={addHandler}
+                                cartItem={cartItem}
                             />
                         </Route>
 
@@ -350,7 +354,10 @@ const UserLayout = () => {
                         <Route path={`/admin/report-month/:year`} exact>
                             <ReportMonth yearHandler={yearHandler} />
                         </Route>
-                        <Route path={`/admin/order-month/:month`} exact>
+                        <Route
+                            path={`/admin/order-month/:month`}
+                            exact
+                        >
                             <OrderMonth year={year} />
                         </Route>
                         <Route path={`/admin/product/product-view/:id`} exact>

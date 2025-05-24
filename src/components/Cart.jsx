@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
+import { Modal } from "antd";
+import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { Modal, Button } from "antd";
 // import 'font-awesome/css/font-awesome.min.css';
+import { toast } from "react-toastify";
 import {
     getCartItemByAccountId,
-    modifyCartItem,
-    removeCartItem,
     isEnoughCartItem,
+    modifyCartItem,
+    modifyCartItemFromNotUserFromDetail,
+    removeCartItem,
 } from "../api/CartApi";
-import { toast } from "react-toastify";
-import { NavLink } from "react-bootstrap";
 
 const Cart = (props) => {
     const [cart, setCart] = useState([]);
@@ -39,8 +39,35 @@ const Cart = (props) => {
         onLoad();
     }, [props.user]);
 
+    console.log(props.cartItem, "cartItem");
+
     const onLoad = () => {
         if (props?.user) {
+            if ((props.cartItem ?? []).length > 0) {
+                const carts = props.cartItem.map((item) => {
+                    return {
+                        attributeId: item.attribute._id,
+                        quantity: item.quantity,
+                        lastPrice: item.lastPrice,
+                    };
+                });
+
+                console.log(carts, "carts");
+                modifyCartItemFromNotUserFromDetail(carts).then(() => {
+                    getCartItemByAccountId(localStorage.getItem("id")).then(
+                        (resp) => {
+                            setCart(
+                                resp.data.content.map((item) => ({
+                                    ...item,
+                                    checked: false,
+                                }))
+                            );
+                            props.outStockHandler(resp.data.content);
+                        }
+                    );
+                });
+                return;
+            }
             getCartItemByAccountId(localStorage.getItem("id")).then((resp) => {
                 setCart(
                     resp.data.content.map((item) => ({
@@ -48,11 +75,11 @@ const Cart = (props) => {
                         checked: false,
                     }))
                 );
-                props.outStockHandler(resp.data);
+                props.outStockHandler(resp.data.content);
             });
         } else {
             setCart(
-                props.cartItem.map((item) => ({ ...item, checked: false }))
+                props.cartItem?.map((item) => ({ ...item, checked: false }))
             );
             props.outStockHandler(props.cartItem);
         }
@@ -70,31 +97,22 @@ const Cart = (props) => {
                 };
 
                 modifyCartItem(data)
-                    .then(() => onLoad())
+                    .then((res) => {
+                        toast.success(res.data.message);
+                        onLoad();
+                    })
                     .catch((error) =>
                         toast.warning(error.response.data.message)
                     );
             } else {
-                isEnoughCartItem(attr, quantity)
-                    .then(() => {
-                        const res = cart.map((item) =>
-                            item.id === attr
-                                ? { ...item, quantity: quantity }
-                                : item
-                        );
-                        const flag = res.filter((item) => item.quantity > 0);
-                        setCart(flag);
-                        props.cartHandler(flag);
-                    })
-                    .catch((error) => {
-                        const res = cart.map((item) =>
-                            item.id === attr ? { ...item, quantity: 1 } : item
-                        );
-                        const flag = res.filter((item) => item.quantity > 0);
-                        setCart(flag);
-                        props.cartHandler(flag);
-                        toast.warning(error.response.data.message);
-                    });
+                const res = cart.map((item) =>
+                    item.attribute._id === attr
+                        ? { ...item, quantity: quantity }
+                        : item
+                );
+                const flag = res.filter((item) => item.quantity > 0);
+                setCart(flag);
+                props.cartHandler(flag);
             }
         }
     };
@@ -110,25 +128,22 @@ const Cart = (props) => {
                 };
 
                 modifyCartItem(data)
-                    .then(() => onLoad())
+                    .then((res) => {
+                        toast.success(res.data.message);
+                        onLoad();
+                    })
                     .catch((error) =>
                         toast.warning(error.response.data.message)
                     );
             } else {
-                isEnoughCartItem(attr, quantity)
-                    .then(() => {
-                        const res = cart.map((item) =>
-                            item.id === attr
-                                ? { ...item, quantity: quantity }
-                                : item
-                        );
-                        const flag = res.filter((item) => item.quantity > 0);
-                        setCart(flag);
-                        props.cartHandler(flag);
-                    })
-                    .catch((error) => {
-                        toast.warning(error.response.data.message);
-                    });
+                const res = cart.map((item) =>
+                    item.attribute._id === attr
+                        ? { ...item, quantity: quantity }
+                        : item
+                );
+                const attributes = res.filter((item) => item.quantity > 0);
+                setCart(attributes);
+                props.cartHandler(attributes);
             }
         }
     };
@@ -151,7 +166,7 @@ const Cart = (props) => {
                 .catch((error) => toast.warning(error.response.data.message));
         } else {
             const res = cart.filter(
-                (item) => item._id !== itemToRemove.attribute._id
+                (item) => item.attribute._id !== itemToRemove.attribute._id
             );
             setCart(res);
             props.cartHandler(res);
@@ -159,27 +174,32 @@ const Cart = (props) => {
     };
 
     const checkOutHandler = () => {
-        if (props.buy.length === 0) {
-            toast.warning("Bạn vẫn chưa chọn sản phẩm nào để mua.");
-        } else {
-            for (let j = 0; j < props.buy.length; j++) {
-                for (let i = 0; i < cart.length; i++) {
-                    if (props.buy[j] == cart[i]._id) {
-                        isEnoughCartItem(cart[i]?._id, cart[i]?.quantity)
-                            .then((resp) => resp.data)
-                            .catch((error) => {
-                                toast.warn(error.response.data.message);
-                                history.push("/cart");
-                            });
+        if (props.user) {
+            if (props.buy.length === 0) {
+                toast.warning("Bạn vẫn chưa chọn sản phẩm nào để mua.");
+            } else {
+                for (let j = 0; j < props.buy.length; j++) {
+                    for (let i = 0; i < cart.length; i++) {
+                        if (props.buy[j] == cart[i]._id) {
+                            isEnoughCartItem(cart[i]?.attribute._id)
+                                .then((resp) => resp.data)
+                                .catch((error) => {
+                                    toast.warn(error.response.data.message);
+                                    history.push("/cart");
+                                });
+                        }
                     }
                 }
+                history.push("/checkout");
             }
-            history.push("/checkout");
+        } else {
+            toast.warning("Vui lòng đăng nhập!!!");
         }
     };
 
     const buyHandler = (e) => {
         const id = e.target.value;
+        console.log(id, "xxxxxxxxxxx");
         const index = cart.findIndex((item) => item._id == id);
         const flag = cart[index].checked;
         if (flag) {
@@ -303,7 +323,10 @@ const Cart = (props) => {
                                         {item?.attribute?.size}
                                     </td>
                                     <td className="text-center align-middle font-bold">
-                                        {item?.lastPrice?.toLocaleString()} đ
+                                        {item?.lastPrice?.toLocaleString(
+                                            "vi-VN"
+                                        )}{" "}
+                                        đ
                                     </td>
                                     <td className="text-center align-middle font-bold">
                                         <div className="flex items-center justify-center gap-2">
@@ -349,7 +372,7 @@ const Cart = (props) => {
                                     <td className="text-center align-middle font-bold">
                                         {(
                                             item?.quantity * item?.lastPrice
-                                        ).toLocaleString()}
+                                        ).toLocaleString("vi-VN")}
                                         đ
                                     </td>
                                     <td className="text-center align-middle font-bold">

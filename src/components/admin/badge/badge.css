@@ -25,6 +25,14 @@
     background-color: purple;
 }
 
+.badge-return {
+    background-color: rgb(185, 75, 75);
+}
+
+.badge-refund {
+    background-color: rgb(100, 100, 100);
+}
+
 .badge-CUS {
     background-color: var(--main-color-green);
 }

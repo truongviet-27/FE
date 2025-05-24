@@ -9,6 +9,8 @@ const orderStatus = {
     SHIPPING: "warning",
     DELIVERED: "success",
     CANCELLED: "danger",
+    RETURN: "return",
+    REFUND: "refund",
 };
 
 export { active, orderStatus };

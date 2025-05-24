@@ -12,6 +12,7 @@ import {
     getOrderByOrderStatusAndYearAndMonth,
     getOrderDetailByOrderId,
     updateCancel,
+    updateOrderRefund,
     updateProcess,
     updateShip,
     updateSuccess,
@@ -59,6 +60,10 @@ const Order = () => {
     const [size, setSize] = useState(10);
 
     const history = useHistory();
+
+    const [showFifth, setShowFifth] = useState(false);
+
+    const [flagModalFifth, setFlagModalFifth] = useState(false);
 
     const { register, handleSubmit, setValue, getValues, watch, reset } =
         useForm({
@@ -117,7 +122,7 @@ const Order = () => {
         setShowFirst(false);
         setFlagProcess(false);
     };
-    const handleShowFirst = (orderId, statusCode, paymentCode, isPending) => {
+    const handleShowFirst = (orderId, statusCode, paymentCode, isPayment) => {
         getOrderById(orderId)
             .then((resp) => setTemp(resp.data.data))
             .catch((error) => console.log(error));
@@ -131,7 +136,7 @@ const Order = () => {
             orderId,
             statusCode,
             paymentCode,
-            isPending,
+            isPayment,
         });
     };
 
@@ -141,24 +146,23 @@ const Order = () => {
         // setCode(null);
         setShipDate(null);
     };
-    const handleShowSecond = (orderId, statusCode, paymentCode, isPending) => {
+    const handleShowSecond = (orderId, statusCode, paymentCode, isPayment) => {
         setShowSecond(true);
         setObj({
             orderId,
             statusCode,
             paymentCode,
-            isPending,
+            isPayment,
         });
     };
 
     const [flagSuccess, setFlagSuccess] = useState(false);
-    const [flagModalFouth, setFlagModalFouth] = useState(false);
 
     const handleCloseThird = () => {
         setShowThird(false);
         setFlagSuccess(false);
     };
-    const handleShowThird = (orderId, statusCode, paymentCode, isPending) => {
+    const handleShowThird = (orderId, statusCode, paymentCode, isPayment) => {
         getOrderById(orderId)
             .then((resp) => setTemp(resp.data.data))
             .catch((error) => console.log(error));
@@ -167,7 +171,7 @@ const Order = () => {
             orderId,
             statusCode,
             paymentCode,
-            isPending,
+            isPayment,
         });
     };
 
@@ -176,13 +180,29 @@ const Order = () => {
         setReason(null);
         setDescription(null);
     };
-    const handleShowFouth = (orderId, statusCode, paymentCode, isPending) => {
+    const handleShowFouth = (orderId, statusCode, paymentCode, isPayment) => {
         setShowFouth(true);
         setObj({
             orderId,
             statusCode,
             paymentCode,
-            isPending,
+            isPayment,
+        });
+    };
+
+    const handleCloseFifth = () => {
+        setShowFifth(false);
+    };
+    const handleShowFifth = (orderId, statusCode, paymentCode, isPayment) => {
+        getOrderById(orderId)
+            .then((resp) => setTemp(resp.data.data))
+            .catch((error) => console.log(error));
+        setShowFifth(true);
+        setObj({
+            orderId,
+            statusCode,
+            paymentCode,
+            isPayment,
         });
     };
 
@@ -279,36 +299,45 @@ const Order = () => {
         orderId,
         statusCode,
         paymentCode,
-        isPending
+        isPayment
     ) => {
-        handleShowFirst(orderId, statusCode, paymentCode, isPending);
+        handleShowFirst(orderId, statusCode, paymentCode, isPayment);
     };
 
     const updateStatusHandlerSecond = (
         orderId,
         statusCode,
         paymentCode,
-        isPending
+        isPayment
     ) => {
-        handleShowSecond(orderId, statusCode, paymentCode, isPending);
+        handleShowSecond(orderId, statusCode, paymentCode, isPayment);
     };
 
     const updateStatusHandlerThird = (
         orderId,
         statusCode,
         paymentCode,
-        isPending
+        isPayment
     ) => {
-        handleShowThird(orderId, statusCode, paymentCode, isPending);
+        handleShowThird(orderId, statusCode, paymentCode, isPayment);
     };
 
     const updateStatusHandlerFouth = (
         orderId,
         statusCode,
         paymentCode,
-        isPending
+        isPayment
     ) => {
-        handleShowFouth(orderId, statusCode, paymentCode, isPending);
+        handleShowFouth(orderId, statusCode, paymentCode, isPayment);
+    };
+
+    const updateStatusHandlerFifth = (
+        orderId,
+        statusCode,
+        paymentCode,
+        isPayment
+    ) => {
+        handleShowFifth(orderId, statusCode, paymentCode, isPayment);
     };
 
     const confirmUpdateProcess = () => {
@@ -413,10 +442,15 @@ const Order = () => {
                     getValues("to"),
                     page,
                     size
-                ).catch((error) => {
-                    console.log(error);
-                    toast.error(error.response.data.message);
-                });
+                )
+                    .then((res) => {
+                        setOrders(res.data.content);
+                        setTotal(res.data.totalPages);
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        toast.error(error.response.data.message);
+                    });
                 toast.success(res.data.message);
             })
             .catch((error) => {
@@ -538,9 +572,41 @@ const Order = () => {
         setFlagSuccess(checked);
     };
 
-    const flagModalFouthHanler = (e) => {
-        const { checked } = e.target;
-        setFlagModalFouth(checked);
+    const handleOrderRefund = async () => {
+        const data = {
+            orderId: obj.orderId,
+            status: obj.statusCode,
+        };
+        updateOrderRefund(data)
+            .then((res) => {
+                setShowFifth(false);
+                getAllOrderAndPagination(
+                    getValues("status"),
+                    getValues("payment"),
+                    getValues("from"),
+                    getValues("to"),
+                    page,
+                    size
+                )
+                    .then((res) => {
+                        setOrders(res.data.content);
+                        setTotal(res.data.totalPages);
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        toast.error(error.response.data.message);
+                    });
+                toast.success(res.data.message);
+            })
+            .catch((error) => {
+                console.log(error, "error");
+                toast.error(error.response.data.message);
+            });
+    };
+
+    const flagModalFifthHanler = (e) => {
+        console.log(e.target.checked, "value");
+        setFlagModalFifth(e.target.checked);
     };
 
     return (
@@ -777,6 +843,32 @@ const Order = () => {
                                                         content={"Hủy"}
                                                     />
                                                 </th>
+                                                <th
+                                                    scope="col"
+                                                    className="text-center align-middle"
+                                                >
+                                                    <Badge
+                                                        type={
+                                                            orderStatus[
+                                                                "RETURN"
+                                                            ]
+                                                        }
+                                                        content={"Trả hàng"}
+                                                    />
+                                                </th>
+                                                <th
+                                                    scope="col"
+                                                    className="text-center align-middle"
+                                                >
+                                                    <Badge
+                                                        type={
+                                                            orderStatus[
+                                                                "REFUND"
+                                                            ]
+                                                        }
+                                                        content={"Hoàn tiền"}
+                                                    />
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -836,15 +928,16 @@ const Order = () => {
                                                             />
                                                         </td>
                                                         <td className="text-center align-middle font-medium">
-                                                            {item.total.toLocaleString()}{" "}
+                                                            {item.total.toLocaleString(
+                                                                "vi-VN"
+                                                            )}{" "}
                                                             ₫
                                                         </td>
                                                         {
                                                             <td className="text-center align-middle font-medium">
-                                                                {item.payment !==
-                                                                    "VNPAY" && (
+                                                                {
                                                                     <input
-                                                                        className="form-check-input"
+                                                                        className="form-check-input border-1 border-black"
                                                                         type="radio"
                                                                         name={
                                                                             index
@@ -856,17 +949,24 @@ const Order = () => {
                                                                             "PENDING_CONFIRM"
                                                                         }
                                                                         value="COD"
+                                                                        style={{
+                                                                            opacity:
+                                                                                0 <
+                                                                                currentIndex
+                                                                                    ? 0.1
+                                                                                    : 1,
+                                                                        }}
                                                                         disabled={
                                                                             0 <
                                                                             currentIndex
                                                                         }
                                                                     />
-                                                                )}
+                                                                }
                                                             </td>
                                                         }
                                                         <td className="text-center align-middle font-medium">
                                                             <input
-                                                                className="form-check-input"
+                                                                className="form-check-input border-1 border-black"
                                                                 type="radio"
                                                                 name={index}
                                                                 checked={
@@ -882,9 +982,16 @@ const Order = () => {
                                                                         e.target
                                                                             .value,
                                                                         item.payment,
-                                                                        item.isPending
+                                                                        item.isPayment
                                                                     )
                                                                 }
+                                                                style={{
+                                                                    opacity:
+                                                                        1 <
+                                                                        currentIndex
+                                                                            ? 0.1
+                                                                            : 1,
+                                                                }}
                                                                 disabled={
                                                                     1 <
                                                                     currentIndex
@@ -893,7 +1000,7 @@ const Order = () => {
                                                         </td>
                                                         <td className="text-center align-middle font-medium">
                                                             <input
-                                                                className="form-check-input"
+                                                                className="form-check-input border-1 border-black"
                                                                 type="radio"
                                                                 name={index}
                                                                 checked={
@@ -909,9 +1016,24 @@ const Order = () => {
                                                                         e.target
                                                                             .value,
                                                                         item.payment,
-                                                                        item.isPending
+                                                                        item.isPayment
                                                                     )
                                                                 }
+                                                                style={{
+                                                                    opacity:
+                                                                        (item
+                                                                            .orderStatus
+                                                                            .code !==
+                                                                            "PROCESSING" &&
+                                                                            item
+                                                                                .orderStatus
+                                                                                .code !==
+                                                                                "SHIPPING") ||
+                                                                        2 <
+                                                                            currentIndex
+                                                                            ? 0.1
+                                                                            : 1,
+                                                                }}
                                                                 disabled={
                                                                     (item
                                                                         .orderStatus
@@ -928,7 +1050,7 @@ const Order = () => {
                                                         </td>
                                                         <td className="text-center align-middle font-medium">
                                                             <input
-                                                                className="form-check-input"
+                                                                className="form-check-input border-1 border-black"
                                                                 type="radio"
                                                                 name={index}
                                                                 checked={
@@ -944,9 +1066,24 @@ const Order = () => {
                                                                         e.target
                                                                             .value,
                                                                         item.payment,
-                                                                        item.isPending
+                                                                        item.isPayment
                                                                     )
                                                                 }
+                                                                style={{
+                                                                    opacity:
+                                                                        (item
+                                                                            .orderStatus
+                                                                            .code !==
+                                                                            "SHIPPING" &&
+                                                                            item
+                                                                                .orderStatus
+                                                                                .code !==
+                                                                                "DELIVERED") ||
+                                                                        3 <
+                                                                            currentIndex
+                                                                            ? 0.1
+                                                                            : 1,
+                                                                }}
                                                                 disabled={
                                                                     (item
                                                                         .orderStatus
@@ -963,7 +1100,7 @@ const Order = () => {
                                                         </td>
                                                         <td className="text-center align-middle font-medium">
                                                             <input
-                                                                className="form-check-input"
+                                                                className="form-check-input border-1 border-black"
                                                                 type="radio"
                                                                 name={index}
                                                                 checked={
@@ -979,16 +1116,113 @@ const Order = () => {
                                                                         e.target
                                                                             .value,
                                                                         item.payment,
-                                                                        item.isPending
+                                                                        item.isPayment
                                                                     )
                                                                 }
+                                                                style={{
+                                                                    opacity:
+                                                                        item
+                                                                            .orderStatus
+                                                                            .code ===
+                                                                            "DELIVERED" ||
+                                                                        item
+                                                                            .orderStatus
+                                                                            .code ===
+                                                                            "SHIPPING" ||
+                                                                        4 <
+                                                                            currentIndex
+                                                                            ? 0.1
+                                                                            : 1,
+                                                                }}
                                                                 disabled={
                                                                     item
                                                                         .orderStatus
                                                                         .code ===
                                                                         "DELIVERED" ||
+                                                                    item
+                                                                        .orderStatus
+                                                                        .code ===
+                                                                        "SHIPPING" ||
                                                                     4 <
                                                                         currentIndex
+                                                                }
+                                                            />
+                                                        </td>
+                                                        <td className="text-center align-middle font-medium">
+                                                            <input
+                                                                className="form-check-input border-1 border-black"
+                                                                type="radio"
+                                                                name={index}
+                                                                checked={
+                                                                    item
+                                                                        .orderStatus
+                                                                        .code ===
+                                                                    "RETURN"
+                                                                }
+                                                                style={{
+                                                                    opacity:
+                                                                        item
+                                                                            .orderStatus
+                                                                            .code ===
+                                                                        "RETURN"
+                                                                            ? 1
+                                                                            : 0.1,
+                                                                }}
+                                                                value="RETURN"
+                                                            />
+                                                        </td>
+                                                        <td className="text-center align-middle font-medium">
+                                                            <input
+                                                                className="form-check-input border-1 border-black"
+                                                                type="radio"
+                                                                name={index}
+                                                                checked={
+                                                                    item
+                                                                        .orderStatus
+                                                                        .code ===
+                                                                    "REFUND"
+                                                                }
+                                                                value="REFUND"
+                                                                onChange={(e) =>
+                                                                    updateStatusHandlerFifth(
+                                                                        item._id,
+                                                                        e.target
+                                                                            .value,
+                                                                        item.payment,
+                                                                        item.isPayment
+                                                                    )
+                                                                }
+                                                                style={{
+                                                                    opacity: !(
+                                                                        item
+                                                                            .orderStatus
+                                                                            .code ===
+                                                                            "RETURN" ||
+                                                                        (item
+                                                                            .orderStatus
+                                                                            .code ===
+                                                                            "CANCELLED" &&
+                                                                            item.isPayment) ||
+                                                                        5 <
+                                                                            currentIndex
+                                                                    )
+                                                                        ? 0.1
+                                                                        : 1,
+                                                                }}
+                                                                disabled={
+                                                                    !(
+                                                                        item
+                                                                            .orderStatus
+                                                                            .code ===
+                                                                            "RETURN" ||
+                                                                        (item
+                                                                            .orderStatus
+                                                                            .code ===
+                                                                            "CANCELLED" &&
+                                                                            item.isPayment) ||
+                                                                        6 <
+                                                                            currentIndex
+                                                                    )
                                                                 }
                                                             />
                                                         </td>
@@ -1137,7 +1371,9 @@ const Order = () => {
                             <span className="font-bold min-w-[90px]">
                                 Tổng tiền:
                             </span>
-                            <span>{temp?.total?.toLocaleString()} VNĐ</span>
+                            <span>
+                                {temp?.total?.toLocaleString("vi-VN")} VNĐ
+                            </span>
                         </div>
                     </Alert>
                     <Form.Check
@@ -1194,16 +1430,6 @@ const Order = () => {
                                 );
                             })}
                         </Form.Select>
-                        {/* <Form>
-              <Form.Label style={{ marginRight: 30, marginBottom: 10 }}>
-                Mã vận đơn
-              </Form.Label>
-              <Form.Control
-                style={{ height: 40, width: 300, marginBottom: 20 }}
-                type="text"
-                onChange={(e) => codeHandler(e.target.value)}
-              />
-            </Form> */}
                         <Form>
                             <Form.Label
                                 style={{ marginRight: 30, marginBottom: 10 }}
@@ -1248,7 +1474,9 @@ const Order = () => {
                             <span className="font-bold">
                                 Tổng tiền đơn hàng:
                             </span>
-                            <span>{temp?.total?.toLocaleString()} đ</span>
+                            <span>
+                                {temp?.total?.toLocaleString("vi-VN")} đ
+                            </span>
                         </div>
                     </Alert>
                     <Form.Group className="mb-3" controlId="formBasicCheckbox">
@@ -1284,15 +1512,6 @@ const Order = () => {
                     <Alert variant="danger">
                         <div className="flex gap-2 items-center">
                             <Alert.Heading>Hủy đơn hàng</Alert.Heading>
-                            {obj.isPending ? (
-                                <Alert.Heading style={{ marginBottom: 5 }}>
-                                    (Đã thanh toán)
-                                </Alert.Heading>
-                            ) : (
-                                <Alert.Heading style={{ marginBottom: 5 }}>
-                                    (Chưa thanh toán)
-                                </Alert.Heading>
-                            )}
                         </div>
                         <hr />
                         <Form.Label
@@ -1328,17 +1547,51 @@ const Order = () => {
                                 }
                             />
                         </Form>
-                        {obj.isPending && (
-                            <Form.Group
-                                className="mb-3 mt-4"
-                                controlId="formBasicCheckbox"
-                            >
+                    </Alert>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button
+                        variant="danger"
+                        onClick={confirmUpdateCancel}
+                        disabled={!reason || !description}
+                    >
+                        Xác nhận
+                    </Button>
+                    <Button variant="primary" onClick={handleCloseFouth}>
+                        Đóng
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={showFifth} onHide={handleCloseFifth}>
+                <Modal.Header closeButton>
+                    <Modal.Title style={{ textAlign: "center" }}>
+                        Xác nhận hoàn tiền
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {
+                        <Form.Group
+                            className="mb-3 mt-4"
+                            controlId="formBasicCheckbox"
+                        >
+                            <div className="flex flex-col gap-2">
+                                <div className="flex mb-3 mt-3">
+                                    <span className="font-bold min-w-[90px]">
+                                        Tổng tiền:
+                                    </span>
+                                    <span>
+                                        {temp?.total?.toLocaleString("vi-VN")}{" "}
+                                        VNĐ
+                                    </span>
+                                </div>
+                                <hr />
                                 <div className="flex items-center gap-2">
                                     <Form.Check
                                         type="checkbox"
-                                        defaultChecked={flagModalFouth}
+                                        defaultChecked={flagModalFifth}
                                         onChange={(e) =>
-                                            flagModalFouthHanler(e)
+                                            flagModalFifthHanler(e)
                                         }
                                         style={{
                                             marginTop: 0,
@@ -1353,23 +1606,19 @@ const Order = () => {
                                         Xác nhận hoàn tiền
                                     </Form.Label>
                                 </div>
-                            </Form.Group>
-                        )}
-                    </Alert>
+                            </div>
+                        </Form.Group>
+                    }
                 </Modal.Body>
                 <Modal.Footer>
                     <Button
                         variant="danger"
-                        onClick={confirmUpdateCancel}
-                        disabled={
-                            !reason ||
-                            !description ||
-                            (!flagModalFouth && obj.isPending)
-                        }
+                        onClick={handleOrderRefund}
+                        disabled={!flagModalFifth}
                     >
                         Xác nhận
                     </Button>
-                    <Button variant="primary" onClick={handleCloseFouth}>
+                    <Button variant="primary" onClick={handleCloseFifth}>
                         Đóng
                     </Button>
                 </Modal.Footer>

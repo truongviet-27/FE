@@ -369,7 +369,9 @@ const Product = (props) => {
                                                                             a?.price ??
                                                                             0
                                                                     )
-                                                                ).toLocaleString()}{" "}
+                                                                ).toLocaleString(
+                                                                    "vi-VN"
+                                                                )}{" "}
                                                             </span>
                                                             <span className="text-[12px]">
                                                                 đ
@@ -384,7 +386,9 @@ const Product = (props) => {
                                                                             a?.price ??
                                                                             0
                                                                     )
-                                                                ).toLocaleString()}{" "}
+                                                                ).toLocaleString(
+                                                                    "vi-VN"
+                                                                )}{" "}
                                                             </span>
                                                             <span className="text-[12px]">
                                                                 đ
@@ -410,7 +414,9 @@ const Product = (props) => {
                                                                                 ?.sale
                                                                                 ?.discount)) /
                                                                     100
-                                                                ).toLocaleString()}{" "}
+                                                                ).toLocaleString(
+                                                                    "vi-VN"
+                                                                )}{" "}
                                                                 <span className="text-[12px]">
                                                                     đ
                                                                 </span>
@@ -432,7 +438,9 @@ const Product = (props) => {
                                                                                 ?.sale
                                                                                 ?.discount)) /
                                                                     100
-                                                                ).toLocaleString()}{" "}
+                                                                ).toLocaleString(
+                                                                    "vi-VN"
+                                                                )}{" "}
                                                                 <span className="text-[12px]">
                                                                     đ
                                                                 </span>

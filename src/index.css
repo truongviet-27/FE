@@ -191,65 +191,36 @@ button:hover {
     color: white;
 }
 
-.custom-gallery .image-gallery-slide img {
-    object-fit: cover;
-    background-size: cover;
-    max-height: 400px;
+.image-gallery{
+    height: 100%;
 }
 
-.custom-gallery .image-gallery-thumbnails img {
-    border-radius: 8px;
-    cursor: pointer;
-    transition: transform 0.2s linear;
-}
-
-.image-gallery-thumbnail.active,
-.image-gallery-thumbnail:focus {
-    border: none;
-}
-
-.custom-gallery button:hover {
+.image-gallery-content button {
     background-color: transparent;
-    box-shadow: none;
-    color: inherit;
-    width: auto;
+    box-shadow: none !important;
+    right: 0 !important;
+}
+
+.image-gallery-slide-wrapper > button:hover {
+    right: 0 !important;
+}
+.image-gallery-content button svg {
+    font-size: 20px !important;
+}
+
+.image-gallery-icon svg:hover {
+    right: 0 !important;
+}
+
+.image-gallery-content button:hover {
     border: none;
-    outline: none;
-    filter: none;
-    left: inherit;
+    color: white !important;
+    font-size: 20px !important;
 }
-
-.image-gallery-left-nav .image-gallery-svg,
-.image-gallery-right-nav .image-gallery-svg {
-    width: 45px;
-    height: 45px;
+.image-gallery-thumbnail {
+    overflow: hidden;
 }
-
-.image-gallery-right-nav .image-gallery-svg:hover {
-    background-color: #bdbdbd;
-    border-radius: 50%;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.image-gallery-left-nav .image-gallery-svg:hover {
-    background-color: #bdbdbd;
-    border-radius: 50%;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.image-gallery-fullscreen-button:hover {
-    color: #ccc;
-}
-.image-gallery-fullscreen-button .image-gallery-svg:hover {
-    color: #ccc;
-}
-.custom-gallery .image-gallery-thumbnail:hover,
-.custom-gallery .image-gallery-thumbnail:focus {
-    transform: none !important;
-    transition: none !important;
+.image-gallery-thumbnails button {
+    height: 120px !important;
+    width: 120px !important;
 }

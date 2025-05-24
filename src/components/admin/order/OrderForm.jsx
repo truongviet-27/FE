@@ -89,14 +89,15 @@ const OrderForm = () => {
                                         {item.attribute.size}
                                     </h6>
                                     <small className="text-muted">
-                                        Giá {item.sellPrice.toLocaleString()} x{" "}
-                                        {item.quantity}
+                                        Giá{" "}
+                                        {item.sellPrice.toLocaleString("vi-VN")}{" "}
+                                        x {item.quantity}
                                     </small>
                                 </div>
                                 <strong>
                                     {(
                                         item.sellPrice * item.quantity
-                                    ).toLocaleString()}{" "}
+                                    ).toLocaleString("vi-VN")}{" "}
                                     đ
                                 </strong>
                             </li>
@@ -105,14 +106,14 @@ const OrderForm = () => {
                             <li className="list-group-item d-flex justify-content-between">
                                 <span>Giá giảm (VND)</span>
                                 <strong>
-                                    - {(sub - amount).toLocaleString()} đ
+                                    - {(sub - amount).toLocaleString("vi-VN")} đ
                                 </strong>
                             </li>
                         )}
                         <li className="list-group-item d-flex justify-content-between">
                             <span>Tổng tiền (VND)</span>
                             <strong>
-                                {amount && amount.toLocaleString()} đ
+                                {amount && amount.toLocaleString("vi-VN")} đ
                             </strong>
                         </li>
                     </ul>

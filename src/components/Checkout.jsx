@@ -204,11 +204,16 @@ const Checkout = (props) => {
 
             createOrder(order)
                 .then((res) => {
-                    generatePaymentUrl({ orderId: res.data.data._id })
-                        .then((res) => {
-                            window.location.href = res.data.data;
-                        })
-                        .catch((err) => toast.error(err.message));
+                    if (data.payment === "VNPAY") {
+                        generatePaymentUrl({ orderId: res.data.data._id })
+                            .then((res) => {
+                                window.location.href = res.data.data;
+                            })
+                            .catch((err) => toast.error(err.message));
+                    } else {
+                        toast.success(res.data.message);
+                        history.push(`/order/detail/${res.data.data._id}`);
+                    }
                 })
                 .catch(() => {
                     toast.success(
@@ -226,7 +231,7 @@ const Checkout = (props) => {
         return cart.reduce((acc, cur) => {
             return acc + cur.lastPrice * cur.quantity;
         }, 0);
-    }, [cart]); // 🟢 thêm cart vào dependency array
+    }, [cart]); //
 
     return (
         <div className="pb-3 container-fluid !mb-20 !px-20">
@@ -520,7 +525,9 @@ const Checkout = (props) => {
                                                 </span>
                                                 <div className="text-muted flex gap-1 text-[14px]">
                                                     <span>
-                                                        {item.lastPrice.toLocaleString()}
+                                                        {item.lastPrice.toLocaleString(
+                                                            "vi-VN"
+                                                        )}
                                                     </span>
                                                     <span>x</span>
                                                     <span>{item.quantity}</span>
@@ -532,7 +539,7 @@ const Checkout = (props) => {
                                                 {(
                                                     item.lastPrice *
                                                     item.quantity
-                                                ).toLocaleString()}
+                                                ).toLocaleString("vi-VN")}
                                             </span>
                                             <span>{"VNĐ"}</span>
                                         </div>
@@ -617,14 +624,14 @@ const Checkout = (props) => {
                                         {amount &&
                                             (
                                                 amount + (sub ?? 0)
-                                            ).toLocaleString()}
+                                            ).toLocaleString("vi-VN")}
                                     </strong>
                                 </li>
                                 {sub && (
                                     <li className="list-group-item d-flex justify-content-between font-medium">
                                         <span>Giá giảm (VNĐ)</span>
                                         <strong>
-                                            - {sub.toLocaleString()}
+                                            - {sub.toLocaleString("vi-VN")}
                                         </strong>
                                     </li>
                                 )}
@@ -632,7 +639,8 @@ const Checkout = (props) => {
                                     <li className="list-group-item d-flex justify-content-between font-medium">
                                         <span>Thành tiền (VNĐ)</span>
                                         <strong>
-                                            {amount && amount.toLocaleString()}
+                                            {amount &&
+                                                amount.toLocaleString("vi-VN")}
                                         </strong>
                                     </li>
                                 )}

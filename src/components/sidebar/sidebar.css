@@ -1,5 +1,5 @@
 .sidebar {
-    min-width: var(--sidebar-width);
+    min-width: 250px;
     height: 100vh;
     /* position: fixed;
     left: 0;
@@ -24,7 +24,7 @@
 }
 
 .sidebar__item-inner {
-    padding: 15px 25px;
+    padding: 15px 10px;
     display: flex;
     align-items: center;
     font-weight: 600;

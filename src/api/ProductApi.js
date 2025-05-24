@@ -32,7 +32,7 @@ export const relateProduct = async (page, size, id, brandId, userId) => {
 };
 
 export const getRecommendation = async (id) => {
-    const url = `/api/v1/product/recommendation?id=${id}&page=0&size=3`;
+    const url = `/api/v1/product/recommendation?productId=${id}&page=0&size=5`;
     return await Instance.get(url);
 };
 

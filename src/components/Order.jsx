@@ -11,7 +11,7 @@ import convertStatusOrder from "../utils/convertStatusOrder";
 const Order = (props) => {
     const [order, setOrder] = useState([]);
     const [orderStatus, setOrderStatus] = useState([]);
-    const [status, setStatus] = useState("");
+    const [status, setStatus] = useState([]);
     const [obj, setObj] = useState({});
     const [total, setTotal] = useState();
     const [page, setPage] = useState(0);
@@ -125,40 +125,63 @@ const Order = (props) => {
                     </div>
                     <div>
                         <div className="col-12 mb-3 mt-3 mini-card">
-                            <div className="form-check form-check-inline mr-5">
+                            <div className="form-check-inline !mr-8">
                                 <input
                                     className="form-check-input"
-                                    type="radio"
+                                    type="checkbox"
                                     name="inlineRadioOptions"
                                     value=""
                                     onChange={(event) => {
                                         setStatus(event.target.value);
                                         setPage(0);
                                     }}
+                                    style={{
+                                        marginTop: "2px",
+                                    }}
                                     checked={status == ""}
                                 />
-                                <label className="form-check-label">
+                                <label className="form-check-label !ml-2">
                                     Tất cả
                                 </label>
                             </div>
                             {orderStatus?.map((item, index) => (
                                 <div
-                                    className="form-check form-check-inline mr-5 ml-5"
-                                    key={index}
+                                    className="form-check-inline !mr-8"
+                                    key={item._id}
                                 >
                                     <input
                                         className="form-check-input"
-                                        type="radio"
+                                        type="checkbox"
                                         name="inlineRadioOptions"
-                                        value={item._id}
+                                        value={item.code}
                                         onChange={(event) => {
-                                            setStatus(event.target.value);
+                                            const value = event.target.value;
+                                            if (status.length === 6) {
+                                                setStatus([]);
+                                            } else {
+                                                if (event.target.checked) {
+                                                    setStatus((prev) => [
+                                                        ...prev,
+                                                        value,
+                                                    ]);
+                                                } else {
+                                                    setStatus((prev) =>
+                                                        prev.filter(
+                                                            (code) =>
+                                                                code !== value
+                                                        )
+                                                    );
+                                                }
+                                            }
                                             setPage(0);
                                         }}
-                                        checked={status == item._id}
+                                        style={{
+                                            marginTop: "2px",
+                                        }}
+                                        checked={status.includes(item.code)}
                                     />
                                     <label
-                                        className="form-check-label"
+                                        className="form-check-label !ml-2"
                                         htmlFor="inlineRadio2"
                                     >
                                         {item.name}
@@ -263,11 +286,12 @@ const Order = (props) => {
                                             {formatDate(item?.shipDate)}
                                         </td>
                                         <td className="text-center align-middle font-bold">
-                                            {item.total.toLocaleString()} ₫
+                                            {item.total.toLocaleString("vi-VN")}{" "}
+                                            ₫
                                         </td>
                                         <td className="text-center align-middle font-bold">
                                             <button
-                                                className={`btn btn-light `}
+                                                className={`btn btn-light`}
                                                 onClick={() =>
                                                     handleShowFouth(
                                                         item._id,
@@ -275,8 +299,12 @@ const Order = (props) => {
                                                     )
                                                 }
                                                 disabled={[
-                                                    "CANCELLED",
+                                                    "PROCESSING",
+                                                    "SHIPPING",
                                                     "DELIVERED",
+                                                    "CANCELLED",
+                                                    "RETURN",
+                                                    "REFUND",
                                                 ].includes(
                                                     item?.orderStatus?.code
                                                 )}

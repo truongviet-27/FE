@@ -19,8 +19,8 @@ export const getAllOrderStatus = async () => {
     return await Instance.get(url);
 };
 
-export const getAllOrder = async (id, orderStatusId, page, size) => {
-    const url = `/api/v1/order/list?accountId=${id}&orderStatusId=${orderStatusId}&page=${page}&size=${size}`;
+export const getAllOrder = async (id, status, page, size) => {
+    const url = `/api/v1/order/list?accountId=${id}&statusCode=${status}&page=${page}&size=${size}`;
     return await Instance.get(url);
 };
 
@@ -29,9 +29,19 @@ export const cancelOrder = async (data) => {
     return await Instance.post(url, data);
 };
 
+export const updateOrderReturn = async (data) => {
+    const url = `/api/v1/order/update-order-return`;
+    return await Instance.post(url, data);
+};
+
+export const updateOrderRefund = async (data) => {
+    const url = `/api/v1/order/update-order-refund`;
+    return await Instance.post(url, data);
+};
+
 //admin
-export const countOrderByName = async () => {
-    const url = `/api/v1/order/list/count`;
+export const countOrderByCategoryName = async () => {
+    const url = `/api/v1/order/list/category-count`;
     return await Instance.get(url);
 };
 
@@ -67,8 +77,14 @@ export const getOrderByOrderStatusAndYearAndMonth = async (
     return await Instance.get(url);
 };
 
-export const getOrderByOrderYearAndMonth = async (year, month, page, size) => {
-    const url = `/api/v1/order/synthesis/order-year-month?year=${year}&month=${month}&page=${page}&size=${size}`;
+export const getOrderByOrderYearAndMonth = async (
+    year,
+    month,
+    statusCode,
+    page,
+    size
+) => {
+    const url = `/api/v1/order/synthesis/order-year-month?year=${year}&month=${month}&statusCode=${statusCode}&page=${page}&size=${size}`;
     return await Instance.get(url);
 };
 

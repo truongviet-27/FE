@@ -351,7 +351,7 @@ const OrderDetail = () => {
                                         {item?.attribute?.size}
                                     </td>
                                     <td className="text-center align-middle font-bold">
-                                        {item?.sellPrice?.toLocaleString()}₫
+                                        {item?.sellPrice?.toLocaleString("vi-VN")}₫
                                     </td>
                                     <td className="text-center align-middle font-bold">
                                         {item?.quantity}
@@ -359,7 +359,7 @@ const OrderDetail = () => {
                                     <td className="text-center align-middle font-bold">
                                         {(
                                             item?.sellPrice * item?.quantity
-                                        )?.toLocaleString()}
+                                        )?.toLocaleString("vi-VN")}
                                         ₫
                                     </td>
                                 </tr>
@@ -372,7 +372,7 @@ const OrderDetail = () => {
                             {(
                                 order?.total /
                                 (1 - (order?.voucher?.discount ?? 0) / 100)
-                            )?.toLocaleString()}{" "}
+                            )?.toLocaleString("vi-VN")}{" "}
                             đ
                         </p>
                         {order?.voucher?.discount ? (
@@ -381,7 +381,7 @@ const OrderDetail = () => {
                                 {(
                                     order?.total /
                                     (1 - (order?.voucher?.discount ?? 0) / 100)
-                                )?.toLocaleString()}{" "}
+                                )?.toLocaleString("vi-VN")}{" "}
                                 đ
                             </p>
                         ) : (
@@ -390,49 +390,9 @@ const OrderDetail = () => {
                             </p>
                         )}
                         <h5 className="text-danger !font-bold">
-                            Tổng cộng: {order?.total?.toLocaleString()} đ
+                            Tổng cộng: {order?.total?.toLocaleString("vi-VN")} đ
                         </h5>
                     </div>
-                    {/* <div className="flex mb-5 justify-between">
-                        <div className="">
-                            <p
-                                className="display-4 text-primary !font-bold"
-                                style={{ fontSize: "24px" }}
-                            >
-                                Trạng thái thanh toán
-                            </p>
-                            <p
-                                className="text-danger"
-                                style={{ fontWeight: "bolder" }}
-                            >
-                                {order?.isPayment
-                                    ? "Đã thanh toán"
-                                    : "Chưa thanh toán"}
-                            </p>
-                        </div>
-                        <div className="">
-                            <p
-                                className="display-4 text-primary !font-bold"
-                                style={{ fontSize: "24px" }}
-                            >
-                                Trạng thái đơn hàng
-                            </p>
-                            <p
-                                className="text-danger"
-                                style={{ fontWeight: "bolder" }}
-                            >
-                                {order?.orderStatus?.name}
-                            </p>
-                            <p
-                                className="text"
-                                style={{ fontWeight: "bolder" }}
-                            >
-                                {order?.reason && (
-                                    <>Lí do hủy : {order?.reason}</>
-                                )}
-                            </p>
-                        </div>
-                    </div> */}
                     <div className="flex flex-col justify-between md:flex-row !pt-10 mb-5 border-t-1 border-b-1 border-gray-300">
                         <div className="mb-4">
                             <div>
@@ -465,35 +425,38 @@ const OrderDetail = () => {
                             <div>
                                 <div className="flex items-center gap-2 mb-2">
                                     <FaClipboardList className="mb-2 text-primary text-[22px]" />
+
                                     <h5 className="text-primary !mb-1">
                                         Trạng thái đơn hàng
                                     </h5>
                                 </div>
-                                <p className="text-info">
-                                    {convertStatusColor(
-                                        order?.orderStatus?.code
+                                <div className="flex flex-col !ml-8">
+                                    <p className="text-danger font-bold">
+                                        {convertStatusOrder(
+                                            order?.orderStatus?.code
+                                        )}
+                                    </p>
+                                    <p className="font-bold">
+                                        {order?.shipDate &&
+                                        order.orderStatus?.code == "SHIPPING"
+                                            ? `Ngày nhận dự kiến: ${new Date(
+                                                  order?.shipDate
+                                              ).toLocaleDateString("vi-VN", {
+                                                  day: "2-digit",
+                                                  month: "2-digit",
+                                                  year: "numeric",
+                                              })}`
+                                            : ""}
+                                    </p>
+                                    {order.reason && (
+                                        <div className="text flex gap-2">
+                                            <span className="font-bold">
+                                                Lí do hủy:
+                                            </span>
+                                            <span>{order.reason}</span>
+                                        </div>
                                     )}
-                                </p>
-                                <p className="text-info">
-                                    {order?.shipDate &&
-                                    order.orderStatus?.name == "SHIPPING"
-                                        ? `Ngày nhận dự kiến: ${new Date(
-                                              order?.shipDate
-                                          ).toLocaleDateString("vi-VN", {
-                                              day: "2-digit",
-                                              month: "2-digit",
-                                              year: "numeric",
-                                          })}`
-                                        : ""}
-                                </p>
-                                {order.reason && (
-                                    <div className="text flex gap-2">
-                                        <span className="font-bold">
-                                            Lí do hủy:
-                                        </span>
-                                        <span>{order.reason}</span>
-                                    </div>
-                                )}
+                                </div>
                             </div>
                         </div>
                         <div className="mb-4">
@@ -554,19 +517,40 @@ const OrderDetail = () => {
                                             Xác nhận đã giao hàng
                                         </button>
                                     )}
-                                    {order?.orderStatus?.code !== "DELIVERED" && !order.isPayment && (
-                                            <button
-                                                className="btn btn-danger mx-2"
-                                                onClick={() => {
-                                                    handleShowFouth(
-                                                        id,
-                                                        "CANCELLED"
-                                                    );
-                                                }}
-                                            >
-                                                Hủy đơn hàng
-                                            </button>
-                                        )}
+                                    {(order?.orderStatus?.code ===
+                                        "DELIVERED" ||
+                                        order?.orderStatus?.code ===
+                                            "PENDING_CONFIRM") && (
+                                        <button
+                                            className="btn btn-danger mx-2"
+                                            onClick={() => {
+                                                handleShowFouth(
+                                                    id,
+                                                    "CANCELLED"
+                                                );
+                                            }}
+                                        >
+                                            Hủy đơn hàng
+                                        </button>
+                                    )}
+
+                                    {((order?.orderStatus?.code ===
+                                        "DELIVERED" &&
+                                        order.isPayment) ||
+                                        order?.orderStatus?.code ===
+                                            "RETURN") && (
+                                        <button
+                                            className="btn btn-danger mx-2"
+                                            onClick={() => {
+                                                handleShowFouth(
+                                                    id,
+                                                    "CANCELLED"
+                                                );
+                                            }}
+                                        >
+                                            Hoàn tiền
+                                        </button>
+                                    )}
                                 </div>
                             )}
                     </div>
@@ -654,7 +638,7 @@ const OrderDetail = () => {
                             <span className="font-bold min-w-[90px]">
                                 Tổng tiền:
                             </span>
-                            <span>{order?.total?.toLocaleString()} VNĐ</span>
+                            <span>{order?.total?.toLocaleString("vi-VN")} VNĐ</span>
                         </div>
                     </Alert>
                     <Form.Group className="mb-3" controlId="formBasicCheckbox">
@@ -713,16 +697,6 @@ const OrderDetail = () => {
                                 );
                             })}
                         </Form.Select>
-                        {/* <Form>
-              <Form.Label style={{ marginRight: 30, marginBottom: 10 }}>
-                Mã vận đơn
-              </Form.Label>
-              <Form.Control
-                style={{ height: 40, width: 300, marginBottom: 20 }}
-                type="text"
-                onChange={(e) => codeHandler(e.target.value)}
-              />
-            </Form> */}
                         <Form>
                             <Form.Label
                                 style={{ marginRight: 30, marginBottom: 10 }}
@@ -764,7 +738,7 @@ const OrderDetail = () => {
                         <Alert.Heading>Tiền đã về tay?</Alert.Heading>
                         <hr />
                         <p className="font-weight-bold">
-                            Tổng tiền đơn hàng: {order?.total?.toLocaleString()}{" "}
+                            Tổng tiền đơn hàng: {order?.total?.toLocaleString("vi-VN")}{" "}
                             đ
                         </p>
                     </Alert>

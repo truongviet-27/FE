@@ -159,7 +159,7 @@ const Home = (props) => {
                                                     ...item.attributes.map(
                                                         (a) => a.price ?? 0
                                                     )
-                                                ).toLocaleString()}{" "}
+                                                ).toLocaleString("vi-VN")}{" "}
                                             </span>
                                             <span className="text-[12px]">
                                                 đ
@@ -172,7 +172,7 @@ const Home = (props) => {
                                                     ...item.attributes.map(
                                                         (a) => a.price ?? 0
                                                     )
-                                                ).toLocaleString()}{" "}
+                                                ).toLocaleString("vi-VN")}{" "}
                                             </span>
                                             <span className="text-[12px]">
                                                 đ
@@ -193,7 +193,7 @@ const Home = (props) => {
                                                             item?.sale
                                                                 ?.discount)) /
                                                     100
-                                                ).toLocaleString()}{" "}
+                                                ).toLocaleString("vi-VN")}{" "}
                                                 <span className="text-[12px]">
                                                     đ
                                                 </span>
@@ -210,7 +210,7 @@ const Home = (props) => {
                                                             item?.sale
                                                                 ?.discount)) /
                                                     100
-                                                ).toLocaleString()}{" "}
+                                                ).toLocaleString("vi-VN")}{" "}
                                                 <span className="text-[12px]">
                                                     đ
                                                 </span>

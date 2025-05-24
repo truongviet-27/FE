@@ -128,11 +128,14 @@ const Detail = () => {
                                     <span className="ml-2">
                                         {price && item?.sale?.discount > 0 ? (
                                             <del>
-                                                {price?.toLocaleString() + " đ"}
+                                                {price?.toLocaleString(
+                                                    "vi-VN"
+                                                ) + " đ"}
                                             </del>
                                         ) : (
                                             price &&
-                                            price?.toLocaleString() + " đ"
+                                            price?.toLocaleString("vi-VN") +
+                                                " đ"
                                         )}
                                     </span>
                                 </div>
@@ -143,7 +146,7 @@ const Detail = () => {
                                             (price *
                                                 (100 - item?.sale?.discount)) /
                                             100
-                                        )?.toLocaleString() + " đ"}
+                                        )?.toLocaleString("vi-VN") + " đ"}
                                 </span>
                                 <div className="flex items-center rounded-[4px] px-1 bg-[#feeeea] !text-[#ee4d2d] text-[12px]">
                                     {item?.sale?.discount}%

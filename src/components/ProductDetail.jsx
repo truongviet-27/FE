@@ -3,11 +3,9 @@ import { Button } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import Table from "react-bootstrap/Table";
 import { NavLink, useParams } from "react-router-dom";
+import { Rating } from "react-simple-star-rating";
 import { toast } from "react-toastify";
-import {
-    getAllReviewAttributeByProductId,
-    getAttributeById,
-} from "../api/AttributeApi";
+import { getAllReviewAttributeByProductId } from "../api/AttributeApi";
 import {
     getCartItemByAccountId,
     isEnoughCartItem,
@@ -19,7 +17,6 @@ import {
     relateProduct,
     toggleLikeProduct,
 } from "../api/ProductApi";
-import { Rating } from "react-simple-star-rating";
 import formatDate from "../utils/convertDate";
 
 import ImageGallery from "react-image-gallery";
@@ -27,11 +24,11 @@ import "react-image-gallery/styles/css/image-gallery.css";
 
 const ProductDetail = (props) => {
     const { id } = useParams();
-    const [item, setItem] = useState();
+    const [product, setProduct] = useState();
     const [attributes, setAttributes] = useState([]);
     const [price, setPrice] = useState();
     const [stock, setStock] = useState();
-    const [flag, setFlag] = useState();
+    const [attribute, setAttribute] = useState();
     const [count, setCount] = useState(1);
     const [status, setStatus] = useState(true);
     const [relate, setRelate] = useState([]);
@@ -53,8 +50,8 @@ const ProductDetail = (props) => {
             const res = await relateProduct(
                 page,
                 5,
-                item._id,
-                item.brand._id,
+                product._id,
+                product.brand._id,
                 localStorage.getItem("id")
             );
             setRelate(res.data.content);
@@ -63,8 +60,6 @@ const ProductDetail = (props) => {
             console.error("Error fetching related products:", err);
         }
     };
-
-    console.log(reviews, "reviews");
 
     useEffect(() => {
         loadRelatedProducts();
@@ -89,7 +84,7 @@ const ProductDetail = (props) => {
     const onLoad = () => {
         getProductById(id)
             .then((res) => {
-                setItem(res.data.data);
+                setProduct(res.data.data);
                 setImages(
                     res.data.data.imageUrls.map((item) => ({
                         original: item.url,
@@ -100,7 +95,7 @@ const ProductDetail = (props) => {
                 onModify(
                     res.data.data.attributes[0].price,
                     res.data.data.attributes[0].stock,
-                    res.data.data.attributes[0]._id
+                    res.data.data.attributes[0]
                 );
                 relateProduct(
                     page,
@@ -115,7 +110,7 @@ const ProductDetail = (props) => {
                     })
                     .catch((error) => console.log(error));
 
-                getRecommendation(res.data.id)
+                getRecommendation(res.data.data._id)
                     .then((resp) => {
                         setRecommendations(resp.data.data.content);
                     })
@@ -129,24 +124,24 @@ const ProductDetail = (props) => {
 
         setStatus(stock >= count);
 
-        if (localStorage.getItem("user")) {
-            getCartItemByAccountId(
-                JSON.parse(localStorage.getItem("user"))?._id
-            ).then((resp) => {
-                console.log("RESSPP" + resp);
-                setCart(
-                    resp.data.data.map((item) => ({ ...item, checked: false }))
-                );
-            });
-        }
+        // if (localStorage.getItem("user")) {
+        //     getCartItemByAccountId(
+        //         JSON.parse(localStorage.getItem("user"))?._id
+        //     ).then((resp) => {
+        //         console.log("RESSPP" + resp);
+        //         setCart(
+        //             resp.data.data.map((item) => ({ ...item, checked: false }))
+        //         );
+        //     });
+        // }
     };
 
-    const onModify = (price, stock, flag) => {
+    const onModify = (price, stock, attribute) => {
         setCount(1);
         setStatus(stock >= count);
         setPrice(price);
         setStock(stock);
-        setFlag(flag);
+        setAttribute(attribute);
     };
 
     const handleLike = (productId, currentLikeStatus) => {
@@ -163,8 +158,8 @@ const ProductDetail = (props) => {
                 relateProduct(
                     page,
                     5,
-                    item._id,
-                    item.brand._id,
+                    product._id,
+                    product.brand._id,
                     localStorage.getItem("id")
                 ).then((response) => {
                     setRelate(response.data.content);
@@ -176,52 +171,45 @@ const ProductDetail = (props) => {
             });
     };
 
-    const onAddCartHandler = async (attributeId, lastPrice) => {
+    const onAddCartHandler = async (attribute, lastPrice) => {
         if (!status) {
             toast.warning("Sản phẩm đã hết hàng.");
         } else {
-            if (flag) {
-                if (props.user) {
-                    const flagId = cart.map((item) => item._id);
-                    const obj = cart.filter((i) => i.id == attributeId)[0];
-                    console.log(obj);
-                    const data = {
-                        attributeId: attributeId,
-                        quantity: flagId.includes(attributeId)
-                            ? count + obj.quantity
-                            : count,
-                        lastPrice,
-                    };
-                    console.log(data, "data");
-                    modifyCartItemFromDetail(data)
-                        .then((response) => {
-                            toast.success(response.data.message);
-                        })
-                        .catch((error) => {
-                            setCount(1);
-                            toast.error(error.response.data.message);
-                        });
-                } else {
-                    getAttributeById(attributeId)
-                        .then((resp) => {
-                            const data = {
-                                id: attributeId,
-                                image: item.main,
-                                name: item.name,
-                                size: resp.data.size,
-                                price: resp.data.price,
-                                stock: resp.data.stock,
-                                discount: item.discount,
-                                quantity: count,
-                                lastPrice: lastPrice,
-                            };
-                            props.addHandler(data);
-                            toast.success("Thêm vào giỏ hàng thành công.");
-                        })
-                        .catch((error) => console.log(error));
-                }
+            if (props.user) {
+                const data = {
+                    attributeId: attribute._id,
+                    quantity: count,
+                    lastPrice,
+                };
+                console.log(data, "data");
+                modifyCartItemFromDetail(data)
+                    .then((response) => {
+                        toast.success(response.data.message);
+                    })
+                    .catch((error) => {
+                        setCount(1);
+                        toast.error(error.response.data.message);
+                    });
             } else {
-                toast.warning("Mời chọn size.");
+                const data = {
+                    imageUrls: product.imageUrls,
+                    product: {
+                        _id: product._id,
+                        name: product.name,
+                        code: product.code,
+                    },
+                    attribute: {
+                        _id: attribute._id,
+                        size: attribute.size,
+                        stock: attribute.stock,
+                        price: attribute.price,
+                    },
+                    quantity: count,
+                    lastPrice: lastPrice,
+                };
+                props.addHandler(data);
+                toast.success("Thêm vào giỏ hàng thành công.");
+                setCount(1);
             }
         }
     };
@@ -229,7 +217,7 @@ const ProductDetail = (props) => {
     const updateCount = (value) => {
         if (Number(value) >= 1 && Number(value) <= stock) {
             setCount(Number(value));
-            isEnoughCartItem(flag, value).catch((error) => {
+            isEnoughCartItem(attribute._id, value).catch((error) => {
                 toast.warning(error.response.data.message);
                 setCount(1);
             });
@@ -239,14 +227,34 @@ const ProductDetail = (props) => {
     };
 
     const addCount = (value) => {
-        setCount(Number(value));
-        isEnoughCartItem(flag, value)
-            .then(() => {
-                setCount(value);
-            })
-            .catch((error) => {
-                toast.warning(error.response.data.message);
-            });
+        if (props.user) {
+            isEnoughCartItem(attribute._id, value)
+                .then(() => {
+                    setCount(value);
+                })
+                .catch((error) => {
+                    toast.warning(error.response.data.message);
+                });
+        } else {
+            const attributeItem = props.cartItem?.find(
+                (item) => item.attribute._id === attribute._id
+            );
+
+            if (attributeItem) {
+                if (
+                    attributeItem.quantity + Number(value) >
+                    attributeItem.attribute.stock
+                ) {
+                    toast.warning(
+                        `Giỏ hàng đã có ${attributeItem.quantity} sản phẩm`
+                    );
+                } else {
+                    setCount(Number(value));
+                }
+            } else {
+                setCount(Number(value));
+            }
+        }
     };
 
     const onChangePageReview = (index) => {};
@@ -268,11 +276,11 @@ const ProductDetail = (props) => {
 
     return (
         <div>
-            {item && (
+            {product && (
                 <div className="col-12 mt-5">
                     <div className="flex flex-col lg:flex-row border border-gray-200 rounded-2xl !p-10 !mb-0 gap-12">
-                        <div className="w-full lg:w-2/5 border">
-                            <div className="!h-full !w-full !p-10">
+                        <div className="w-full lg:w-2/5 border rounded-2xl overflow-hidden">
+                            <div className="!h-full !w-full">
                                 {images.length > 0 && (
                                     <ImageGallery
                                         items={images}
@@ -285,12 +293,12 @@ const ProductDetail = (props) => {
                         <div className="w-full lg:w-3/5">
                             <div className="text-[14px] mt-0 lg:!mt-0">
                                 <div className="text-[24px] font-bold">
-                                    <span>{item?.name.toUpperCase()} </span>
-                                    <span className="">- {item?.code}</span>
+                                    <span>{product?.name.toUpperCase()} </span>
+                                    <span className="">- {product?.code}</span>
                                 </div>
                                 <div className="mt-2">
                                     <Rating
-                                        initialValue={item.rating ?? 5}
+                                        initialValue={product.rating ?? 5}
                                         size={20}
                                         transition
                                         allowFraction={true}
@@ -302,7 +310,7 @@ const ProductDetail = (props) => {
                                 </div>
                                 <div className="mt-3">
                                     <span className="font-medium">
-                                        Mã SP: {item?.code}
+                                        Mã SP: {product?.code}
                                     </span>
                                 </div>
                                 <div className="flex gap-10 mt-4">
@@ -310,18 +318,21 @@ const ProductDetail = (props) => {
                                         <span> Đã bán:</span>
                                         <span>
                                             {
-                                                item.attributes.find(
-                                                    (item) => item._id === flag
-                                                ).sumOrder
+                                                product.attributes.find(
+                                                    (attributeItem) =>
+                                                        attributeItem._id ===
+                                                        attribute._id
+                                                )?.sumOrder
                                             }
                                         </span>
                                         <span>sản phẩm</span>
                                     </div>
                                     <span className="font-medium">
-                                        Lượt xem: {item?.view} lượt
+                                        Lượt xem: {product?.view} lượt
                                     </span>
                                     <span className="font-medium">
-                                        Yêu thích: {item?.likeQuantity?.length}
+                                        Yêu thích:{" "}
+                                        {product?.likeQuantity?.length}
                                     </span>
                                 </div>
 
@@ -330,14 +341,16 @@ const ProductDetail = (props) => {
                                         <span> Giá gốc:</span>
                                         <span className="ml-2">
                                             {price &&
-                                            item?.sale?.discount > 0 ? (
+                                            product?.sale?.discount > 0 ? (
                                                 <del>
-                                                    {price?.toLocaleString() +
-                                                        " đ"}
+                                                    {price?.toLocaleString(
+                                                        "vi-VN"
+                                                    ) + " đ"}
                                                 </del>
                                             ) : (
                                                 price &&
-                                                price?.toLocaleString() + " đ"
+                                                price?.toLocaleString("vi-VN") +
+                                                    " đ"
                                             )}
                                         </span>
                                     </div>
@@ -347,12 +360,13 @@ const ProductDetail = (props) => {
                                             (
                                                 (price *
                                                     (100 -
-                                                        item?.sale?.discount)) /
+                                                        product?.sale
+                                                            ?.discount)) /
                                                 100
-                                            )?.toLocaleString() + " đ"}
+                                            )?.toLocaleString("vi-VN") + " đ"}
                                     </span>
                                     <div className="flex items-center rounded-[4px] px-1 bg-[#feeeea] !text-[#ee4d2d] text-[12px]">
-                                        {item?.sale?.discount}%
+                                        {product?.sale?.discount}%
                                     </div>
                                 </div>
 
@@ -365,32 +379,40 @@ const ProductDetail = (props) => {
                                 <div className="flex items-center gap-4">
                                     <label className="mr-5">Kích thước</label>
                                     <div className="flex gap-4">
-                                        {attributes?.map((i, index) => (
-                                            <div
-                                                className="flex items-center gap-2"
-                                                key={index}
-                                            >
-                                                <input
-                                                    className="form-check-input !mt-0"
-                                                    type="radio"
-                                                    name="inlineRadioOptions"
-                                                    id="inlineRadio3"
-                                                    defaultValue="option3"
-                                                    onChange={() =>
-                                                        onModify(
-                                                            i?.price,
-                                                            i?.stock,
-                                                            i?._id
-                                                        )
-                                                    }
-                                                    disabled={i?.stock === 0}
-                                                    checked={flag == i?._id}
-                                                />
-                                                <label className="form-check-label">
-                                                    {i?.size}
-                                                </label>
-                                            </div>
-                                        ))}
+                                        {attributes?.map(
+                                            (attributeItem, index) => (
+                                                <div
+                                                    className="flex items-center gap-2"
+                                                    key={attributeItem._id}
+                                                >
+                                                    <input
+                                                        className="form-check-input !mt-0"
+                                                        type="radio"
+                                                        name="inlineRadioOptions"
+                                                        id="inlineRadio3"
+                                                        defaultValue="option3"
+                                                        onChange={() =>
+                                                            onModify(
+                                                                attributeItem?.price,
+                                                                attributeItem?.stock,
+                                                                attributeItem
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            attributeItem?.stock ===
+                                                            0
+                                                        }
+                                                        checked={
+                                                            attribute._id ==
+                                                            attributeItem?._id
+                                                        }
+                                                    />
+                                                    <label className="form-check-label">
+                                                        {attributeItem?.size}
+                                                    </label>
+                                                </div>
+                                            )
+                                        )}
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 mt-5">
@@ -436,9 +458,10 @@ const ProductDetail = (props) => {
                                     style={{ marginRight: "20px" }}
                                     onClick={() =>
                                         onAddCartHandler(
-                                            flag,
+                                            attribute,
                                             (price *
-                                                (100 - item?.sale?.discount)) /
+                                                (100 -
+                                                    product?.sale?.discount)) /
                                                 100
                                         )
                                     }
@@ -458,7 +481,7 @@ const ProductDetail = (props) => {
                                     Mô tả sản phẩm
                                 </p>
                                 <span className="text-[14px]">
-                                    {item?.description}
+                                    {product?.description}
                                 </span>
                             </div>
                         </div>
@@ -680,7 +703,9 @@ const ProductDetail = (props) => {
                                                                                 a.price ??
                                                                                 0
                                                                         )
-                                                                    ).toLocaleString()}{" "}
+                                                                    ).toLocaleString(
+                                                                        "vi-VN"
+                                                                    )}{" "}
                                                                 </span>
                                                                 <span className="text-[12px]">
                                                                     đ
@@ -697,7 +722,9 @@ const ProductDetail = (props) => {
                                                                                 a.price ??
                                                                                 0
                                                                         )
-                                                                    ).toLocaleString()}{" "}
+                                                                    ).toLocaleString(
+                                                                        "vi-VN"
+                                                                    )}{" "}
                                                                 </span>
                                                                 <span className="text-[12px]">
                                                                     đ
@@ -723,7 +750,9 @@ const ProductDetail = (props) => {
                                                                                     ?.sale
                                                                                     ?.discount)) /
                                                                         100
-                                                                    ).toLocaleString()}{" "}
+                                                                    ).toLocaleString(
+                                                                        "vi-VN"
+                                                                    )}{" "}
                                                                     <span className="text-[12px]">
                                                                         đ
                                                                     </span>
@@ -745,7 +774,9 @@ const ProductDetail = (props) => {
                                                                                     ?.sale
                                                                                     ?.discount)) /
                                                                         100
-                                                                    ).toLocaleString()}{" "}
+                                                                    ).toLocaleString(
+                                                                        "vi-VN"
+                                                                    )}{" "}
                                                                     <span className="text-[12px]">
                                                                         đ
                                                                     </span>
@@ -914,7 +945,9 @@ const ProductDetail = (props) => {
                                                                     (100 -
                                                                         item.discount)) /
                                                                 100
-                                                            ).toLocaleString()}{" "}
+                                                            ).toLocaleString(
+                                                                "vi-VN"
+                                                            )}{" "}
                                                             đ
                                                         </p>
                                                     </div>
@@ -970,7 +1003,9 @@ const ProductDetail = (props) => {
                                                         <p className="mb-0 small">
                                                             <b>
                                                                 Giá gốc:{" "}
-                                                                {item.price.toLocaleString()}{" "}
+                                                                {item.price.toLocaleString(
+                                                                    "vi-VN"
+                                                                )}{" "}
                                                                 đ
                                                             </b>
                                                         </p>
@@ -982,7 +1017,9 @@ const ProductDetail = (props) => {
                                                                 (item.price *
                                                                     item.discount) /
                                                                 100
-                                                            ).toLocaleString()}{" "}
+                                                            ).toLocaleString(
+                                                                "vi-VN"
+                                                            )}{" "}
                                                             đ ({item.discount}
                                                             %)
                                                         </p>
@@ -1037,57 +1074,55 @@ const ProductDetail = (props) => {
                         <thead>
                             <tr>
                                 <th></th>
-                                <th>{item && item?.name}</th>
-                                <th>{temp && temp?.name}</th>
+                                <th>{product?.name}</th>
+                                <th>{temp?.name}</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td>Code</td>
-                                <td>{item && item?.code}</td>
-                                <td>{temp && temp?.code}</td>
+                                <td>{product?.code}</td>
+                                <td>{temp?.code}</td>
                             </tr>
                             <tr>
                                 <td>Thương hiệu</td>
-                                <td>{item && item?.brand}</td>
-                                <td>{temp && temp?.brand}</td>
+                                <td>{product?.brand}</td>
+                                <td>{temp?.brand}</td>
                             </tr>
                             <tr>
                                 <td>Giá</td>
                                 <td>
-                                    {item && item?.price?.toLocaleString()} đ
+                                    {product?.price?.toLocaleString("vi-VN")} đ
                                 </td>
                                 <td>
-                                    {temp && temp?.price?.toLocaleString()} đ
+                                    {temp?.price?.toLocaleString("vi-VN")} đ
                                 </td>
                             </tr>
                             <tr>
                                 <td>Giảm giá</td>
-                                <td>{item && item?.discount} %</td>
-                                <td>{temp && temp?.discount} %</td>
+                                <td>{product?.discount} %</td>
+                                <td>{temp?.discount} %</td>
                             </tr>
                             <tr>
                                 <td>Lượt thích</td>
-                                <td>{item && item?.view}</td>
-                                <td>{temp && temp?.view}</td>
+                                <td>{product?.view}</td>
+                                <td>{temp?.view}</td>
                             </tr>
                             <tr>
                                 <td>Size</td>
                                 <td>
-                                    {item &&
-                                        item?.attributes?.reduce(
-                                            (result, item) =>
-                                                result + " " + item.size + "",
-                                            ""
-                                        )}
+                                    {product?.attributes?.reduce(
+                                        (result, product) =>
+                                            result + " " + product.size + "",
+                                        ""
+                                    )}
                                 </td>
                                 <td>
-                                    {temp &&
-                                        temp?.attributes?.reduce(
-                                            (result, item) =>
-                                                result + " " + item.size + "",
-                                            ""
-                                        )}
+                                    {temp?.attributes?.reduce(
+                                        (result, product) =>
+                                            result + " " + product.size + "",
+                                        ""
+                                    )}
                                 </td>
                             </tr>
                         </tbody>

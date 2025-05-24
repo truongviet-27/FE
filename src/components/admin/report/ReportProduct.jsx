@@ -40,100 +40,106 @@ const ReportProduct = () => {
         history.goBack();
     };
     return (
-        <div className="card flex flex-col !mx-[25px] overflow-y-hidden">
-            <div className="col-12 flex items-center justify-between text-center mb-4">
-                <button style={{ width: 60 }} onClick={() => goBack()}>
-                    <i
-                        className="fa fa-arrow-left"
-                        style={{ fontSize: 18 }}
-                        aria-hidden="true"
-                    ></i>
-                </button>
-                <div className="card__header">
-                    <h3 className="text-danger">Doanh thu theo sản phẩm</h3>
+        <div className="card flex flex-col !mx-[25px] overflow-y-hidden justify-between">
+            <div>
+                <div className="col-12 flex items-center justify-between text-center mb-4">
+                    <button style={{ width: 60 }} onClick={() => goBack()}>
+                        <i
+                            className="fa fa-arrow-left"
+                            style={{ fontSize: 18 }}
+                            aria-hidden="true"
+                        ></i>
+                    </button>
+                    <div className="card__header">
+                        <h3 className="text-danger">Doanh thu theo sản phẩm</h3>
+                    </div>
+                    <div className="w-[60px]"></div>
                 </div>
-                <div className="w-[60px]"></div>
-            </div>
 
-            <div className="flex items-center justify-end gap-3 !mt-0">
-                <select
-                    className="form-control !w-[150px]"
-                    onChange={(e) => {
-                        setSort(e.target.value);
-                    }}
-                >
-                    <option value={"totalRevenue"}>Doanh thu</option>
-                    <option value={"totalQuantity"}>Số lượng bán</option>
-                    <option value={"orderDetailLength"}>Số lượng đơn</option>
-                </select>
-            </div>
-            <div className="card__body min-h-[450px]">
-                <table className="table table-striped table-bordered table-hover">
-                    <thead className="thead-dark">
-                        <tr>
-                            <th
-                                scope="col"
-                                className="text-center align-middle"
-                            >
-                                Mã sản phẩm
-                            </th>
-                            <th
-                                scope="col"
-                                className="text-center align-middle"
-                            >
-                                Tên sản phẩm
-                            </th>
-                            <th
-                                scope="col"
-                                className="text-center align-middle"
-                            >
-                                Số lượng bán
-                            </th>
-                            <th
-                                scope="col"
-                                className="text-center align-middle"
-                            >
-                                Số lượng đơn
-                            </th>
-                            <th
-                                scope="col"
-                                className="text-center align-middle"
-                            >
-                                Doanh thu
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {product?.map((item, index) => (
-                            <tr key={item._id}>
-                                <td
-                                    className="text-center align-middle font-medium"
-                                    scope="row"
+                <div className="flex items-center justify-end gap-3 !mt-0">
+                    <select
+                        className="form-control !w-[150px]"
+                        onChange={(e) => {
+                            setSort(e.target.value);
+                        }}
+                    >
+                        <option value={"totalRevenue"}>Doanh thu</option>
+                        <option value={"totalQuantity"}>Số lượng bán</option>
+                        <option value={"orderDetailLength"}>
+                            Số lượng đơn
+                        </option>
+                    </select>
+                </div>
+                <div className="card__body min-h-[450px] mt-4">
+                    <table className="table table-striped table-bordered table-hover">
+                        <thead className="thead-dark">
+                            <tr>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
                                 >
-                                    <NavLink
-                                        to={`/admin/order-product/${item._id}`}
-                                        exact
-                                    >
-                                        {item.productInfo.code}
-                                    </NavLink>
-                                </td>
-                                <td className="text-center align-middle font-medium">
-                                    {item.productInfo.name}
-                                </td>
-                                <td className="text-center align-middle font-medium">
-                                    {item.totalQuantity ?? 0}
-                                </td>
-                                <td className="text-center align-middle font-medium">
-                                    {item?.orderDetailIds?.length ?? 0}
-                                </td>
-                                <td className="text-center align-middle font-medium">
-                                    {item.totalRevenue.toLocaleString() ?? 0}{" "}
-                                    VNĐ
-                                </td>
+                                    Mã sản phẩm
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Tên sản phẩm
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Số lượng bán
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Số lượng đơn
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="text-center align-middle"
+                                >
+                                    Doanh thu
+                                </th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {product?.map((item, index) => (
+                                <tr key={item._id}>
+                                    <td
+                                        className="text-center align-middle font-medium"
+                                        scope="row"
+                                    >
+                                        <NavLink
+                                            to={`/admin/order-product/${item._id}`}
+                                            exact
+                                        >
+                                            {item.productInfo.code}
+                                        </NavLink>
+                                    </td>
+                                    <td className="text-center align-middle font-medium">
+                                        {item.productInfo.name}
+                                    </td>
+                                    <td className="text-center align-middle font-medium">
+                                        {item.totalQuantity ?? 0}
+                                    </td>
+                                    <td className="text-center align-middle font-medium">
+                                        {item?.orderDetailIds?.length ?? 0}
+                                    </td>
+                                    <td className="text-center align-middle font-medium">
+                                        {item.totalRevenue.toLocaleString(
+                                            "vi-VN"
+                                        ) ?? 0}{" "}
+                                        VNĐ
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <nav
                 aria-label="Page navigation"

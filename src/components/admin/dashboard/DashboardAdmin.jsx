@@ -6,7 +6,7 @@ import { countAccount } from "../../../api/AccountApi";
 import {
     amountYear,
     countOrder,
-    countOrderByName,
+    countOrderByCategoryName,
     reportAmountYear,
     reportByProduct,
 } from "../../../api/OrderApi";
@@ -41,107 +41,12 @@ const Dashboard = () => {
 
     const history = useHistory();
 
+    const [stateTotalYear, setStateTotalYear] = useState({
+        series: {},
+        options: {},
+    });
+
     useEffect(() => {
-        // Đơn hàng theo danh mục
-        countOrderByName()
-            .then((resp) => {
-                const categoryName = resp.data.content.map(
-                    (item) => item.categoryName
-                );
-                setChartDonutOption({
-                    labels: categoryName,
-                });
-
-                // setChartDonutOption({
-                //     annotations: {
-                //         points: [
-                //             {
-                //                 x: "Bananas",
-                //                 seriesIndex: 0,
-                //                 label: {
-                //                     borderColor: "#775DD0",
-                //                     offsetY: 0,
-                //                     style: {
-                //                         color: "#fff",
-                //                         background: "#775DD0",
-                //                     },
-                //                     text: "Bananas are good",
-                //                 },
-                //             },
-                //         ],
-                //     },
-                //     chart: {
-                //         height: 350,
-                //         type: "bar",
-                //     },
-                //     plotOptions: {
-                //         bar: {
-                //             borderRadius: 10,
-                //             columnWidth: "50%",
-                //         },
-                //     },
-                //     dataLabels: {
-                //         enabled: false,
-                //     },
-                //     stroke: {
-                //         width: 0,
-                //     },
-                //     grid: {
-                //         row: {
-                //             colors: ["#fff", "#f2f2f2"],
-                //         },
-                //     },
-                //     xaxis: {
-                //         labels: {
-                //             rotate: -45,
-                //         },
-                //         categories: [
-                //             "Apples",
-                //             "Oranges",
-                //             "Strawberries",
-                //             "Pineapples",
-                //             "Mangoes",
-                //             "Bananas",
-                //             "Blackberries",
-                //             "Pears",
-                //             "Watermelons",
-                //             "Cherries",
-                //             "Pomegranates",
-                //             "Tangerines",
-                //             "Papayas",
-                //         ],
-                //         tickPlacement: "on",
-                //     },
-                //     yaxis: {
-                //         title: {
-                //             text: "Servings",
-                //         },
-                //     },
-                //     fill: {
-                //         type: "gradient",
-                //         gradient: {
-                //             shade: "light",
-                //             type: "horizontal",
-                //             shadeIntensity: 0.25,
-                //             gradientToColors: undefined,
-                //             inverseColors: true,
-                //             opacityFrom: 0.85,
-                //             opacityTo: 0.85,
-                //             stops: [50, 0, 100],
-                //         },
-                //     },
-                // });
-                const total = resp.data.content.map(
-                    (item) => item.totalRevenue
-                );
-
-                setSeriesChartDonut(total);
-                // setSeriesChartDonut({
-                //     name: "Servings",
-                //     data: [44, 55, 41, 67, 22, 43, 21, 33, 45, 31, 87, 65, 35],
-                // });
-            })
-            .catch((error) => toast.error(error.message));
         // Doanh thu theo sản phẩm
         reportByProduct(0, 10, "totalRevenue")
             .then((resp) => {
@@ -191,33 +96,121 @@ const Dashboard = () => {
         reportAmountYear()
             .then((resp) => {
                 const years = resp.data.data.map((item) => item.year);
-                const revenues = resp.data.data.map((item) => item.totalAmount);
+                const realizedRevenue = resp.data.data.map(
+                    (item) => item.realizedRevenue
+                );
+                const unearnedRevenue = resp.data.data.map(
+                    (item) => item.unearnedRevenue
+                );
+                const unsuccessfulRevenue = resp.data.data.map(
+                    (item) => item.unsuccessfulRevenue
+                );
 
-                setYearChartOptions({
-                    chart: {
-                        type: "line",
-                    },
-                    xaxis: {
-                        categories: years,
-                    },
-                    title: {
-                        text: "Doanh thu theo năm",
-                        align: "center",
+                setStateTotalYear({
+                    series: [
+                        {
+                            name: "Doanh thu thực thu",
+                            data: realizedRevenue,
+                        },
+                        {
+                            name: "Doanh thu chưa thực hiện",
+                            data: unearnedRevenue,
+                        },
+                        {
+                            name: "Doanh thu không thành công",
+                            data: unsuccessfulRevenue,
+                        },
+                    ],
+                    options: {
+                        chart: {
+                            type: "bar",
+                            height: 400,
+                            stacked: true,
+                            toolbar: {
+                                show: true,
+                                tools: {
+                                    download: true,
+                                    selection: false,
+                                    zoom: true,
+                                    zoomin: true,
+                                    zoomout: true,
+                                    pan: true,
+                                    reset: true,
+                                },
+                            },
+                            zoom: {
+                                enabled: true,
+                            },
+                        },
+                        responsive: [
+                            {
+                                breakpoint: 480,
+                                options: {
+                                    legend: {
+                                        position: "bottom",
+                                        offsetX: -10,
+                                        offsetY: 0,
+                                    },
+                                },
+                            },
+                        ],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function (val) {
+                                return val.toLocaleString("vi-VN") + " VNĐ";
+                            },
+                            style: {
+                                fontSize: "12px",
+                                colors: ["#000"],
+                            },
+                        },
+                        plotOptions: {
+                            bar: {
+                                horizontal: false,
+                                borderRadius: 5,
+                                borderRadiusApplication: "end",
+                                borderRadiusWhenStacked: "last",
+                                dataLabels: {
+                                    total: {
+                                        enabled: true,
+                                        style: {
+                                            fontSize: "13px",
+                                            fontWeight: 800,
+                                        },
+                                        formatter: function (val) {
+                                            return (
+                                                val.toLocaleString("vi-VN") +
+                                                " VNĐ"
+                                            );
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        xaxis: {
+                            type: "number",
+                            categories: years,
+                        },
+                        yaxis: {
+                            labels: {
+                                formatter: function (val) {
+                                    return val.toLocaleString("vi-VN") + " VNĐ";
+                                },
+                            },
+                        },
+                        legend: {
+                            position: "bottom",
+                            offsetY: 40,
+                        },
+                        fill: {
+                            opacity: 1,
+                        },
+                        title: {
+                            text: "Thống kê đơn hàng",
+                            align: "center",
+                        },
                     },
                 });
-
-                setYearChartSeries([
-                    {
-                        name: "Doanh thu",
-                        data: revenues,
-                    },
-                ]);
-
-                const totalRevenue = resp.data.data.reduce(
-                    (sum, item) => sum + item.totalAmount,
-                    0
-                );
-                setTotal(totalRevenue);
             })
             .catch((error) => console.log(error));
 
@@ -236,7 +229,24 @@ const Dashboard = () => {
             setInitialRevenue(initial);
             setTotal(actual + initial);
         });
-        // .catch((error) => toast.error(error.message));
+
+        // Đơn hàng theo danh mục
+        countOrderByCategoryName()
+            .then((resp) => {
+                const categoryName = resp.data.content.map(
+                    (item) => item.categoryName
+                );
+                setChartDonutOption({
+                    labels: categoryName,
+                });
+
+                const total = resp.data.content.map(
+                    (item) => item.totalRevenue
+                );
+
+                setSeriesChartDonut(total);
+            })
+            .catch((error) => toast.error(error.message));
 
         // Số lượng tài khoản
         countAccount()
@@ -268,15 +278,14 @@ const Dashboard = () => {
                             <div>
                                 <StatusCard
                                     icon={statusCards[2].icon}
-                                    count={`${
-                                        total && (total ?? 0).toLocaleString()
-                                    } VNĐ`}
+                                    count={`${(total ?? 0).toLocaleString(
+                                        "vi-VN"
+                                    )} VNĐ`}
                                     title={`Tổng doanh thu: `}
                                     onClick={() => {
                                         togglePopoverTotal();
                                     }}
                                     onBlur={() => {
-                                        console.log("xxxxxxxxxxxxxxxxx");
                                         setIsOpenTotal(false);
                                     }}
                                 />
@@ -302,19 +311,25 @@ const Dashboard = () => {
                                         onClick={() => {}}
                                     >
                                         <div className="flex justify-between gap-4 font-medium mt-2 hover:text-gray-400 active:text-gray-700">
-                                            <span>Doanh thu khởi tạo :</span>
+                                            <span>
+                                                Doanh thu chưa thực hiện :
+                                            </span>
                                             <div className="flex gap-2">
                                                 <span>
-                                                    {initialRevenue.toLocaleString()}
+                                                    {initialRevenue.toLocaleString(
+                                                        "vi-VN"
+                                                    )}
                                                 </span>
                                                 <span>VNĐ</span>
                                             </div>
                                         </div>
                                         <div className="flex justify-between gap-4 font-medium mt-2 hover:text-gray-400 active:text-gray-700">
-                                            <span>Doanh thu thực tế :</span>
+                                            <span>Doanh thu thực thu :</span>
                                             <div className="flex gap-2">
                                                 <span>
-                                                    {actualRevenue.toLocaleString()}
+                                                    {actualRevenue.toLocaleString(
+                                                        "vi-VN"
+                                                    )}
                                                 </span>
                                                 <span>VNĐ</span>
                                             </div>
@@ -402,7 +417,7 @@ const Dashboard = () => {
 
                     {/* Doanh thu theo sản phẩm */}
                     <div className="card flex-col justify-between full-height overflow-hidden">
-                        <Chart
+                        <ReactApexChart
                             options={productChartOptions}
                             series={productChartSeries}
                             type="line"
@@ -415,13 +430,15 @@ const Dashboard = () => {
                             Xem chi tiết
                         </Link>
                     </div>
+                    {/* Doanh thu theo năm */}
                     <div className="card flex-col justify-between full-height overflow-hidden">
-                        <Chart
-                            options={yearChartOptions}
-                            series={yearChartSeries}
-                            type="area"
-                            height="400"
+                        <ReactApexChart
+                            options={stateTotalYear?.options}
+                            series={stateTotalYear?.series}
+                            type="bar"
+                            height={400}
                         />
+
                         <div className="mt-3">
                             <label htmlFor="year-select">Chọn năm:</label>
                             <select
@@ -445,11 +462,11 @@ const Dashboard = () => {
 
                     {/* Biểu đồ Donut: Đơn hàng theo danh mục */}
                     <div className="card full-height overflow-hidden">
-                        <Chart
+                        <ReactApexChart
                             options={chartDonutOption}
                             series={seriesChartDonut}
                             type="donut"
-                            height={"400"}
+                            height={400}
                         />
                     </div>
                 </div>
